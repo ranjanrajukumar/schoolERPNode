@@ -3,6 +3,8 @@ import { badgeFor, dateTime } from './format';
 
 const dot = (...xs) => xs.filter((x) => x !== null && x !== undefined && x !== '').join(' · ');
 const kid = (c, tail) => `/portal/children/${c?.id}${tail}`;
+// "pending" is what the server sends until the teacher marks the work, so it shows as nothing (or Overdue once the date has passed)
+const SUBMISSION_BADGE = { submitted: { text: 'Submitted', tone: 'green' }, late: { text: 'Late', tone: 'amber' }, missing: { text: 'Missing', tone: 'red' } };
 const DAY = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
 const cap = (s) => String(s ?? '').replace(/^./, (c) => c.toUpperCase());
 
@@ -17,7 +19,7 @@ export const FAMILY_MODULES = [
     screens: [
       { key: 'timetable', title: 'Timetable', scope: 'child', kind: 'custom', route: 'Timetable' },
       { key: 'calendar', title: 'Calendar', kind: 'list', path: '/portal/calendar', row: (r) => ({ title: r.title, sub: dot(r.type, niceDate(r.startDate), r.endDate && r.endDate !== r.startDate ? `to ${niceDate(r.endDate)}` : null) }) },
-      { key: 'homework', title: 'Homework', scope: 'child', kind: 'list', path: (c) => kid(c, '/homework'), row: (r) => ({ title: r.title, sub: dot(r.subjectName, `due ${niceDate(r.dueDate)}`), badge: r.submission ? { text: 'Submitted', tone: 'green' } : r.overdue ? { text: 'Overdue', tone: 'red' } : null }), empty: 'No homework right now.' },
+      { key: 'homework', title: 'Homework', scope: 'child', kind: 'list', path: (c) => kid(c, '/homework'), row: (r) => ({ title: r.title, sub: dot(r.subjectName, `due ${niceDate(r.dueDate)}`), badge: SUBMISSION_BADGE[r.submission?.status] ?? (r.overdue ? { text: 'Overdue', tone: 'red' } : null) }), empty: 'No homework right now.' },
       { key: 'materials', title: 'Learning materials', scope: 'child', kind: 'list', path: (c) => kid(c, '/materials'), row: (r) => ({ title: r.title, sub: dot(r.subjectName, r.createdByName) }), actions: [{ kind: 'link', label: 'Open material', url: (r) => r.url, when: (r) => Boolean(r.url) }], empty: 'No materials shared yet.' },
       { key: 'online', title: 'Online classes', scope: 'child', kind: 'list', path: (c) => kid(c, '/online-classes'), row: (r) => ({ title: r.title, sub: dot(r.subjectName, niceDate(r.classDate), `${r.startTime ?? ''}${r.endTime ? `–${r.endTime}` : ''}`), badge: r.today ? { text: 'Today', tone: 'green' } : null }), actions: [{ kind: 'link', label: 'Join class', url: (r) => r.link, when: (r) => Boolean(r.link) }], empty: 'No live classes scheduled.' },
       { key: 'attendance', title: 'Attendance', scope: 'child', kind: 'custom', route: 'Attendance' },
