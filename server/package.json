@@ -1,0 +1,35 @@
+{
+  "name": "schoolerp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch-path=./src src/index.js",
+    "start": "node src/index.js",
+    "db:migrate": "node src/sync.js",
+    "migrate": "node src/sync.js",
+    "test": "node --test test/smoke.test.mjs test/integrity.test.mjs test/access.test.mjs",
+    "db:orphans": "node src/integrity.js",
+    "seed:demo": "node scripts/seed-demo.mjs",
+    "seed:demo:remove": "node scripts/seed-demo.mjs --remove",
+    "check:flow": "node scripts/check-flow.mjs",
+    "check:pages": "node scripts/check-pages.mjs",
+    "test:ui": "node --test test/ui.test.mjs",
+    "run:process": "node scripts/run-process.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0",
+    "nodemailer": "^10.1.1",
+    "sequelize": "^6.37.8",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.16.0"
+  }
+}

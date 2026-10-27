@@ -1,0 +1,931 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>School ERP: Staff Training Manual</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root { --ink:#1b2437; --muted:#5b6578; --line:#dfe4ee; --blue:#2f5fd0; --blue-soft:#eaf0ff; --green:#1b7f4f; --green-soft:#e6f5ec; --amber:#8a5a00; --amber-soft:#fff3d6; --red:#b3261e; --red-soft:#fdeceb; }
+  * { box-sizing: border-box; }
+  body { font-family: "DM Sans", "Segoe UI", Arial, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1, h2, h3, h4 { line-height: 1.25; margin: 0; }
+  p { margin: 0 0 8px; }
+  .cover { height: 255mm; display: flex; flex-direction: column; justify-content: center; page-break-after: always; border-left: 8px solid var(--blue); padding-left: 22px; }
+  .cover small { text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 700; }
+  .cover h1 { font-size: 34pt; margin: 8px 0 10px; }
+  .cover p { font-size: 13pt; color: var(--muted); max-width: 135mm; }
+  .cover .meta { margin-top: 36px; font-size: 10pt; color: var(--muted); }
+  .part { page-break-before: always; }
+  .part-head { border-bottom: 3px solid var(--blue); padding-bottom: 8px; margin-bottom: 14px; }
+  .part-head small { color: var(--blue); font-weight: 700; text-transform: uppercase; letter-spacing: .1em; font-size: 8.5pt; }
+  .part-head h2 { font-size: 21pt; }
+  h3 { font-size: 13.5pt; margin: 18px 0 6px; color: var(--blue); }
+  h4 { font-size: 10.5pt; margin: 12px 0 4px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0 10px; }
+  .facts div { background: #f6f8fc; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: 9.5pt; }
+  .facts b { display: block; font-size: 8pt; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 6px 0 10px; }
+  ol.steps > li { counter-increment: s; position: relative; padding: 4px 0 4px 34px; page-break-inside: avoid; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; font-size: 9.5pt; text-align: center; line-height: 22px; }
+  ol.steps ul { margin: 3px 0 0; padding-left: 18px; color: #2f394d; }
+  ul { margin: 4px 0 8px; padding-left: 20px; }
+  li { margin: 2px 0; }
+  .box { border-radius: 8px; padding: 8px 12px; margin: 8px 0; page-break-inside: avoid; font-size: 10pt; }
+  .tip { background: var(--blue-soft); border-left: 4px solid var(--blue); }
+  .ok { background: var(--green-soft); border-left: 4px solid var(--green); }
+  .warn { background: var(--amber-soft); border-left: 4px solid #d99a00; }
+  .stop { background: var(--red-soft); border-left: 4px solid var(--red); }
+  .box b.t { display: block; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 2px; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 9.6pt; page-break-inside: auto; }
+  th { background: #f0f3fa; text-align: left; font-size: 8.6pt; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  th, td { border: 1px solid var(--line); padding: 5px 8px; vertical-align: top; }
+  tr { page-break-inside: avoid; }
+  .flow { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 8px 0 12px; }
+  .flow span { background: var(--blue-soft); border: 1px solid #c8d7fb; border-radius: 999px; padding: 3px 11px; font-size: 9.5pt; font-weight: 600; }
+  .flow i { color: var(--muted); font-style: normal; }
+  .toc td { border: 0; border-bottom: 1px dotted var(--line); padding: 4px 2px; }
+  .toc td:last-child { text-align: right; color: var(--muted); width: 50px; }
+  .ex { border: 2px dashed #b9c6e8; border-radius: 10px; padding: 8px 12px; margin: 12px 0; page-break-inside: avoid; }
+  .ex h4 { margin-top: 0; color: var(--blue); }
+  .check li { list-style: none; position: relative; padding-left: 22px; }
+  .check li::before { content: "\2610"; position: absolute; left: 0; color: var(--blue); }
+  kbd { background: #f0f3fa; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 9pt; }
+  .btn { background: var(--blue); color: #fff; border-radius: 5px; padding: 0 7px; font-size: 9.3pt; font-weight: 600; white-space: nowrap; }
+  .menu { background: #f0f3fa; border: 1px solid var(--line); border-radius: 5px; padding: 0 6px; font-weight: 600; white-space: nowrap; }
+  .small { font-size: 9pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <small>Staff training manual</small>
+  <h1>School ERP</h1>
+  <p>Every school process, step by step: what to open, what to click, what to check, and what to avoid. For administrators, teachers and accountants, and for the trainer running the sessions.</p>
+  <div class="meta">
+    Covers: setup, admissions, students, attendance, exams, fees, staff and payroll, library, transport, hostel, inventory, certificates, the parent and student portal, messaging and year end.<br>
+    Use it with the demo data (<code>npm run seed:demo</code>) so nobody practises on real records.
+  </div>
+</section>
+
+<section>
+  <div class="part-head" style="margin-top:0"><small>Start here</small><h2>Contents</h2></div>
+  <table class="toc">
+    <tr><td>Part 1: How to use this manual, roles, and signing in</td></tr>
+    <tr><td>Part 2: Finding your way: menu, search, popups, and what happens when you delete</td></tr>
+    <tr><td>Part 3: Setting up the school (admin)</td></tr>
+    <tr><td>Part 4: Admissions: enquiry to enrolment</td></tr>
+    <tr><td>Part 5: Students: records, logins, documents</td></tr>
+    <tr><td>Part 6: Academics: subjects, electives and timetable</td></tr>
+    <tr><td>Part 7: Daily teaching: attendance, leave and alerts</td></tr>
+    <tr><td>Part 8: Exams: marks, results and report cards</td></tr>
+    <tr><td>Part 9: Fees and payments (accountant)</td></tr>
+    <tr><td>Part 10: Staff and payroll</td></tr>
+    <tr><td>Part 11: Library</td></tr>
+    <tr><td>Part 12: Transport</td></tr>
+    <tr><td>Part 13: Hostel</td></tr>
+    <tr><td>Part 14: Inventory</td></tr>
+    <tr><td>Part 15: Certificates and ID cards</td></tr>
+    <tr><td>Part 16: Parent and student portal</td></tr>
+    <tr><td>Part 17: Messages, notices and alerts</td></tr>
+    <tr><td>Part 18: Year end: promotion</td></tr>
+    <tr><td>Part 19: Routine, backups and when something looks wrong</td></tr>
+    <tr><td>Part 20: Trainer's plan, exercises and sign-off sheet</td></tr>
+  </table>
+  <p class="small">Each part starts on a new page and is labelled with its part number at the top. The page number is in the footer.</p>
+</section>
+
+<!-- ===================================================== 1 -->
+<section class="part">
+  <div class="part-head"><small>Part 1</small><h2>How to use this manual, roles, and signing in</h2></div>
+
+  <h3>How each process is laid out</h3>
+  <p>Every process has the same parts, so you can find your way quickly:</p>
+  <table>
+    <tr><th style="width:26%">Part</th><th>What it tells you</th></tr>
+    <tr><td><b>Who / Where</b></td><td>Which role does it, and which menu entry opens it.</td></tr>
+    <tr><td><b>Before you start</b></td><td>What must already exist. Most "it will not let me" problems are a missing earlier step.</td></tr>
+    <tr><td><b>Steps</b></td><td>Numbered, in order.</td></tr>
+    <tr><td><b>Check it worked</b></td><td>What you should see afterwards.</td></tr>
+    <tr><td><b>Watch out</b></td><td>The rules the system enforces, so a refusal does not surprise you.</td></tr>
+  </table>
+
+  <h3>The people and what they can do</h3>
+  <table>
+    <tr><th>Role</th><th>Does</th><th>Cannot do</th></tr>
+    <tr><td><b>Administrator</b></td><td>Everything: admissions, students, academics, staff, settings, users, backups.</td><td>Nothing is closed to an admin.</td></tr>
+    <tr><td><b>Teacher</b></td><td>Attendance and marks for their own classes and subjects, homework, library, requesting inventory. Can read most other screens.</td><td>Fees, admissions, staff records, settings.</td></tr>
+    <tr><td><b>Accountant</b></td><td>Fees, fee structure, payments, finance reports, preparing payroll.</td><td>Approving a payroll payment (admin only), admissions.</td></tr>
+    <tr><td><b>Parent</b></td><td>The Parent Portal for their own children: fees, attendance, results, timetable, notices; applies for leave; asks for certificates.</td><td>Any staff screen.</td></tr>
+    <tr><td><b>Student</b></td><td>A read-only portal for their own record; can apply for leave.</td><td>Everything else.</td></tr>
+  </table>
+  <p>The menu only shows what your role may open. If a menu entry is missing, it is not meant for your role. Your administrator can also create custom roles, for example a Librarian who only sees the library.</p>
+
+  <h3>Signing in</h3>
+  <ol class="steps">
+    <li>Open the school's address in a browser (during setup this is <b>http://localhost:5173</b>).</li>
+    <li>Type your email and password and press the sign-in button.</li>
+    <li>If you were given a <b>temporary password</b> (new student accounts and new teacher logins always are), the system asks you to change it first. Nothing else works until you do. Choose at least 8 characters, different from the temporary one.</li>
+    <li>To leave, use <b>Logout</b> at the bottom of the left menu. Do this on shared computers.</li>
+  </ol>
+  <div class="box warn"><b class="t">Watch out</b>Too many wrong passwords locks sign-in for that email for 15 minutes. Do not keep trying; ask the administrator to reset the password.</div>
+  <div class="box stop"><b class="t">Before going live (administrator)</b>Change the starting admin password (<code>admin123</code>) and the secret key in the server settings. Anyone who has seen the example file knows them.</div>
+</section>
+
+<!-- ===================================================== 2 -->
+<section class="part">
+  <div class="part-head"><small>Part 2</small><h2>Finding your way</h2></div>
+
+  <h3>The screen</h3>
+  <ul>
+    <li><b>Left menu:</b> one group per area (Admissions, Students, Academics, Fees &amp; Finance and so on). Click a group to open its pages.</li>
+    <li><b>Top bar:</b> a search box, a theme button (light, dark or follow your device), and your name with Logout.</li>
+    <li><b>Page header:</b> the page title and the main action on the right, for example <span class="btn">+ New enquiry</span>.</li>
+    <li><b>Summary tiles</b> under the header count what is on the page. They are a quick health check: if a tile looks wrong, something needs attention.</li>
+    <li><b>Tabs</b> (All, New, Follow-up, Converted and so on) show a slice of the list, each with a count.</li>
+    <li><b>Search and filters</b> narrow the table. Type a name, a phone number or an ID. Every word you type must match.</li>
+  </ul>
+
+  <h3>Handy shortcuts</h3>
+  <table>
+    <tr><td><kbd>Ctrl</kbd> + <kbd>K</kbd></td><td>Jump to any page you may open, find a student by name, switch theme, or sign out.</td></tr>
+    <tr><td>Type-ahead boxes</td><td>Wherever a form needs one student or one staff member you get a search box, not a long list. Type part of the name, admission number or phone and pick from the results.</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Closes a popup. If you typed something, the system asks before throwing it away.</td></tr>
+  </table>
+
+  <h3>Popups and forms</h3>
+  <p>Most "add" and "edit" forms open as a popup over the list. Fields marked <b>*</b> are required. A red message at the top of the popup tells you what to fix. Clicking the dim background does not close a popup, so you cannot lose work by accident.</p>
+
+  <h3>What happens when you delete</h3>
+  <div class="box tip"><b class="t">Soft delete</b>Nothing important disappears at once. A deleted record is hidden and remembered, with who deleted it and when. Enquiries even have a <b>Deleted</b> tab where you can <b>Restore</b> them. Only an already-deleted enquiry can be removed permanently.</div>
+  <ul>
+    <li>A student with a certificate request cannot be deleted. Mark the student <b>inactive</b> instead.</li>
+    <li>Staff with payslips, reviews or documents cannot be deleted. Mark them inactive.</li>
+    <li>A fee that has any payment cannot be deleted. Use a discount or fine to change what is owed.</li>
+    <li>An issued certificate can never be deleted; it is part of the register.</li>
+  </ul>
+
+  <h3>Everything is recorded</h3>
+  <p>Every create, change and delete is written to the <b>Audit log</b> with the person and time. Saved attendance that is corrected keeps the old value, the new value and the reason. Work as if your name is on every change, because it is.</p>
+</section>
+
+<!-- ===================================================== 3 -->
+<section class="part">
+  <div class="part-head"><small>Part 3 &middot; Administrator</small><h2>Setting up the school</h2></div>
+  <p>Do these once, in this order. Later processes read what earlier ones create: you cannot enrol a student into a class that does not exist, or bill a fee that has no structure.</p>
+  <div class="flow"><span>School profile</span><i>&rarr;</i><span>Academic year</span><i>&rarr;</i><span>Master data</span><i>&rarr;</i><span>Classes</span><i>&rarr;</i><span>Subjects &amp; map</span><i>&rarr;</i><span>Staff</span><i>&rarr;</i><span>Fee structure</span><i>&rarr;</i><span>Timetable</span><i>&rarr;</i><span>Users</span></div>
+
+  <div class="facts"><div><b>Who</b>Administrator</div><div><b>Where</b>Settings, Academics, Staff &amp; HR, Fees &amp; Finance, User Management</div><div><b>Time</b>About 4 to 6 weeks for a whole school</div></div>
+
+  <h3>3.1 School profile</h3>
+  <ol class="steps">
+    <li>Open <span class="menu">Settings</span> &rarr; <span class="menu">School Profile</span>.</li>
+    <li>Edit the name, code, board, contact details, principal and motto. Upload the logo as a PNG or JPEG up to 1 MB.</li>
+    <li>Set the <b>current academic year</b> here or under Academic Years. Save.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The school name and logo now appear on the sign-in page, in the header, and on every printout (receipts, report cards, ID cards, certificates).</div>
+
+  <h3>3.2 Academic year and campus</h3>
+  <ol class="steps">
+    <li><span class="menu">Academics</span> &rarr; <span class="menu">Academic Years</span>: add the year (for example 2026-2027) and make it current.</li>
+    <li><span class="menu">Settings</span> &rarr; <span class="menu">Branches</span>: the first campus is the main one. Add more only if the school has more.</li>
+  </ol>
+
+  <h3>3.3 Master data (the dropdown lists)</h3>
+  <ol class="steps">
+    <li>Open <span class="menu">Settings</span> &rarr; <span class="menu">Master Data</span>.</li>
+    <li>Review religion, category, nationality, mother tongue, state, relation, occupation, qualification and marital status. Rename, hide or reorder as the school needs.</li>
+    <li>Open the three <b>document lists</b> (Application documents, Student documents, Staff documents). Tick <b>Required</b> on each document the school insists on, for example birth certificate and address proof.</li>
+  </ol>
+  <div class="box warn"><b class="t">Watch out</b>An application cannot be submitted until every <b>required application document</b> is uploaded. Decide these carefully before admissions open.</div>
+
+  <h3>3.4 Classes and sections</h3>
+  <ol class="steps">
+    <li><span class="menu">Academics</span> &rarr; <span class="menu">Classes &amp; Sections</span> &rarr; add a class with its name (for example Grade 5) and section (A).</li>
+    <li>Add the room and, when staff exist, the class teacher.</li>
+  </ol>
+  <p>Name plus section must be unique. "Grade 5 A" cannot be created twice.</p>
+
+  <h3>3.5 Subjects and the subject map</h3>
+  <ol class="steps">
+    <li><span class="menu">Academics</span> &rarr; <span class="menu">Subjects</span>: add each subject once.</li>
+    <li><span class="menu">Academics</span> &rarr; <span class="menu">Subject Map</span> (or <span class="menu">Class Map</span>): for each class add its subjects.
+      <ul><li><b>Core</b> subjects are taken by everyone; <b>elective</b> subjects belong to a group (for example "Second language") and each student takes one.</li>
+      <li>Choose <b>theory</b>, <b>practical</b> or <b>both</b>. For both, set the practical share (30% of 100 marks means 70 theory plus 30 practical).</li>
+      <li>Set periods a week and the teacher.</li></ul></li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The <b>Class map</b> page shows one class at a glance: teacher, subjects, fees, activities, transport and hostel. The <b>Setup guide</b> in Help ticks each step from real data and shows what a class still lacks.</div>
+
+  <h3>3.6 Staff and teacher logins</h3>
+  <ol class="steps">
+    <li><span class="menu">Staff &amp; HR</span> &rarr; <span class="menu">Departments</span> and <span class="menu">Designations</span>: add the lists first.</li>
+    <li><span class="menu">Staff Directory</span> &rarr; register each staff member (see Part 10).</li>
+    <li><span class="menu">User Management</span> &rarr; <span class="menu">Users</span>: create a login for each teacher. <b>The login email must be exactly the same as the email on the staff profile.</b> That is how the system knows which classes and subjects belong to the teacher.</li>
+    <li>On <span class="menu">Classes</span>, pick the staff member as <b>class teacher</b>. The teacher then gets a <b>My Class</b> page.</li>
+  </ol>
+
+  <h3>3.7 Fee structure</h3>
+  <ol class="steps">
+    <li><span class="menu">Fees &amp; Finance</span> &rarr; <span class="menu">Fee Types</span>: tuition, transport, lab and so on.</li>
+    <li><span class="menu">Fee Structure</span>: for each class add its fee items with amount and due date.</li>
+    <li>Optional: <span class="menu">Fee Groups</span> are reusable bundles (for example "Uniform pack") that a family can choose at admission.</li>
+    <li><span class="menu">Settings</span> &rarr; <b>Payments</b>: receipt number prefix, which payment methods are accepted, whether part payments are allowed.</li>
+  </ol>
+
+  <h3>3.8 Timetable</h3>
+  <ol class="steps">
+    <li><span class="menu">Academics</span> &rarr; <span class="menu">Class Timetable</span>: choose a class and place subjects into days and periods with teacher and room.</li>
+  </ol>
+  <p>A room cannot serve two classes at the same time, and one-off room bookings cannot clash with lessons. Completion is measured against the periods the subject map asks for.</p>
+
+  <h3>3.9 Loading many records from a spreadsheet</h3>
+  <ol class="steps">
+    <li><span class="menu">Settings</span> &rarr; <span class="menu">Data Import / Export</span>.</li>
+    <li>Pick what you are loading. The order that works is: classes, subjects, departments, designations, staff, curriculum, fee types, fee structure, books, students.</li>
+    <li>Download the <b>template</b>, fill it in (the example row shows the format), and upload it.</li>
+    <li>First the system <b>checks every row</b> and lists every problem in plain words. Fix the file and upload again. Only a file with no problems is imported, all in one go.</li>
+  </ol>
+  <div class="box tip"><b class="t">Safe to repeat</b>Rows already in the system are reported as "already there" and skipped, so you can re-upload a corrected file without creating duplicates. Logins, parent accounts and the timetable are not imported on purpose: they involve passwords and decisions.</div>
+</section>
+
+<!-- ===================================================== 4 -->
+<section class="part">
+  <div class="part-head"><small>Part 4 &middot; Admissions officer (administrator)</small><h2>Admissions: enquiry to enrolment</h2></div>
+  <div class="flow"><span>Enquiry</span><i>&rarr;</i><span>Application</span><i>&rarr;</i><span>Under review</span><i>&rarr;</i><span>Assessment</span><i>&rarr;</i><span>Offer</span><i>&rarr;</i><span>Enrol</span><i>&rarr;</i><span>Student</span></div>
+  <p>One admissions record follows the family the whole way. Nothing is typed twice, and everything collected moves to the student when you enrol.</p>
+  <div class="facts"><div><b>Who</b>Administrator</div><div><b>Where</b>Admissions group in the menu</div><div><b>Before you start</b>Classes, academic year, required documents, fee structure</div></div>
+
+  <h3>4.1 Record an enquiry</h3>
+  <ol class="steps">
+    <li><span class="menu">Admissions</span> &rarr; <span class="menu">Admission Enquiries</span> &rarr; <span class="btn">+ New enquiry</span>.</li>
+    <li>Fill the four sections: <b>student</b>, <b>parent</b>, <b>enquiry details</b> (grade applying for, and where the enquiry came from: website, walk-in, phone, referral, social media or other) and <b>follow-up plan</b>.</li>
+    <li>Save. The enquiry gets a number like <b>ENQ-2026-0012</b>.</li>
+  </ol>
+  <p>Enquiries from the school website's <b>/apply</b> form arrive here automatically, marked as online.</p>
+
+  <h3>4.2 Follow up</h3>
+  <ol class="steps">
+    <li>Open the row's menu and choose to <b>plan a follow-up or visit</b>. Pick the date, the way you will contact them and a note.</li>
+    <li>When the date arrives, the enquiry moves to the <b>Follow-up</b> tab and the "Needs follow-up" tile counts it.</li>
+    <li>After you call, record the outcome. A campus visit date shows in the "Visits scheduled" tile.</li>
+  </ol>
+
+  <h3>4.3 Start the application</h3>
+  <ol class="steps">
+    <li>On the enquiry row click <span class="btn">Apply</span>, or open <span class="menu">Admissions</span> &rarr; <span class="menu">Admission</span> &rarr; New admission.</li>
+    <li><b>Step 1, Student:</b> first and last name, date of birth, grade applying for, academic year, personal details. Click <span class="btn">Continue to guardians</span>. The draft is saved and gets its own address, so you can leave and come back.</li>
+    <li><b>Step 2, Guardians:</b> primary guardian, relationship, phone number, address, and contact and local guardian details. If a brother or sister already studies here, click <span class="btn">+ Add a sibling</span> and fill the relation, admission number or employee code, name and class. You can add up to 10. Click <span class="btn">Continue to schooling</span>.</li>
+    <li><b>Step 3, Schooling:</b> previous school, qualifications, then what the family wants: an <b>elective</b> from each group, <b>activities</b>, a <b>bus route and stop</b> (always both), a <b>hostel</b> bed, a <b>fee group</b>. Upload the <b>required documents</b> in the checklist: each slot has Upload, Replace and Remove, and "needed" ones are marked until uploaded. Click <span class="btn">Continue to review</span>.</li>
+    <li><b>Step 4, Review:</b> read the summary, tick the <b>consent</b> box and click <span class="btn">Submit application</span>. The button stays disabled until consent is ticked.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The application appears under <b>Admission</b> with the stage <b>Under review</b>, and the enquiry shows as <b>Applied</b>.</div>
+  <div class="box warn"><b class="t">Watch out</b>
+    <ul style="margin:0"><li>Submit fails if a required detail, a required document or the consent is missing. The message names what is missing.</li>
+    <li>You cannot move an enquiry to "applied" any other way. The application form is where the required details are collected.</li>
+    <li>Documents must be PDF, JPG, PNG or WebP, up to 5 MB each, at most 10 per application. The system looks inside the file; renaming a file does not fool it.</li>
+    <li>An elective must belong to the grade chosen, one per group. A route needs a stop.</li></ul></div>
+
+  <h3>4.4 Test, interview and offer</h3>
+  <ol class="steps">
+    <li><span class="menu">Entrance Tests</span>: schedule a test date for a submitted application; after the date, enter the marks (maximum marks must be above zero).</li>
+    <li><span class="menu">Interview Schedule</span>: set date, time and panel (all three are required); after the interview, record the result.</li>
+    <li>Decide: <b>Approve</b> (needs the class applied for), <b>Waitlist</b>, or <b>Reject</b> (the applicant can be reopened later as an enquiry). The <span class="menu">Waiting List</span> entry shows waitlisted applicants.</li>
+    <li>An approved applicant has an <b>offer</b> with a confirm-by date (14 days by default). <span class="menu">Admission Offers</span> lists them; after the date the offer shows as expired.</li>
+  </ol>
+  <div class="box warn"><b class="t">Watch out</b>A test or interview can only be scheduled for a <b>submitted</b> application. Marks and results cannot be entered for a date that is still in the future.</div>
+
+  <h3>4.5 Enrol</h3>
+  <ol class="steps">
+    <li>On the approved applicant's row click <span class="btn">Enroll</span>. The button changes to <b>"Sure? Click again to enroll"</b>. Click it a second time.</li>
+    <li>A green message appears: <b>Enrolled as ADM-2026-xxxx; N fee item(s) billed</b>, together with the student's <b>login username and starting password</b>.</li>
+    <li><b>Write the password down now.</b> It is shown only once. Hand it to the family; the student must change it at first sign-in.</li>
+    <li>If the family asked for a hostel bed, the message says what is left to do: the hostel desk must choose a room (Part 13).</li>
+  </ol>
+  <h4>What enrolment did for you, in one step</h4>
+  <table>
+    <tr><td>Student record</td><td>Created in the class applied for, with a generated admission number and every detail from the enquiry and application, including siblings.</td></tr>
+    <tr><td>Login</td><td>A student login with a starting password.</td></tr>
+    <tr><td>Fees</td><td>Every fee item in that class's structure billed, once. Fee group items chosen by the family are billed alongside.</td></tr>
+    <tr><td>Documents and photo</td><td>The application's documents become the student's documents (same names); the photo becomes the student's photo.</td></tr>
+    <tr><td>Choices</td><td>Elective subjects, activity registrations and the bus assignment are created.</td></tr>
+  </table>
+  <div class="box ok"><b class="t">Check it worked</b>Open <span class="menu">Students</span> &rarr; <span class="menu">Enrolled Students</span>, find the child, open the details popup: subjects, bus, activities, documents and the sibling details are all there.</div>
+  <div class="box stop"><b class="t">Undoing a mistake</b>If you enrolled the wrong person, delete the <b>student</b>. The applicant goes back to holding an offer, so nothing points at a student that no longer exists. A student with certificate requests cannot be deleted; mark them inactive.</div>
+</section>
+
+<!-- ===================================================== 5 -->
+<section class="part">
+  <div class="part-head"><small>Part 5 &middot; Administrator</small><h2>Students: records, logins, documents</h2></div>
+  <div class="facts"><div><b>Who</b>Administrator (teachers can read)</div><div><b>Where</b>Students group</div><div><b>Before you start</b>Classes and fee structure</div></div>
+
+  <h3>5.1 Register a student directly (without an application)</h3>
+  <ol class="steps">
+    <li><span class="menu">Students</span> &rarr; <span class="menu">Enrolled Students</span> &rarr; <span class="btn">Register new student</span>.</li>
+    <li>Required: first name, last name and the admission number (leave it blank and one is generated).</li>
+    <li>Choose the class. Tick the option to <b>bill the class fee structure</b> if you want fees raised now.</li>
+    <li>Fill what you know: parents, contact, address, previous school, siblings, remarks. Save.</li>
+  </ol>
+  <div class="box warn"><b class="t">Watch out</b>If a student with the same name and date of birth exists, the system asks you to confirm before creating a duplicate. Look at the existing record first.</div>
+
+  <h3>5.2 Photo and documents</h3>
+  <ol class="steps">
+    <li>Open the student's details popup.</li>
+    <li>Upload the <b>photo</b> (one per student; a new one replaces the old).</li>
+    <li>In the <b>document checklist</b> upload each required document. A badge shows when required documents are missing.</li>
+  </ol>
+  <p>Photos are JPEG, PNG or WebP up to 1 MB. Documents are PDF or images up to 5 MB. Files are stored in the database, so backups contain them.</p>
+
+  <h3>5.3 Create logins</h3>
+  <table>
+    <tr><th>For</th><th>Where</th><th>Notes</th></tr>
+    <tr><td>Student</td><td><span class="menu">Students</span> &rarr; <span class="menu">Student Accounts</span></td><td>One login per student. Stops working when the student is made inactive. The password is temporary.</td></tr>
+    <tr><td>Parent</td><td><span class="menu">Parent Portal</span> &rarr; <span class="menu">Parent Accounts</span>, or <b>Create parent login</b> on the student's profile</td><td>Can be filled from the father, mother or guardian details already on the student and links the child on save. One parent can be linked to several children.</td></tr>
+  </table>
+
+  <h3>5.4 Health, behaviour and clinic</h3>
+  <p><span class="menu">Student Health Records</span> holds blood group, allergies, regular medication and the emergency contact. <span class="menu">Clinic Visits</span> and <span class="menu">Student Behavior</span> record events against a student. Teachers and admins can use these.</p>
+
+  <h3>5.5 Changing a student's class or electives</h3>
+  <ol class="steps">
+    <li>Edit the student and choose the new class, or open the details popup and change an elective directly.</li>
+    <li>The system removes electives that do not belong to the new class.</li>
+  </ol>
+  <h3>5.6 When a student leaves</h3>
+  <ol class="steps">
+    <li>Issue a <b>Transfer Certificate</b> (Part 15).</li>
+    <li>Set the student to <b>inactive</b>. Their login stops, they no longer appear in attendance sheets or ID card runs, and their history stays.</li>
+  </ol>
+  <div class="box stop"><b class="t">Do not delete a student who has history</b>Deleting hides the record. If the student has certificate requests, the system refuses. Inactive is almost always the right answer.</div>
+</section>
+
+<!-- ===================================================== 6 -->
+<section class="part">
+  <div class="part-head"><small>Part 6 &middot; Academic coordinator, teachers</small><h2>Academics: subjects, electives and timetable</h2></div>
+
+  <h3>6.1 Electives: how a student chooses</h3>
+  <ol class="steps">
+    <li>The class's elective subjects sit in <b>groups</b> such as "Second language".</li>
+    <li>A family picks one per group on the application, or the office sets it later in the student's details popup.</li>
+    <li>Exams then expect marks only for the student's own subjects, and ranks are worked out of those.</li>
+  </ol>
+
+  <h3>6.2 Teaching tools</h3>
+  <table>
+    <tr><th>Page</th><th>Use it to</th></tr>
+    <tr><td>Syllabus &amp; Lesson Plans</td><td>Plan topics per class and subject and track their status.</td></tr>
+    <tr><td>Homework &amp; Assignments</td><td>Set homework with a due date; the tracker shows who submitted.</td></tr>
+    <tr><td>Online Classes</td><td>Add a live class with its joining link; students and parents see the last week and what is coming.</td></tr>
+    <tr><td>Study Materials</td><td>Share links and materials by class and subject.</td></tr>
+    <tr><td>Academic Calendar, List of Holidays</td><td>Publish terms, events and holidays; they show in the portal.</td></tr>
+  </table>
+
+  <h3>6.3 Substitutions</h3>
+  <ol class="steps">
+    <li><span class="menu">Timetable</span> &rarr; <span class="menu">Substitution Management</span>.</li>
+    <li>The page lists the periods of teachers on approved leave.</li>
+    <li>Pick cover. The system only offers teachers who are free: no lesson, no other cover, not on leave.</li>
+  </ol>
+  <h3>6.4 Timetable reports</h3>
+  <p><span class="menu">Timetable Reports</span> shows teacher workload, periods per class, room use and periods that still have no teacher. Check it before the term starts.</p>
+</section>
+
+<!-- ===================================================== 7 -->
+<section class="part">
+  <div class="part-head"><small>Part 7 &middot; Teachers</small><h2>Daily teaching: attendance, leave and alerts</h2></div>
+  <div class="facts"><div><b>Who</b>Teachers (and admin)</div><div><b>Where</b>Attendance group, My Class</div><div><b>When</b>Every school day, early</div></div>
+
+  <h3>7.1 Mark attendance</h3>
+  <ol class="steps">
+    <li>Open <span class="menu">Dashboard</span> &rarr; <span class="menu">My Class</span>, or <span class="menu">Attendance</span> &rarr; <span class="menu">Mark Attendance</span>. A class teacher's page opens on their own class.</li>
+    <li>Check the date (today) and the class.</li>
+    <li>For each student choose <b>present</b>, <b>absent</b> or <b>late</b>. For a late student add the <b>arrival time</b> (like 08:15) and, if useful, a short note (up to 120 characters).</li>
+    <li>Save. The button tells you when there are unsaved changes.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The dashboard tile "Present today" updates, and the parent of an absent child can see it in their portal. If automatic alerts are on, the guardian is notified.</div>
+  <div class="box warn"><b class="t">Watch out</b>You cannot mark a future date, or a student who is not in the class. A teacher can only open their own classes.</div>
+
+  <h3>7.2 Correct a saved mark</h3>
+  <ol class="steps">
+    <li>Change the mark the same way and save, or use <span class="menu">Attendance Corrections</span>.</li>
+    <li>Give a <b>reason</b>. The system records the old value, the new value, the reason and who changed it.</li>
+  </ol>
+
+  <h3>7.3 Student leave</h3>
+  <ol class="steps">
+    <li>A parent applies in their portal (<b>Apply for Leave</b>) with dates and a reason. A student can also apply from their own portal.</li>
+    <li>You see it under <span class="menu">Attendance</span> &rarr; <span class="menu">Student Leave</span> and on My Class as "waiting for a decision".</li>
+    <li><b>Approve</b>, or <b>Reject</b> with a reason (a reason is required).</li>
+    <li><span class="menu">Student Leave Record</span> shows the history; <span class="menu">Leave Balances</span> shows days used.</li>
+  </ol>
+  <div class="box warn"><b class="t">Rules</b>Leave cannot be requested for dates already over. Overlapping pending or approved leave is refused. Leave that has already started cannot be cancelled.</div>
+
+  <h3>7.4 Monthly, period and biometric attendance</h3>
+  <ul>
+    <li><span class="menu">Monthly Attendance</span>: a sheet for a class and month; every change must fall in that month.</li>
+    <li><span class="menu">Period Attendance</span>: attendance per period for a class and day.</li>
+    <li><span class="menu">Biometric Attendance</span>: card or fingerprint devices send marks directly; the page shows what arrived.</li>
+  </ul>
+
+  <h3>7.5 Parent absence alerts</h3>
+  <ol class="steps">
+    <li><span class="menu">Attendance</span> &rarr; <span class="menu">Parent Absence Alerts</span>.</li>
+    <li>With <b>Automatic alerts on</b>, the system checks every few minutes and notifies guardians of students marked absent, once per absence.</li>
+    <li>You can also send a text for one absent student from this page.</li>
+  </ol>
+  <div class="box stop"><b class="t">Is it really sending?</b>Until the school's email and SMS credentials are set up, messages are only <b>recorded</b> in the history as "recorded only" and are <b>not delivered</b>. Ask the administrator to confirm under Settings &rarr; Integrations.</div>
+
+  <h3>7.6 Reports</h3>
+  <p><span class="menu">Reports</span> &rarr; attendance for any date range and class. Students below the minimum (75% by default) are flagged. Use <b>Export</b> to download what is on screen.</p>
+</section>
+
+<!-- ===================================================== 8 -->
+<section class="part">
+  <div class="part-head"><small>Part 8 &middot; Exam cell, teachers</small><h2>Exams: marks, results and report cards</h2></div>
+  <div class="flow"><span>Grade setup</span><i>&rarr;</i><span>Create exam</span><i>&rarr;</i><span>Enter marks</span><i>&rarr;</i><span>Results &amp; ranks</span><i>&rarr;</i><span>Report card</span></div>
+  <div class="facts"><div><b>Who</b>Admin creates; teachers enter marks</div><div><b>Where</b>Examinations group</div><div><b>Before you start</b>Subject map, students in the class</div></div>
+
+  <h3>8.1 Grade setup (once)</h3>
+  <ol class="steps">
+    <li><span class="menu">Examinations</span> &rarr; <span class="menu">Grade Setup</span>.</li>
+    <li>Add grades with a name (up to 10 characters) and the lowest percentage for each. The lowest grade must start at 0%, and no two grades can start at the same percentage.</li>
+    <li>Set the <b>pass mark</b> (0 to 100, 40% by default). Save; the button reads Saved until you change something.</li>
+  </ol>
+
+  <h3>8.2 Create an exam</h3>
+  <ol class="steps">
+    <li><span class="menu">Exams, Marks &amp; Results</span> &rarr; create: class, name, maximum marks, dates.</li>
+    <li>The tiles show all, upcoming, ongoing and completed exams from the dates.</li>
+    <li>Optional: <span class="menu">Exam Groups</span> combine several exams with weights (1 to 1000) into one result. An exam can only join a group of its own class.</li>
+  </ol>
+
+  <h3>8.3 Enter marks</h3>
+  <ol class="steps">
+    <li>On the exam row click <b>Marks</b>.</li>
+    <li>Type each student's mark in the box. For a subject taught as theory plus practical there are <b>two boxes</b>, each checked against its own maximum, with the total beside them.</li>
+    <li>Click <span class="btn">Save marks</span>. You see <b>Marks saved</b>. If you try to leave with unsaved marks, the system warns you.</li>
+  </ol>
+  <div class="box warn"><b class="t">Watch out</b>
+    <ul style="margin:0"><li>A mark cannot be higher than the maximum.</li>
+    <li>Only students of the exam's class, and only subjects that class studies, are accepted.</li>
+    <li>A teacher can enter marks only for the subjects assigned to them in the subject map. An admin can enter any.</li></ul></div>
+
+  <h3>8.4 Results, ranks and the merit list</h3>
+  <ol class="steps">
+    <li>Click <b>Results</b> on the exam. The tiles show students, passed, class average and top score; tabs show <b>Pass</b>, <b>Fail</b> and <b>Incomplete</b>.</li>
+    <li>Each student has a total, percentage, grade and rank. A student is ranked out of the subjects they take, so electives are fair.</li>
+    <li><span class="menu">Merit List</span> shows the top students; it prints without the controls.</li>
+  </ol>
+
+  <h3>8.5 Print a report card</h3>
+  <ol class="steps">
+    <li>On the results row open the student's <b>report card</b>.</li>
+    <li>Check the school name, logo, student photo, marks table, total, percentage, grade, rank, result and attendance.</li>
+    <li>Click <span class="btn">Print</span>. The sheet prints cleanly with lines for class teacher, parent and principal signatures.</li>
+  </ol>
+
+  <h3>8.6 Revaluation</h3>
+  <ol class="steps">
+    <li>A parent can raise a request in the portal, or a teacher logs one under <span class="menu">Revaluation Requests</span>.</li>
+    <li>Only one request can be open per subject. The admin <b>accepts</b> (enters the revised mark and a note) or <b>rejects</b> (a reason is required).</li>
+  </ol>
+  <p><span class="menu">Holistic Progress Card</span> records non-academic areas (skills and habits) alongside marks.</p>
+</section>
+
+<!-- ===================================================== 9 -->
+<section class="part">
+  <div class="part-head"><small>Part 9 &middot; Accountant</small><h2>Fees and payments</h2></div>
+  <div class="flow"><span>Fee structure</span><i>&rarr;</i><span>Billing</span><i>&rarr;</i><span>Payment</span><i>&rarr;</i><span>Receipt</span><i>&rarr;</i><span>Reports</span></div>
+  <div class="facts"><div><b>Who</b>Accountant, administrator</div><div><b>Where</b>Fees &amp; Finance group</div><div><b>Before you start</b>Fee structure per class</div></div>
+
+  <h3>9.1 How fees reach a student</h3>
+  <ul>
+    <li><b>At enrolment</b>, every item in the class's fee structure is billed automatically.</li>
+    <li><b>Bill a class:</b> <span class="menu">Fees &amp; Payments</span> &rarr; <span class="btn">Bill a class</span> bills every student of the class for the structure items. A student is never billed twice for the same item.</li>
+    <li><b>Add fee:</b> a single fee for one student (a student, a title and an amount above zero).</li>
+    <li>Hostel, transport and library fines are billed through this same page, so everything one family owes is in one place.</li>
+  </ul>
+  <p>The page shows tiles for <b>billed</b>, <b>collected</b>, <b>outstanding</b> and <b>overdue</b>, tabs by status, search and a class filter.</p>
+  <table>
+    <tr><th>Status</th><th>Meaning</th></tr>
+    <tr><td><b>Unpaid</b></td><td>Nothing paid yet and not yet past the due date.</td></tr>
+    <tr><td><b>Partly paid</b></td><td>Some money received, balance remains.</td></tr>
+    <tr><td><b>Overdue</b></td><td>Not fully paid and the due date has passed.</td></tr>
+    <tr><td><b>Paid</b></td><td>Paid amount equals the amount.</td></tr>
+  </table>
+  <p>Status is worked out by the system from the amounts and the date. You never type it.</p>
+
+  <h3>9.2 Take a payment</h3>
+  <ol class="steps">
+    <li><span class="menu">Fees &amp; Payments</span>: find the fee (search by student name, admission number or phone).</li>
+    <li>Click <span class="btn">Pay</span>. In the popup enter the amount and choose the method (cash, card, bank transfer and so on; only the methods switched on in Settings appear).</li>
+    <li>Save. The <b>receipt</b> opens with its own number.</li>
+    <li>Click <b>Print</b> and give the receipt to the payer.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The fee's balance drops and its status changes to Partly paid or Paid. <span class="menu">Payment History &amp; Receipts</span> lists the payment and you can reprint the receipt later.</div>
+  <div class="box warn"><b class="t">Watch out</b>The system will not take more than the balance. If part payments are switched off in Settings, only the full balance is accepted.</div>
+
+  <h3>9.3 Discount, fine and refund</h3>
+  <ol class="steps">
+    <li>On the fee click <b>Discount</b> or <b>Fine</b>. A <b>reason is required</b> (for example "Sibling discount", "Scholarship").</li>
+    <li>A discount cannot bring the amount below what has already been paid.</li>
+    <li>To refund, open the payment in Payment History and choose refund. The refund is recorded against that payment.</li>
+    <li><b>Late fines:</b> the late fines action bills fines for overdue fees in one go.</li>
+  </ol>
+  <div class="box stop"><b class="t">Never try to "fix" a fee by deleting it</b>A fee with any payment history, even fully refunded, cannot be deleted, moved to another student or re-priced. Use a discount or a fine. If you billed the wrong student and nothing was paid, delete the fee and bill the right student.</div>
+
+  <h3>9.4 Fee reminders</h3>
+  <ol class="steps">
+    <li><span class="menu">Fee Reminders</span> lists guardians with overdue fees.</li>
+    <li>Send the reminder. The same guardian is not reminded again for 24 hours (the cool-down is in Settings).</li>
+  </ol>
+
+  <h3>9.5 Other income, expenses and reports</h3>
+  <ul>
+    <li><span class="menu">Other Income</span> and <span class="menu">Expenses</span>: record non-fee money in and out, with a category.</li>
+    <li><span class="menu">Financial Reports</span>: tabs for attendance, <b>Income &amp; expenses</b> (with collection by method and expenses by category) and <b>Fee defaulters</b>. Each has tiles, search and <b>Export</b>.</li>
+  </ul>
+  <div class="box tip"><b class="t">End-of-day routine</b>Open Payment History, filter to today, compare the total with the cash drawer and the bank slips, and Export for the records.</div>
+</section>
+
+<!-- ===================================================== 10 -->
+<section class="part">
+  <div class="part-head"><small>Part 10 &middot; HR (administrator), accountant</small><h2>Staff and payroll</h2></div>
+
+  <h3>10.1 Register a staff member</h3>
+  <ol class="steps">
+    <li><span class="menu">Staff &amp; HR</span> &rarr; <span class="menu">Staff Directory</span> &rarr; register new staff member.</li>
+    <li>Fill employment (staff number is generated if blank, designation, department, type, joining date), personal and identity details, contact and address, qualification and experience, emergency contact and bank details.</li>
+    <li>Upload the <b>photo</b> and the <b>required staff documents</b> (<span class="menu">Staff Documents</span>): contracts, certificates, ID proofs. PDF or image, up to 5 MB.</li>
+  </ol>
+  <div class="box tip"><b class="t">Who sees what</b>Identity, address and emergency data are visible to administrators only. Bank details are visible to administrators and accountants. Other roles see names, designation, department, contact and joining date.</div>
+  <div class="box warn"><b class="t">Watch out</b>Staff with payslips, reviews or documents cannot be deleted. Mark them inactive instead.</div>
+
+  <h3>10.2 Staff attendance and leave</h3>
+  <ul>
+    <li><span class="menu">Staff Attendance</span> and <span class="menu">Monthly Staff Attendance</span> record and review daily presence.</li>
+    <li><span class="menu">Staff Leave</span>: a staff member applies; the admin approves or rejects (reason needed). <span class="menu">Staff Leave Balance</span> shows allowances and days used. Leave types and yearly allowances are in Settings.</li>
+    <li>Approved leave feeds <b>Substitutions</b> automatically.</li>
+  </ul>
+
+  <h3>10.3 Payroll, every month</h3>
+  <div class="flow"><span>Salary terms</span><i>&rarr;</i><span>Generate payslips</span><i>&rarr;</i><span>Admin approves</span><i>&rarr;</i><span>Paid</span></div>
+  <ol class="steps">
+    <li><b>Accountant:</b> <span class="menu">Payroll</span> &rarr; <b>Salary terms</b> tab: set each staff member's basic salary, allowances and deductions. Basic salary is required.</li>
+    <li><b>Accountant:</b> pick the month and generate payslips. Deductions cannot be more than the gross salary.</li>
+    <li>Check the tiles: staff on payroll, net payroll, paid, and waiting for approval.</li>
+    <li><b>Administrator only:</b> open a payslip and click <b>Approve &amp; mark paid</b>. The approver's name is recorded on the payslip.</li>
+  </ol>
+  <div class="box warn"><b class="t">Watch out</b>The accountant prepares, the administrator approves. This split is deliberate and enforced. A paid payslip cannot be deleted.</div>
+
+  <h3>10.4 Recruitment</h3>
+  <ol class="steps">
+    <li><span class="menu">Recruitment</span>: create an <b>opening</b> with job title and number of vacancies.</li>
+    <li>Add <b>applicants</b> and move them: applied, shortlisted, interviewed, offered, hired.</li>
+    <li>Only an <b>offered</b> applicant can be hired. Hiring creates the staff profile and closes the opening when all vacancies are filled.</li>
+  </ol>
+
+  <h3>10.5 Performance reviews</h3>
+  <ol class="steps">
+    <li><span class="menu">Performance Reviews</span>: choose the staff member and give each of the four ratings from 1 to 5 (every rating is required). The average is worked out for you.</li>
+    <li>When final, <b>finalise</b> the review. A finalised review cannot be changed or deleted.</li>
+  </ol>
+</section>
+
+<!-- ===================================================== 11 -->
+<section class="part">
+  <div class="part-head"><small>Part 11 &middot; Librarian, teachers</small><h2>Library</h2></div>
+  <div class="flow"><span>Categories</span><i>&rarr;</i><span>Books</span><i>&rarr;</i><span>Cards</span><i>&rarr;</i><span>Issue</span><i>&rarr;</i><span>Return</span><i>&rarr;</i><span>Fines</span></div>
+
+  <h3>11.1 Books and categories</h3>
+  <ol class="steps">
+    <li><span class="menu">Library</span> &rarr; <span class="menu">Book Categories</span>: add categories first. A category with books cannot be deleted.</li>
+    <li><span class="menu">Books &amp; Loans</span> &rarr; add a book with title, author, category and number of copies. You can also load books from a spreadsheet (Part 3.9).</li>
+  </ol>
+
+  <h3>11.2 Library cards</h3>
+  <ol class="steps">
+    <li><span class="menu">Library Members</span> &rarr; issue a card: card number, valid-until date, <b>books allowed at a time</b> (1 to 50) and status (active or suspended).</li>
+    <li>A student with a card is held to its limit. A student without a card can still borrow unless the school requires a card in Settings.</li>
+  </ol>
+
+  <h3>11.3 Issue and return</h3>
+  <ol class="steps">
+    <li><span class="menu">Books &amp; Loans</span> &rarr; <b>Issue a book</b>: search the student, choose the book and the loan period (14 days by default, never more than 90).</li>
+    <li>When it comes back, click <b>Return</b> on the loan.</li>
+    <li>If it is late, a fine (per day, set in Settings) is billed to the student as a normal fee, once.</li>
+  </ol>
+  <div class="box warn"><b class="t">The system will refuse when</b>
+    <ul style="margin:0"><li>the student is inactive, or already has this book on loan, or is at the card limit;</li><li>the card is suspended or expired;</li><li>no copy is free, or the free copies are being held for students who reserved first.</li></ul></div>
+
+  <h3>11.4 Reservations</h3>
+  <ol class="steps">
+    <li><span class="menu">Book Reservations</span> &rarr; reserve a book <b>only when no copy is free</b>.</li>
+    <li>When a copy is returned it is held for the first person in the queue, so no one can jump ahead.</li>
+  </ol>
+  <h3>11.5 Fines from earlier returns and reports</h3>
+  <p>On Books &amp; Loans use <b>Bill fines from earlier returns</b> to bill late returns made before fine billing was switched on; running it again does not bill twice. <span class="menu">Library Reports</span> shows the most borrowed books and titles per category.</p>
+</section>
+
+<!-- ===================================================== 12 -->
+<section class="part">
+  <div class="part-head"><small>Part 12 &middot; Transport manager</small><h2>Transport</h2></div>
+  <div class="flow"><span>Vehicles</span><i>&rarr;</i><span>Drivers</span><i>&rarr;</i><span>Routes &amp; stops</span><i>&rarr;</i><span>Assign riders</span><i>&rarr;</i><span>Fees</span><i>&rarr;</i><span>Attendance</span></div>
+
+  <h3>12.1 Set up</h3>
+  <ol class="steps">
+    <li><span class="menu">Transport</span> &rarr; <span class="menu">Vehicles</span>: registration number and seats.</li>
+    <li><span class="menu">Drivers &amp; Attendants</span>: add the staff who run the buses.</li>
+    <li><span class="menu">Routes</span>: name, vehicle and monthly fee. <span class="menu">Stops</span>: stops in order; a stop belongs to one route.</li>
+  </ol>
+  <h3>12.2 Assign a student to a bus</h3>
+  <ol class="steps">
+    <li><span class="menu">Student Route Assignment</span> &rarr; assign: choose the student, the <b>route and stop</b> (the stop must be on that route), the trips used (both, pickup only or drop only) and who is authorised to collect the child.</li>
+    <li>Editing the row moves the rider.</li>
+  </ol>
+  <div class="box warn"><b class="t">Rules</b>A vehicle never carries more than its seats. Only active students can use transport. A route or stop with riders cannot be deleted.</div>
+  <h3>12.3 Fees, attendance and tracking</h3>
+  <ul>
+    <li><span class="menu">Transport Fees</span>: bills the monthly route fee through the normal fee flow, with a confirmation before billing.</li>
+    <li><span class="menu">Transport Attendance</span>: pick route, trip (morning or evening) and date; mark each rider <b>boarded</b> or <b>absent</b>; one Save button.</li>
+    <li><span class="menu">Bus Tracking</span>: live position from the bus GPS units. Parents see it in their portal.</li>
+    <li><span class="menu">Vehicle Maintenance</span> and <span class="menu">Transport Reports</span> (riders, vehicle use, route income, maintenance due, export).</li>
+  </ul>
+</section>
+
+<!-- ===================================================== 13 -->
+<section class="part">
+  <div class="part-head"><small>Part 13 &middot; Hostel warden, administrator</small><h2>Hostel</h2></div>
+  <div class="flow"><span>Hostels</span><i>&rarr;</i><span>Rooms</span><i>&rarr;</i><span>Allocation</span><i>&rarr;</i><span>Roll call</span><i>&rarr;</i><span>Mess</span><i>&rarr;</i><span>Fees</span></div>
+
+  <h3>13.1 Rooms and allocation</h3>
+  <ol class="steps">
+    <li><span class="menu">Hostels</span>: add each hostel and its type (boys or girls). <span class="menu">Hostel Rooms</span>: rooms with beds and monthly fee.</li>
+    <li><span class="menu">Room Allocation</span> &rarr; allocate: choose the boarder, the room, the <b>bed number</b> (unique in the room), the meal plan, the security deposit, the local guardian and whether the parent consent form was received.</li>
+    <li>To move a boarder, edit their allocation.</li>
+  </ol>
+  <div class="box ok"><b class="t">Follow-up from enrolment</b>If a family asked for a hostel bed on the application, enrolment leaves it as a task because a bed needs a room. Do it here.</div>
+  <div class="box warn"><b class="t">Rules</b>Capacity and boys or girls checks apply. Only active students can live in the hostel. A room with residents cannot be deleted.</div>
+
+  <h3>13.2 Night roll call</h3>
+  <ol class="steps">
+    <li><span class="menu">Hostel Attendance</span>: choose the hostel and date.</li>
+    <li>Mark each boarder <b>present</b>, <b>absent</b> or <b>leave</b>. Click Save; it reads Saved until you change something.</li>
+  </ol>
+  <h3>13.3 Mess menu</h3>
+  <ol class="steps">
+    <li><span class="menu">Mess Management</span>: choose the hostel. Click <span class="btn">+ Add meal</span> or <b>+ Add</b> in a cell.</li>
+    <li>Pick the day and meal (breakfast, lunch, snacks, dinner) and type the items. Saving the same day and meal again <b>replaces</b> the entry.</li>
+  </ol>
+  <h3>13.4 Visitors</h3>
+  <ol class="steps">
+    <li><span class="menu">Visitor Log</span> &rarr; <b>Check in a visitor</b>: pick the boarder (only boarders can be visited), visitor name, relation, phone and purpose.</li>
+    <li>When they leave, click <b>Check out</b>. The "Inside now" tile reminds you who is still in.</li>
+  </ol>
+  <h3>13.5 Fees and reports</h3>
+  <p><span class="menu">Hostel Fees</span> bills the monthly fee through the normal fee flow, with a confirmation first. <span class="menu">Hostel Reports</span> shows boarders, income, full rooms, tonight's roll call and occupancy, with export.</p>
+</section>
+
+<!-- ===================================================== 14 -->
+<section class="part">
+  <div class="part-head"><small>Part 14 &middot; Store keeper (administrator), teachers</small><h2>Inventory</h2></div>
+  <div class="flow"><span>Categories</span><i>&rarr;</i><span>Items</span><i>&rarr;</i><span>Suppliers</span><i>&rarr;</i><span>Purchase order</span><i>&rarr;</i><span>Receive</span><i>&rarr;</i><span>Issue</span></div>
+
+  <h3>14.1 Items and stock</h3>
+  <ol class="steps">
+    <li><span class="menu">Item Categories</span>, then <span class="menu">Inventory Items</span> and <span class="menu">Suppliers</span>.</li>
+    <li>Stock only changes through <b>movements</b>: <span class="menu">Stock In</span> adds, <span class="menu">Stock Out</span> issues. You cannot issue more than is in stock.</li>
+  </ol>
+  <h3>14.2 Purchase orders</h3>
+  <ol class="steps">
+    <li><span class="menu">Purchase Orders</span> &rarr; new order: supplier, expected date, and the lines (each item only once, a whole quantity above zero, a valid cost).</li>
+    <li>When the goods arrive click <b>Receive</b>. Every line is added to stock <b>exactly once</b>; receiving twice is not possible.</li>
+  </ol>
+  <h3>14.3 Requests from teachers</h3>
+  <ol class="steps">
+    <li><b>Teacher:</b> <span class="menu">Inventory Requests</span> &rarr; new request: item, quantity and <b>what it is needed for</b> (required).</li>
+    <li><b>Administrator:</b> <b>Approve</b> (you may issue fewer than asked; stock is issued through the normal stock-out rules) or <b>Reject</b> (a reason is required).</li>
+    <li>Teachers see only their own requests. A request can be withdrawn before a decision.</li>
+  </ol>
+  <h3>14.4 Assets and reports</h3>
+  <ul>
+    <li><span class="menu">Asset Register</span>: individually tagged assets with location, cost and status. <span class="menu">Asset Maintenance</span> keeps the service log and a 30-day service-due list. An asset with maintenance history is marked <b>disposed</b>, never deleted.</li>
+    <li><span class="menu">Stock Reports</span>: low stock list and stock value at the latest cost.</li>
+  </ul>
+</section>
+
+<!-- ===================================================== 15 -->
+<section class="part">
+  <div class="part-head"><small>Part 15 &middot; Administrator</small><h2>Certificates and ID cards</h2></div>
+
+  <h3>15.1 Certificates</h3>
+  <div class="flow"><span>Request</span><i>&rarr;</i><span>Issue (or reject)</span><i>&rarr;</i><span>Print</span></div>
+  <ol class="steps">
+    <li><span class="menu">Documents &amp; Certificates</span> &rarr; <span class="menu">Requests &amp; Issued Register</span>. Requests come from a parent in the portal (bonafide, character, fee certificates) or are raised here at the office. A <b>transfer certificate</b> comes only from the parent or the office.</li>
+    <li>Open the request and click <b>Issue</b>, or <b>Reject</b> with a reason.</li>
+    <li>Click <b>Print</b>.</li>
+  </ol>
+  <div class="box tip"><b class="t">Wording</b><span class="menu">Document Templates</span> sets the wording of each certificate with placeholders such as the student's name. The wording in force is <b>frozen into the certificate when it is issued</b>, so reprinting later never changes it.</div>
+  <div class="box warn"><b class="t">Watch out</b>Only one open request per student and certificate type. An issued certificate stays in the register permanently. A student with certificate requests cannot be deleted.</div>
+
+  <h3>15.2 ID cards</h3>
+  <ol class="steps">
+    <li><span class="menu">Settings</span> &rarr; <span class="menu">ID Card Design</span>: colours, logo, academic year, signature and footer text, and which details show. One design serves student and staff cards; the preview updates as you change it.</li>
+    <li>To print for a whole class: <span class="menu">Documents &amp; Certificates</span> &rarr; <span class="menu">ID Cards</span>, choose the class from the list, check the cards, click <b>Print N cards</b>.</li>
+    <li>One card: from the student's details popup, or a staff card from the Staff page.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The page shows one card for every <b>active</b> student in the class, with photo, name, admission number and class.</div>
+</section>
+
+<!-- ===================================================== 16 -->
+<section class="part">
+  <div class="part-head"><small>Part 16 &middot; Parents and students</small><h2>The parent and student portal</h2></div>
+  <p>Use this part to train parents and students, or to answer their questions at the office.</p>
+
+  <h3>16.1 First sign-in</h3>
+  <ol class="steps">
+    <li>The family receives a username (or email) and a temporary password from the school.</li>
+    <li>They sign in and are asked to set their own password first.</li>
+  </ol>
+  <h3>16.2 What a parent can do</h3>
+  <table>
+    <tr><th>Menu entry</th><th>What they see or do</th></tr>
+    <tr><td>Dashboard</td><td>Thirty-day attendance and the fee position for each child at a glance.</td></tr>
+    <tr><td>Child Profile, Attendance, Class Timetable</td><td>Everything recorded about the child, day-by-day attendance, and the weekly timetable.</td></tr>
+    <tr><td>Homework, Online Classes, Learning Materials</td><td>What was set, the joining links for live classes, and shared materials.</td></tr>
+    <tr><td>Exams &amp; Results, Fees &amp; Payments</td><td>Marks, grades and report cards; fees, balances and receipts.</td></tr>
+    <tr><td>Library, Activities, Transport Tracking</td><td>Books on loan, clubs and events, and the bus position.</td></tr>
+    <tr><td>Notices, Messages, Events &amp; Calendar</td><td>School announcements and the calendar.</td></tr>
+    <tr><td>Apply for Leave</td><td>Dates and a reason; the class teacher decides.</td></tr>
+    <tr><td>Certificates &amp; Documents</td><td>Request a bonafide, character, fee or transfer certificate; see when it is decided.</td></tr>
+    <tr><td>Feedback &amp; Grievance, Help &amp; Support</td><td>Send a concern to the school and see replies.</td></tr>
+  </table>
+  <h3>16.3 What a student can do</h3>
+  <p>The same pages for their own record, read-only. A student <b>can</b> apply for leave and withdraw their own request, and can request a certificate (the office decides). They cannot change anything else. A transfer certificate is requested by the parent or at the office.</p>
+  <div class="box warn"><b class="t">Common questions</b>
+    <ul style="margin:0"><li><b>"I cannot see my other child."</b> The child must be linked to the parent account. The office links them under Parent Portal &rarr; Parent Accounts.</li>
+    <li><b>"My student cannot sign in."</b> The account stops working when the student is made inactive.</li>
+    <li><b>"Nothing happens on a page."</b> Ask them to sign out and in again; if it persists, tell the administrator the page name.</li></ul></div>
+  <h3>16.4 What the office watches</h3>
+  <ul>
+    <li><span class="menu">Parent Login Activity</span>: last sign-in per parent and a flag for accounts that never signed in. Call those parents.</li>
+    <li><span class="menu">Parent Requests</span>: leave, certificate and revaluation requests from the portal, with a link to decide each.</li>
+    <li><span class="menu">Login History</span> (User Management): the last 300 sign-in attempts, kept 180 days. Never shows passwords.</li>
+  </ul>
+</section>
+
+<!-- ===================================================== 17 -->
+<section class="part">
+  <div class="part-head"><small>Part 17 &middot; Administrator</small><h2>Messages, notices and alerts</h2></div>
+  <h3>17.1 Notices</h3>
+  <ol class="steps">
+    <li><span class="menu">Communication</span> &rarr; <span class="menu">Notices</span> &rarr; add a notice, choose who it is for (everyone, students, staff and so on) and publish.</li>
+    <li>It appears in the portal's Notices and on the dashboard.</li>
+  </ol>
+  <h3>17.2 Email and SMS</h3>
+  <ol class="steps">
+    <li><span class="menu">Send Email</span> / <span class="menu">Send SMS</span> / <span class="menu">Parent Messages</span> / <span class="menu">Staff Messages</span>: choose the audience (all parents, one class, one number, all staff, a user group).</li>
+    <li>Write the message or pick a <span class="menu">Message Template</span>. An email needs a subject.</li>
+    <li>Send. Check <span class="menu">Communication History</span> for the result of each message.</li>
+  </ol>
+  <div class="box stop"><b class="t">Are messages really delivered?</b>Until email (SMTP) and SMS (Twilio) credentials are set in the server settings, the system runs in <b>log-only mode</b>. The history shows <b>"recorded only"</b> and <b>nothing is delivered</b>. Open <span class="menu">Settings</span> &rarr; <span class="menu">Integrations</span>: it shows which credentials are set (never the values) and can send a test message. Do this before the first real alert.</div>
+  <div class="box warn"><b class="t">Phone numbers</b>A phone number needs a country code (for example +91...), or the school sets a default country code. An invalid number is refused before sending.</div>
+  <h3>17.3 Push notifications</h3>
+  <p>Browser alerts: each person turns them on for their own device from the page; they need a secure connection (https) or localhost. An admin sends them from <span class="menu">Push Notifications</span>.</p>
+  <h3>17.4 Feedback and grievances</h3>
+  <p>Any staff login can send feedback. Only an administrator answers. Parents send theirs from the portal. The <b>grievance ladder</b> escalates unanswered items so they are not forgotten. Staff can also write to the administrator from <b>Help &amp; Support</b> &rarr; Submit a Support Request.</p>
+</section>
+
+<!-- ===================================================== 18 -->
+<section class="part">
+  <div class="part-head"><small>Part 18 &middot; Administrator</small><h2>Year end: promotion</h2></div>
+  <div class="facts"><div><b>Who</b>Administrator</div><div><b>Where</b>Students &rarr; Year-end Promotion</div><div><b>When</b>After results are final</div></div>
+  <div class="box stop"><b class="t">Before you start</b>Take a manual backup first (Part 19). Promotion changes many records at once.</div>
+  <ol class="steps">
+    <li>Create next year's classes if they do not exist, and add the new academic year.</li>
+    <li>Open <span class="menu">Students</span> &rarr; <span class="menu">Year-end Promotion</span>.</li>
+    <li>Choose the <b>from class</b> and the <b>to class</b> (they must be different).</li>
+    <li>To hold some students back, select only the students who should move.</li>
+    <li>To <b>graduate</b> a class, leave the target empty: the students become <b>inactive</b> (graduated or left).</li>
+    <li>Confirm. The result shows how many moved.</li>
+    <li>Do the <b>highest class first</b>, so a class is empty before the one below moves up.</li>
+    <li>When all classes are done, make the new academic year the current one in <span class="menu">Academic Years</span>.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The ID cards page shows the students in their new class. Electives that do not belong to the new class are removed; set the new ones in the student's details or at the start of term. Former students are listed in <span class="menu">Alumni</span>.</div>
+</section>
+
+<!-- ===================================================== 19 -->
+<section class="part">
+  <div class="part-head"><small>Part 19</small><h2>Routine, backups and when something looks wrong</h2></div>
+  <h3>19.1 The routine</h3>
+  <table>
+    <tr><th style="width:15%">When</th><th style="width:20%">Who</th><th>What</th></tr>
+    <tr><td>Every school day</td><td>Teachers</td><td>Mark attendance early; enter homework and marks.</td></tr>
+    <tr><td>Every school day</td><td>Admissions</td><td>Follow up enquiries due today; review new applications.</td></tr>
+    <tr><td>Every school day</td><td>Accountant</td><td>Record payments; reconcile the day's receipts with the cash and bank.</td></tr>
+    <tr><td>Every week</td><td>Administrator</td><td>Look at the Dashboard priorities (unmarked classes, overdue fees); read the Audit log; copy the backup folder off the server.</td></tr>
+    <tr><td>Every month</td><td>Accountant, administrator</td><td>Payroll; hostel and transport fee runs; fee reminders; administrator approves payroll.</td></tr>
+    <tr><td>Every term</td><td>Exam cell</td><td>Create exams, enter marks, publish results and report cards.</td></tr>
+    <tr><td>Year end</td><td>Administrator</td><td>Backup, promotion, new academic year.</td></tr>
+  </table>
+
+  <h3>19.2 Backups</h3>
+  <ol class="steps">
+    <li><b>Automatic:</b> the system writes a backup file about once a day to the server's <b>backups</b> folder and keeps the newest 14.</li>
+    <li><b>Copy that folder somewhere else</b> (another disk, a cloud drive). A backup on the same disk as the database does not survive that disk failing.</li>
+    <li><b>Manual:</b> <span class="menu">Settings</span> &rarr; <span class="menu">Backup &amp; Restore</span> &rarr; download. The file holds every table, including uploaded photos and documents, and password hashes. Keep it private.</li>
+    <li><b>Restore</b> replaces <b>all</b> data in one step: you must type <b>RESTORE</b>, the file must be a School ERP backup that contains user accounts, and any error rolls everything back. Practise this on a test copy before you ever need it.</li>
+  </ol>
+
+  <h3>19.3 When something looks wrong</h3>
+  <table>
+    <tr><th style="width:34%">What you see</th><th>What it usually means and what to do</th></tr>
+    <tr><td>"Please change your password first"</td><td>A temporary password. Open the change-password page and set your own.</td></tr>
+    <tr><td>"Submit the student application first"</td><td>An enquiry cannot skip the application form. Use <b>Apply</b> on the enquiry.</td></tr>
+    <tr><td>Application will not submit</td><td>A required detail, required document or the consent is missing. The message names it.</td></tr>
+    <tr><td>"Only approved applicants can be enrolled"</td><td>Approve the applicant first (it needs the class applied for).</td></tr>
+    <tr><td>Enroll seems to do nothing</td><td>It needs two clicks. The first arms the button ("Sure? Click again").</td></tr>
+    <tr><td>Cannot delete a student or fee</td><td>It has history (certificate request, payments). Mark the student inactive; use a discount or fine for a fee.</td></tr>
+    <tr><td>Marks refused</td><td>Over the maximum, wrong class or subject, or the subject is not assigned to this teacher.</td></tr>
+    <tr><td>Teacher cannot see a class</td><td>The login email must equal the staff profile email, and the teacher must be the class or subject teacher.</td></tr>
+    <tr><td>Payment refused</td><td>More than the balance, or part payment is switched off, or the method is not enabled.</td></tr>
+    <tr><td>Messages "recorded only"</td><td>Email or SMS is not configured. See Integrations.</td></tr>
+    <tr><td>Phone number refused</td><td>Add the country code.</td></tr>
+    <tr><td>A page shows "Something went wrong on this screen"</td><td>Nothing you saved is lost. Reload the page. If it repeats, tell the administrator the page name and what you clicked.</td></tr>
+  </table>
+  <div class="box tip"><b class="t">Reporting a problem well</b>Write down: who you are, the page, what you clicked, the exact message, and the time. The Audit log and Login History can then be checked against it.</div>
+</section>
+
+<!-- ===================================================== 20 -->
+<section class="part">
+  <div class="part-head"><small>Part 20 &middot; Trainer</small><h2>Trainer's plan, exercises and sign-off</h2></div>
+  <p>Run the sessions on <b>demo data</b> in a rehearsal copy, never on live records. Load it with <code>npm run seed:demo --prefix server</code> and clear it with <code>npm run seed:demo:remove --prefix server</code>.</p>
+
+  <h3>20.1 Suggested sessions</h3>
+  <table>
+    <tr><th style="width:5%">#</th><th style="width:30%">Session</th><th style="width:18%">Who attends</th><th>Parts</th><th style="width:9%">Time</th></tr>
+    <tr><td>1</td><td>Getting started</td><td>Everyone</td><td>1, 2</td><td>1 h</td></tr>
+    <tr><td>2</td><td>Setup and data loading</td><td>Administrators</td><td>3</td><td>3 h</td></tr>
+    <tr><td>3</td><td>Admissions</td><td>Admissions team</td><td>4, 5</td><td>3 h</td></tr>
+    <tr><td>4</td><td>Teaching day</td><td>All teachers</td><td>6, 7, 8</td><td>3 h</td></tr>
+    <tr><td>5</td><td>Fees and accounts</td><td>Accountants</td><td>9, 10 (payroll)</td><td>3 h</td></tr>
+    <tr><td>6</td><td>Staff and HR</td><td>HR, administrators</td><td>10</td><td>2 h</td></tr>
+    <tr><td>7</td><td>Library, transport, hostel, inventory</td><td>Each desk</td><td>11 to 14</td><td>2 h each</td></tr>
+    <tr><td>8</td><td>Certificates, portal, messages</td><td>Office staff</td><td>15 to 17</td><td>2 h</td></tr>
+    <tr><td>9</td><td>Routine, backups, year end</td><td>Administrators</td><td>18, 19</td><td>2 h</td></tr>
+    <tr><td>10</td><td>Full rehearsal: one family through everything</td><td>Everyone</td><td>All</td><td>half day</td></tr>
+  </table>
+
+  <h3>20.2 Hands-on exercises</h3>
+  <div class="ex"><h4>Exercise A: one family, whole process (session 10)</h4>
+    <ol class="steps">
+      <li>Record an enquiry for a child; plan a follow-up.</li>
+      <li>Start the application; add a sibling; upload the required documents; submit.</li>
+      <li>Schedule a test and an interview; record the results; approve; make the offer.</li>
+      <li>Enrol; note the student's login password; check fees were billed.</li>
+      <li>Pay the fee in two parts; print both receipts.</li>
+      <li>Create a parent login; sign in as the parent and look at fees.</li>
+      <li>Mark attendance for the class; enter marks for an exam; print the report card.</li>
+      <li>Raise a certificate request as the parent; issue it at the office.</li>
+      <li>Promote the class and check the ID card.</li>
+    </ol></div>
+  <div class="ex"><h4>Exercise B: break it on purpose (all sessions)</h4>
+    <ul>
+      <li>Try to submit an application without a required document. Read the message.</li>
+      <li>Try to pay more than the balance. Try to delete a fee that has a payment.</li>
+      <li>Enter a mark higher than the maximum.</li>
+      <li>Try to issue a book that is already on loan to the same student.</li>
+      <li>Try to enrol an applicant who has not been approved.</li>
+    </ul>
+    <p class="small">The aim is for staff to meet each refusal in training, so it does not frighten them in real use.</p></div>
+  <div class="ex"><h4>Exercise C: recover (administrators)</h4>
+    <ul>
+      <li>Delete an enquiry, find it in the Deleted tab, restore it.</li>
+      <li>Correct a saved attendance mark and find the correction record.</li>
+      <li>Download a manual backup. On a <b>test copy</b>, restore it.</li>
+    </ul></div>
+
+  <h3>20.3 Before going live</h3>
+  <ul class="check">
+    <li>Admin password, secret key and database password changed from the examples.</li>
+    <li>School profile, academic year, classes, subject map, staff and fee structure filled in; the Setup guide is all ticked.</li>
+    <li>Required document lists decided in Master Data.</li>
+    <li>Email and SMS credentials set, and a test message delivered (Settings &rarr; Integrations).</li>
+    <li>Teacher logins created, with the same email as each staff profile.</li>
+    <li>Backup folder is copied off the server on a schedule; one restore has been practised on a test copy.</li>
+    <li>One real class rehearsed end to end; what the pilot showed has been fixed.</li>
+    <li>Everyone has changed their temporary password.</li>
+  </ul>
+
+  <h3>20.4 Sign-off sheet</h3>
+  <table>
+    <tr><th>Name</th><th>Role</th><th>Sessions completed</th><th>Exercise A</th><th>Exercise B</th><th>Signature / date</th></tr>
+    <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+</section>
+
+</body>
+</html>
