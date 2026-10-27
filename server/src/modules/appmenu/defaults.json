@@ -1161,11 +1161,61 @@
     "audience": "family",
     "parentKey": null,
     "roles": null,
+    "key": "hostel",
+    "label": "Hostel",
+    "icon": "bed-outline",
+    "kind": "section",
+    "position": 40
+  },
+  {
+    "audience": "family",
+    "parentKey": "hostel",
+    "roles": null,
+    "key": "hostel.details",
+    "label": "Room & warden",
+    "icon": "bed-outline",
+    "kind": "stats",
+    "position": 10
+  },
+  {
+    "audience": "family",
+    "parentKey": "hostel",
+    "roles": null,
+    "key": "hostel.meals",
+    "label": "Mess menu",
+    "icon": "restaurant-outline",
+    "kind": "list",
+    "position": 20
+  },
+  {
+    "audience": "family",
+    "parentKey": "hostel",
+    "roles": null,
+    "key": "hostel.attendance",
+    "label": "Night roll call",
+    "icon": "moon-outline",
+    "kind": "list",
+    "position": 30
+  },
+  {
+    "audience": "family",
+    "parentKey": "hostel",
+    "roles": null,
+    "key": "hostel.visitors",
+    "label": "Visitors",
+    "icon": "walk-outline",
+    "kind": "list",
+    "position": 40
+  },
+  {
+    "audience": "family",
+    "parentKey": null,
+    "roles": null,
     "key": "library",
     "label": "Library",
     "icon": "library-outline",
     "kind": "section",
-    "position": 40
+    "position": 50
   },
   {
     "audience": "family",
@@ -1185,7 +1235,7 @@
     "label": "Administration",
     "icon": "document-attach-outline",
     "kind": "section",
-    "position": 50
+    "position": 60
   },
   {
     "audience": "family",
@@ -1225,7 +1275,7 @@
     "label": "Other services",
     "icon": "apps-outline",
     "kind": "section",
-    "position": 60
+    "position": 70
   },
   {
     "audience": "family",

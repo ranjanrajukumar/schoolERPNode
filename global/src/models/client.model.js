@@ -11,6 +11,7 @@ export default (sequelize) => sequelize.define('Client', {
   apiUrl: { type: DataTypes.STRING(300), allowNull: false }, // the school's own API, for example https://erp.greenfield.edu/api
   active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   apiKeyHash: { type: DataTypes.STRING(64), allowNull: true }, // SHA-256 of the key the school's server uses to push its logins here; the key itself is shown once
+  lastSyncAt: { type: DataTypes.DATE, allowNull: true }, // when the school's server last reported its logins
   notes: { type: DataTypes.STRING(300), allowNull: true }, // for the people who run the registry; never sent to the app
   createdAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
   updatedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },

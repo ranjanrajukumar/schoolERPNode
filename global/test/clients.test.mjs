@@ -88,3 +88,43 @@ describe('global registry', () => {
     assert.equal((await call('DELETE', `/admin/clients/${a.data.code}`)).status, 404);
   });
 });
+
+describe('the admin page and what it shows', () => {
+  test('the page is served, and the list carries each school\'s logins and last report', async () => {
+    const page = await fetch(`${API.replace(/\/api$/, '')}/admin/`);
+    assert.equal(page.status, 200);
+    assert.match(page.headers.get('content-type'), /text\/html/);
+    const html = await page.text();
+    assert.ok(html.includes('School registry') && !html.includes(KEY ?? 'no-key-set'), 'the page itself holds no secret');
+    assert.match(page.headers.get('content-security-policy') ?? '', /script-src 'self'/, 'scripts only from this site');
+    assert.equal((await fetch(`${API.replace(/\/api$/, '')}/admin/admin.js`)).status, 200);
+
+    const s = await add({ code: `pg${RUN}`, name: `Page School ${RUN}` });
+    assert.equal(s.status, 201);
+    const listed = (code) => call('GET', '/admin/clients').then((r) => r.data.find((c) => c.code === code));
+    const before = await listed(s.data.code);
+    assert.deepEqual([before.logins, before.lastSyncAt], [0, null], 'nothing reported yet');
+    const bcrypt = (await import('bcryptjs')).default;
+    const reported = await fetch(`${API}/provision/identities`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-client-code': s.data.code, 'x-client-key': s.data.apiKey }, body: JSON.stringify({ identities: [{ localUserId: 1, role: 'teacher', name: 'T', email: `pg.${RUN}@school.test`, passwordHash: bcrypt.hashSync('x', 4) }] }) });
+    assert.equal(reported.status, 200);
+    const after = await listed(s.data.code);
+    assert.equal(after.logins, 1);
+    assert.ok(Date.now() - new Date(after.lastSyncAt).getTime() < 10_000, 'the report time is kept');
+    assert.equal(after.hasKey, true);
+    assert.equal(after.apiKey, undefined, 'and the key is never listed');
+  });
+
+  test('a school\'s server can be checked on demand', async () => {
+    const live = await add({ code: `chk${RUN}`, apiUrl: API });
+    const ok = await call('POST', `/admin/clients/${live.data.code}/check`);
+    assert.equal(ok.data.ok, true);
+    assert.ok(Number.isInteger(ok.data.ms));
+    const dead = await add({ code: `chd${RUN}`, apiUrl: 'http://127.0.0.1:9/api' });
+    const bad = await call('POST', `/admin/clients/${dead.data.code}/check`);
+    assert.equal(bad.status, 200);
+    assert.equal(bad.data.ok, false);
+    assert.match(bad.data.error, /did not answer/);
+    assert.equal((await call('POST', '/admin/clients/nosuchschool/check')).status, 404);
+    assert.equal((await call('POST', `/admin/clients/${live.data.code}/check`, { key: null })).status, 401, 'the key is needed');
+  });
+});

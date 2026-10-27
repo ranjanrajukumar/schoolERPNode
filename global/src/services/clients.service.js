@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { Op } from 'sequelize';
-import { Client } from '../models/index.js';
+import { Client, Identity } from '../models/index.js';
 import { badRequest, conflict, notFound } from '../utils/httpError.js';
 import { pruneMobileNumbers } from './provision.service.js';
 
@@ -8,7 +8,7 @@ const CODE = /^[a-z0-9][a-z0-9-]{1,29}$/;
 
 /** What the app is told about a school: enough to show it, and to find its server. Never the notes. */
 export const publicShape = (c) => ({ code: c.code, name: c.name, city: c.city ?? null, state: c.state ?? null, logoUrl: c.logoUrl ?? null, apiUrl: c.apiUrl });
-export const adminShape = (c) => ({ ...publicShape(c), id: c.id, active: c.active, hasKey: Boolean(c.apiKeyHash), notes: c.notes ?? null, createdAt: c.createdAt, updatedAt: c.updatedAt });
+export const adminShape = (c, logins = 0) => ({ ...publicShape(c), id: c.id, active: c.active, hasKey: Boolean(c.apiKeyHash), logins, lastSyncAt: c.lastSyncAt ?? null, notes: c.notes ?? null, createdAt: c.createdAt, updatedAt: c.updatedAt });
 
 const hashKey = (key) => crypto.createHash('sha256').update(String(key)).digest('hex');
 const newKey = () => crypto.randomBytes(24).toString('hex');
@@ -101,7 +101,20 @@ export async function findActiveByCode(code) {
   return publicShape(row);
 }
 
-export const listAll = async () => (await Client.findAll({ order: [['name', 'ASC']] })).map(adminShape);
+/** Every school, with how many active logins it has reported and when it last reported. */
+export async function listAll() {
+  const rows = await Client.findAll({ order: [['name', 'ASC']] });
+  const counts = new Map((await Identity.findAll({ attributes: ['clientId', [Identity.sequelize.fn('COUNT', Identity.sequelize.col('id')), 'n']], where: { active: true }, group: ['clientId'], raw: true })).map((r) => [r.clientId, Number(r.n)]));
+  return rows.map((c) => adminShape(c, counts.get(c.id) ?? 0));
+}
+
+/** Asks a school's server whether it answers, and how fast. */
+export async function checkSchool(code) {
+  const row = await Client.findOne({ where: { code: String(code).toLowerCase() } });
+  if (!row) throw notFound('No school has that code');
+  const started = Date.now();
+  try { await verifyApi(row.apiUrl); return { ok: true, ms: Date.now() - started }; } catch (err) { return { ok: false, error: err.message }; }
+}
 
 export async function create(body, { verify = true } = {}) {
   const data = clean(body);

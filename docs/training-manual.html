@@ -89,7 +89,9 @@
     <tr><td>Part 17: Messages, notices and alerts</td></tr>
     <tr><td>Part 18: Year end: promotion</td></tr>
     <tr><td>Part 19: Routine, backups and when something looks wrong</td></tr>
-    <tr><td>Part 20: Trainer's plan, exercises and sign-off sheet</td></tr>
+    <tr><td>Part 20: The mobile app for parents, students and teachers</td></tr>
+    <tr><td>Part 21: Connecting schools to the app (administrator and IT)</td></tr>
+    <tr><td>Part 22: Trainer's plan, exercises and sign-off sheet</td></tr>
   </table>
   <p class="small">Each part starts on a new page and is labelled with its part number at the top. The page number is in the footer.</p>
 </section>
@@ -126,6 +128,7 @@
     <li>Type your email and password and press the sign-in button.</li>
     <li>If you were given a <b>temporary password</b> (new student accounts and new teacher logins always are), the system asks you to change it first. Nothing else works until you do. Choose at least 8 characters, different from the temporary one.</li>
     <li>To leave, use <b>Logout</b> at the bottom of the left menu. Do this on shared computers.</li>
+    <li><b>On a phone,</b> students, parents and teachers use the school app instead and sign in with their <b>mobile number</b> (see Part 20).</li>
   </ol>
   <div class="box warn"><b class="t">Watch out</b>Too many wrong passwords locks sign-in for that email for 15 minutes. Do not keep trying; ask the administrator to reset the password.</div>
   <div class="box stop"><b class="t">Before going live (administrator)</b>Change the starting admin password (<code>admin123</code>) and the secret key in the server settings. Anyone who has seen the example file knows them.</div>
@@ -403,6 +406,7 @@
   <div class="box ok"><b class="t">Check it worked</b>The dashboard tile "Present today" updates, and the parent of an absent child can see it in their portal. If automatic alerts are on, the guardian is notified.</div>
   <div class="box warn"><b class="t">Watch out</b>You cannot mark a future date, or a student who is not in the class. A teacher can only open their own classes.</div>
 
+<div class="box tip"><b class="t">On a phone</b>Teachers can mark attendance in the app: <b>Mark Attendance</b>, tap a student to cycle present, absent and late, then <b>Save attendance</b> (Part 20.4).</div>
   <h3>7.2 Correct a saved mark</h3>
   <ol class="steps">
     <li>Change the mark the same way and save, or use <span class="menu">Attendance Corrections</span>.</li>
@@ -468,6 +472,7 @@
     <li>Only students of the exam's class, and only subjects that class studies, are accepted.</li>
     <li>A teacher can enter marks only for the subjects assigned to them in the subject map. An admin can enter any.</li></ul></div>
 
+<div class="box tip"><b class="t">On a phone</b>Marks can also be entered in the app under <b>Enter Marks</b>. A subject taught as theory plus practical is entered on the website. Parents see the result under Exam &rarr; Exams &amp; results.</div>
   <h3>8.4 Results, ranks and the merit list</h3>
   <ol class="steps">
     <li>Click <b>Results</b> on the exam. The tiles show students, passed, class average and top score; tabs show <b>Pass</b>, <b>Fail</b> and <b>Incomplete</b>.</li>
@@ -523,6 +528,7 @@
   <div class="box ok"><b class="t">Check it worked</b>The fee's balance drops and its status changes to Partly paid or Paid. <span class="menu">Payment History &amp; Receipts</span> lists the payment and you can reprint the receipt later.</div>
   <div class="box warn"><b class="t">Watch out</b>The system will not take more than the balance. If part payments are switched off in Settings, only the full balance is accepted.</div>
 
+<div class="box tip"><b class="t">On a phone</b>An accountant can take a payment in the app. A parent sees billed, paid and still to pay, and the receipts, under Fees &rarr; Fees &amp; payments, but pays at the office.</div>
   <h3>9.3 Discount, fine and refund</h3>
   <ol class="steps">
     <li>On the fee click <b>Discount</b> or <b>Fine</b>. A <b>reason is required</b> (for example "Sibling discount", "Scholarship").</li>
@@ -616,6 +622,7 @@
   <div class="box warn"><b class="t">The system will refuse when</b>
     <ul style="margin:0"><li>the student is inactive, or already has this book on loan, or is at the card limit;</li><li>the card is suspended or expired;</li><li>no copy is free, or the free copies are being held for students who reserved first.</li></ul></div>
 
+<div class="box tip"><b class="t">On a phone</b>A student sees books on loan and due dates in the app under Library. Staff can mark a book returned there.</div>
   <h3>11.4 Reservations</h3>
   <ol class="steps">
     <li><span class="menu">Book Reservations</span> &rarr; reserve a book <b>only when no copy is free</b>.</li>
@@ -680,6 +687,7 @@
     <li><span class="menu">Visitor Log</span> &rarr; <b>Check in a visitor</b>: pick the boarder (only boarders can be visited), visitor name, relation, phone and purpose.</li>
     <li>When they leave, click <b>Check out</b>. The "Inside now" tile reminds you who is still in.</li>
   </ol>
+  <div class="box tip"><b class="t">What students and parents see</b>A boarder's room, bed, warden, local guardian, the mess menu, the night roll call and visitors all appear in the school app (Part 20). It is read only, and it shows what you record on these pages, so keep them current.</div>
   <h3>13.5 Fees and reports</h3>
   <p><span class="menu">Hostel Fees</span> bills the monthly fee through the normal fee flow, with a confirmation first. <span class="menu">Hostel Reports</span> shows boarders, income, full rooms, tonight's roll call and occupancy, with export.</p>
 </section>
@@ -726,6 +734,7 @@
   <div class="box tip"><b class="t">Wording</b><span class="menu">Document Templates</span> sets the wording of each certificate with placeholders such as the student's name. The wording in force is <b>frozen into the certificate when it is issued</b>, so reprinting later never changes it.</div>
   <div class="box warn"><b class="t">Watch out</b>Only one open request per student and certificate type. An issued certificate stays in the register permanently. A student with certificate requests cannot be deleted.</div>
 
+<div class="box tip"><b class="t">On a phone</b>Parents and students ask for a bonafide, character or fee certificate in the app under Administration &rarr; Certificates. Staff approve or reject it there or on the website.</div>
   <h3>15.2 ID cards</h3>
   <ol class="steps">
     <li><span class="menu">Settings</span> &rarr; <span class="menu">ID Card Design</span>: colours, logo, academic year, signature and footer text, and which details show. One design serves student and staff cards; the preview updates as you change it.</li>
@@ -740,6 +749,7 @@
   <div class="part-head"><small>Part 16 &middot; Parents and students</small><h2>The parent and student portal</h2></div>
   <p>Use this part to train parents and students, or to answer their questions at the office.</p>
 
+<div class="box tip"><b class="t">The same portal on a phone</b>Parents and students can also use the school app (Part 20). It shows the same records, and it signs in with the <b>mobile number</b> kept on the parent or student record, so check that number when you create the account. The school must be connected to the registry (Part 21) first.</div>
   <h3>16.1 First sign-in</h3>
   <ol class="steps">
     <li>The family receives a username (or email) and a temporary password from the school.</li>
@@ -762,6 +772,7 @@
   <p>The same pages for their own record, read-only. A student <b>can</b> apply for leave and withdraw their own request, and can request a certificate (the office decides). They cannot change anything else. A transfer certificate is requested by the parent or at the office.</p>
   <div class="box warn"><b class="t">Common questions</b>
     <ul style="margin:0"><li><b>"I cannot see my other child."</b> The child must be linked to the parent account. The office links them under Parent Portal &rarr; Parent Accounts.</li>
+    <li><b>"The app says my number is not found."</b> The mobile number on the parent or student record is missing or different. Correct it on the record; the app finds the person within a moment. A student can also sign in with the admission number.</li>
     <li><b>"My student cannot sign in."</b> The account stops working when the student is made inactive.</li>
     <li><b>"Nothing happens on a page."</b> Ask them to sign out and in again; if it persists, tell the administrator the page name.</li></ul></div>
   <h3>16.4 What the office watches</h3>
@@ -780,6 +791,7 @@
     <li><span class="menu">Communication</span> &rarr; <span class="menu">Notices</span> &rarr; add a notice, choose who it is for (everyone, students, staff and so on) and publish.</li>
     <li>It appears in the portal's Notices and on the dashboard.</li>
   </ol>
+<div class="box tip"><b class="t">In the app</b>A notice published here appears in the app under Notices, and the push notification reaches the phone. Parents see what you write, so read it before you publish.</div>
   <h3>17.2 Email and SMS</h3>
   <ol class="steps">
     <li><span class="menu">Send Email</span> / <span class="menu">Send SMS</span> / <span class="menu">Parent Messages</span> / <span class="menu">Staff Messages</span>: choose the audience (all parents, one class, one number, all staff, a user group).</li>
@@ -831,6 +843,7 @@
   <ol class="steps">
     <li><b>Automatic:</b> the system writes a backup file about once a day to the server's <b>backups</b> folder and keeps the newest 14.</li>
     <li><b>Copy that folder somewhere else</b> (another disk, a cloud drive). A backup on the same disk as the database does not survive that disk failing.</li>
+    <li><b>The global registry</b> (Part 21) has its own database, <b>school_erp_global</b>, and a signing key. Back both up: they hold every school's app logins. Losing the key means every school must be re-connected.</li>
     <li><b>Manual:</b> <span class="menu">Settings</span> &rarr; <span class="menu">Backup &amp; Restore</span> &rarr; download. The file holds every table, including uploaded photos and documents, and password hashes. Keep it private.</li>
     <li><b>Restore</b> replaces <b>all</b> data in one step: you must type <b>RESTORE</b>, the file must be a School ERP backup that contains user accounts, and any error rolls everything back. Practise this on a test copy before you ever need it.</li>
   </ol>
@@ -855,11 +868,140 @@
 </section>
 
 <!-- ===================================================== 20 -->
+
+<!-- ===================================================== 20 -->
 <section class="part">
-  <div class="part-head"><small>Part 20 &middot; Trainer</small><h2>Trainer's plan, exercises and sign-off</h2></div>
+  <div class="part-head"><small>Part 20 &middot; Parents, students, teachers</small><h2>The mobile app</h2></div>
+  <p>One app serves every school. Nobody chooses a school: the app works it out from the mobile number. This part is for the people who use the app and for the staff who help them.</p>
+  <div class="facts"><div><b>Who</b>Parents, students, teachers, administrators, accountants</div><div><b>Where</b>The school app on a phone</div><div><b>Before you start</b>The school has connected to the registry (Part 21)</div></div>
+
+  <h3>20.1 Signing in</h3>
+  <ol class="steps">
+    <li>Open the app. Type your <b>mobile number</b> (any way you write it: <b>98000 00001</b>, <b>+91 98000 00001</b> or <b>098000 00001</b>) or your <b>email</b>. A student can also type the <b>admission number</b>.</li>
+    <li>Type your password and press <span class="btn">Sign in</span>.</li>
+    <li>The app finds your school and your role (student, teacher, parent, administrator or accountant) and opens your home screen.</li>
+    <li>If you were given a <b>temporary password</b>, the app asks you to choose your own first. Use at least 8 characters.</li>
+  </ol>
+  <div class="box tip"><b class="t">The same login as the website</b>The password is the school's password for you. If you change it in the app, the website accepts the new one a moment later, and the other way round.</div>
+  <h4>When one number is more than one account</h4>
+  <p>A parent and their child may share a phone number, or a teacher may also be a parent at another school. After the correct password the app shows <b>Choose an account</b>: tap the school and role you want. Both accounts keep working; you simply pick.</p>
+  <h4>Switching person</h4>
+  <p>Open <b>Profile</b> and press <b>Switch account</b>. Do this on a shared phone, and whenever someone else needs to sign in.</p>
+
+  <h3>20.2 Parents and students: the home screen</h3>
+  <ul>
+    <li><b>Top bar:</b> a greeting, <b>search</b> (finds a tile by name), <b>notices</b> (the bell) and <b>sign out</b>.</li>
+    <li><b>Frequently Used:</b> the four tiles you open most. It starts with the first four and learns your habits.</li>
+    <li><b>Two cards</b> you swipe sideways: <b>Attendance</b> as a circle with the percentage (red when under 75%), and <b>Payment Due</b> with the amount still to pay. A parent with several children taps a child's name above the cards.</li>
+    <li><b>Sections</b> of icons, like the school menu: <b>Academic</b> (timetable, calendar, homework, learning materials, online classes, attendance, student leave, leave balance), <b>Exam</b> (exams and results, revaluation requests), <b>Fees</b>, <b>Hostel</b> (room and warden, mess menu, night roll call, visitors), <b>Library</b>, <b>Administration</b> (certificates, feedback and grievance, messages) and <b>Other services</b> (transport, notices, activities, change password).</li>
+    <li><b>Bottom bar:</b> Home, <b>Time Table</b>, <b>Ask Query</b> (feedback and grievances, with a button to send a new one) and Profile.</li>
+  </ul>
+
+  <h3>20.3 Things parents and students do in the app</h3>
+  <table>
+    <tr><th style="width:26%">I want to</th><th>Do this</th></tr>
+    <tr><td>See today's attendance</td><td>The ring on the home screen, or <b>Academic &rarr; Attendance</b> for each day of a month.</td></tr>
+    <tr><td>See what is due and pay history</td><td><b>Fees &rarr; Fees &amp; payments</b>: billed, paid, still to pay, and the receipts. Payment itself is at the school office.</td></tr>
+    <tr><td>See marks and the report card</td><td><b>Exam &rarr; Exams &amp; results</b>, then tap an exam to see every subject.</td></tr>
+    <tr><td>Ask for leave</td><td><b>Academic &rarr; Student leave</b>: pick the type, the dates (YYYY-MM-DD) and a reason, then <b>Send request</b>. A request that is still pending can be withdrawn.</td></tr>
+    <tr><td>Ask for a certificate</td><td><b>Administration &rarr; Certificates</b>, then <b>Request a certificate</b>: bonafide, character or fee. A transfer certificate is asked for at the office.</td></tr>
+    <tr><td>Tell the school something</td><td><b>Ask Query</b> &rarr; <b>Send feedback</b>: choose feedback or grievance, the topic, and write it. Replies appear in the same list.</td></tr>
+    <tr><td>Join an online class or open study material</td><td><b>Academic &rarr; Online classes</b> or <b>Learning materials</b>, open the item, press <b>Join class</b> or <b>Open material</b>.</td></tr>
+    <tr><td>Check the hostel</td><td><b>Hostel</b>: room, bed, meal plan, warden's phone, the weekly mess menu, the night roll call of the last month, and who visited. A day scholar sees "Not a boarder".</td></tr>
+    <tr><td>Give consent for a trip</td><td><b>Other services &rarr; Activities</b>, open the activity, <b>Give consent</b> or <b>Decline</b>.</td></tr>
+  </table>
+  <div class="box warn"><b class="t">Pull down to refresh</b>Every page loads when you open it. If something was changed at the school a moment ago, pull the page down to reload it.</div>
+
+  <h3>20.4 Teachers, administrators and accountants</h3>
+  <ul>
+    <li><b>Home</b> shows <b>Today's Summary</b> (present, absent and classes not yet marked; an accountant sees fees due and collected) and a grid with a tile for each area you may open. <b>My Class</b>, <b>Mark Attendance</b> and <b>Enter Marks</b> come first for teachers.</li>
+    <li><b>Mark attendance:</b> choose the class and the day; <b>tap a student</b> to cycle present, absent and late; press <b>All present</b> to start from everyone present; then <b>Save attendance</b>. Changing a past day asks for a reason.</li>
+    <li><b>Enter marks:</b> choose the exam and the subject, type each mark, <b>Save marks</b>. A subject taught as theory plus practical is entered on the website.</li>
+    <li><b>My class:</b> today's roll, who is absent, leave waiting for a decision. Tap a status to call the guardian.</li>
+    <li><b>Decisions on the go:</b> approve or reject student and staff leave; approve or reject item requests and revaluations; issue or reject certificates; take a fee payment; mark a library book returned; check a hostel visitor out; approve a payslip (administrator only); enrol an applicant who has an offer.</li>
+    <li><b>Messages and notices:</b> an administrator can publish a notice and message parents by SMS or email from <b>Communication</b>.</li>
+  </ul>
+  <p>What each person sees is set by the school: the tiles, their names and icons, their order and who may see them are edited on the website under <span class="menu">Settings</span> &rarr; <span class="menu">Mobile App Menu</span> (administrator): rename a tile, choose an icon or upload a picture, move it up or down, limit it to some roles, or hide it. The app picks the change up the next time it is opened.</p>
+
+<h3>20.5 Before you tell families about the app</h3>
+  <ul>
+    <li>The school appears on the registry admin page with a recent <b>Last report</b> (Part 21).</li>
+    <li>Every parent's, student's and teacher's mobile number is correct on their record.</li>
+    <li>Sign in with one test parent, one student and one teacher on a real phone and open Home, Attendance and Fees.</li>
+    <li>The school's server address is reachable from outside the school Wi-Fi (https).</li>
+  </ul>
+
+  <h3>20.6 When something looks wrong</h3>
+  <table>
+    <tr><th style="width:34%">What you see</th><th>What it means and what to do</th></tr>
+    <tr><td>"Invalid mobile number, email or password"</td><td>Check the number or email and the password. The same message appears for an unknown number, so it does not reveal who has an account. Ask the school office to confirm the mobile number on your record.</td></tr>
+    <tr><td>"Too many failed attempts. Try again in N minute(s)"</td><td>Wait. After eight wrong tries for one number or email the app waits 15 minutes. Do not keep trying.</td></tr>
+    <tr><td>"Cannot reach the sign-in service"</td><td>Your phone has no connection, or the registry is down. Try mobile data or Wi-Fi; if it persists, tell the school.</td></tr>
+    <tr><td>"That sign-in has expired" or "was already used"</td><td>The pass the registry gave is valid for two minutes, once. Sign in again.</td></tr>
+    <tr><td>Signs in but the school does not open</td><td>The school's server is not reachable from the phone. Tell the school office.</td></tr>
+    <tr><td>My number works for someone else too</td><td>You will be asked to choose the account. If the password belongs to only one of them, only that one is offered.</td></tr>
+    <tr><td>"Please change your password first"</td><td>A temporary password: choose your own.</td></tr>
+    <tr><td>A new login does not work yet</td><td>A new login reaches the registry within a moment, and the full list is sent every 15 minutes. Wait, or ask an administrator to press <b>Sync now</b> (<code>POST /api/global-sync</code>).</td></tr>
+    <tr><td>Hostel shows "Not a boarder"</td><td>The student has no room. The hostel warden allocates one under Hostel &rarr; Room Allocation.</td></tr>
+  </table>
+</section>
+
+<!-- ===================================================== 21 -->
+<section class="part">
+  <div class="part-head"><small>Part 21 &middot; Administrator and IT</small><h2>Connecting schools to the app</h2></div>
+  <div class="flow"><span>Person types mobile + password</span><i>&rarr;</i><span>Global registry finds school and role</span><i>&rarr;</i><span>App connects to that school</span><i>&rarr;</i><span>School signs them in</span></div>
+  <p>Each school keeps its own server and database. A small separate service, the <b>global registry</b>, knows every school and every login, so one app can serve all of them. It stores each school's name and address, and for each login the role, name, mobile number, email, admission number and <b>password hash</b>. Marks, fees, attendance and everything else stay with the school.</p>
+  <div class="facts"><div><b>Who</b>Administrator or IT person running the registry</div><div><b>Where</b>The registry's admin page: <code>http://&lt;registry&gt;:4100/admin/</code></div><div><b>Needs</b>The admin key (<code>GLOBAL_ADMIN_KEY</code>)</div></div>
+
+  <h3>21.1 Adding a school</h3>
+  <ol class="steps">
+    <li>Open the registry's admin page and enter the <b>admin key</b>. (It is kept in that browser tab only, and cleared when you press <b>Lock</b>.)</li>
+    <li>Press <span class="btn">+ Add a school</span>. Enter the <b>code</b> (short, lower case, easy to say: <b>greenfield</b>), the <b>name</b>, the city and state, and the school's <b>API address</b> (for example <b>https://erp.greenfield.edu/api</b>).</li>
+    <li>Leave <b>Check that the school's server answers</b> ticked, so a typo is caught now. Press <b>Save</b>.</li>
+    <li>A box shows the school's <b>key</b> and three lines to paste into the school's server settings. <b>It is shown once.</b> Copy it before you close the box.</li>
+    <li>On the school's server, open <code>server/.env</code> and add:
+      <ul><li><code>GLOBAL_URL</code> (the registry's address, ending in <code>/api</code>)</li><li><code>GLOBAL_CLIENT_CODE</code> (the school's code)</li><li><code>GLOBAL_CLIENT_KEY</code> (the key)</li></ul>
+      Restart the school's server.</li>
+    <li>Ten seconds later the school reports all its logins. On the admin page the school's <b>Logins</b> count fills in and <b>Last report</b> shows the time.</li>
+  </ol>
+  <div class="box ok"><b class="t">Check it worked</b>The school's row shows a green time such as "2 min ago" and its number of logins. Press <b>Check</b> to confirm the registry can reach the school's server; it reports how long it took.</div>
+
+  <h3>21.2 Day to day</h3>
+  <table>
+    <tr><th style="width:22%">Button</th><th>What it does</th></tr>
+    <tr><td><b>Check</b></td><td>Asks the school's server whether it answers. Use it when parents say they cannot get in.</td></tr>
+    <tr><td><b>Edit</b></td><td>Change the name, city, API address or logo. The code does not change.</td></tr>
+    <tr><td><b>New key</b></td><td>Makes a new key and cancels the old one. The school's server stops reporting until the new key is in its settings. Use it if a key may have leaked.</td></tr>
+    <tr><td><b>Switch off / on</b></td><td>A school that is switched off is not found and its people cannot sign in through the app. Nothing is deleted.</td></tr>
+    <tr><td><b>Remove</b></td><td>Deletes the school and all its logins from the registry after you type its code. The school's own server and data are untouched. Its logins cannot sign in until it is added again.</td></tr>
+  </table>
+  <p>The four tiles at the top show how many schools exist, how many are active, how many logins in total, and <b>Not reporting</b>: active schools that have never reported or have been silent for over an hour. A school normally reports within seconds of a change and every 15 minutes at the latest. If one is not reporting, check its server is running and its three settings are right.</p>
+
+  <h3>21.3 Rules to remember</h3>
+  <ul>
+    <li><b>The school stays the source of truth.</b> Create logins and change passwords at the school (website). The registry follows within a moment. A login deleted at the school is switched off in the registry at the next full report.</li>
+    <li><b>Where the mobile number comes from:</b> a teacher's number from the staff profile, a parent's from the parent profile, a student's own phone or else their guardian's phone. An administrator without a staff profile has no phone and signs in by email. Keep these numbers correct: the app finds people by them.</li>
+    <li><b>Two schools, one number</b> is fine: the person chooses the account after signing in.</li>
+    <li><b>Safety:</b> the registry holds password hashes for every school. Protect its database like a school's own, serve it and every school over <b>https</b>, keep the admin key secret, and give the database a login of its own.</li>
+    <li><b>Backups:</b> back up the registry database (<b>school_erp_global</b>) and its signing key (<code>global/keys/private.pem</code>, or <code>GLOBAL_PRIVATE_KEY</code>). Without the key, every school would have to be re-connected.</li>
+  </ul>
+
+<div class="box ok"><b class="t">Quick reference</b>Admin page: <code>http://&lt;registry&gt;:4100/admin/</code>. School settings: <code>GLOBAL_URL</code>, <code>GLOBAL_CLIENT_CODE</code>, <code>GLOBAL_CLIENT_KEY</code>. Registry database: <b>school_erp_global</b>. Reports: within seconds of a change, every 15 minutes at the latest.</div>
+  <h3>21.4 When something looks wrong</h3>
+  <table>
+    <tr><th style="width:34%">What you see</th><th>What to check</th></tr>
+    <tr><td>The admin page says "That key is not right"</td><td>The key is <code>GLOBAL_ADMIN_KEY</code> in the registry's settings. If it still has the example value the admin page is switched off on purpose.</td></tr>
+    <tr><td>Adding a school fails: "did not answer"</td><td>The address is wrong, the school's server is down, or this computer cannot reach it. Fix it, or untick the check to add it anyway.</td></tr>
+    <tr><td>Last report says Never</td><td>The three <code>GLOBAL_*</code> settings are missing or wrong on the school's server, or it has not been restarted. Its log says "Global registry: N logins reported" when it works.</td></tr>
+    <tr><td>A school's logins are far fewer than expected</td><td>Only logins with an email, mobile number or admission number can sign in. Check the staff, parent and student phone numbers.</td></tr>
+    <tr><td>People get "Invalid ..." though the password is right</td><td>Their login may not have reached the registry yet, or the number on their profile differs from the one they type. Ask an administrator to press <b>Sync now</b> at the school (<code>POST /api/global-sync</code>), then try again.</td></tr>
+  </table>
+</section>
+<section class="part">
+  <div class="part-head"><small>Part 22 &middot; Trainer</small><h2>Trainer's plan, exercises and sign-off</h2></div>
   <p>Run the sessions on <b>demo data</b> in a rehearsal copy, never on live records. Load it with <code>npm run seed:demo --prefix server</code> and clear it with <code>npm run seed:demo:remove --prefix server</code>.</p>
 
-  <h3>20.1 Suggested sessions</h3>
+  <h3>22.1 Suggested sessions</h3>
   <table>
     <tr><th style="width:5%">#</th><th style="width:30%">Session</th><th style="width:18%">Who attends</th><th>Parts</th><th style="width:9%">Time</th></tr>
     <tr><td>1</td><td>Getting started</td><td>Everyone</td><td>1, 2</td><td>1 h</td></tr>
@@ -871,11 +1013,13 @@
     <tr><td>7</td><td>Library, transport, hostel, inventory</td><td>Each desk</td><td>11 to 14</td><td>2 h each</td></tr>
     <tr><td>8</td><td>Certificates, portal, messages</td><td>Office staff</td><td>15 to 17</td><td>2 h</td></tr>
     <tr><td>9</td><td>Routine, backups, year end</td><td>Administrators</td><td>18, 19</td><td>2 h</td></tr>
-    <tr><td>10</td><td>Full rehearsal: one family through everything</td><td>Everyone</td><td>All</td><td>half day</td></tr>
+    <tr><td>10</td><td>The mobile app: signing in, home screen, everyday tasks</td><td>Parents, students, teachers</td><td>20</td><td>1 h</td></tr>
+    <tr><td>11</td><td>Connecting schools to the app</td><td>Administrator, IT</td><td>21</td><td>1 h</td></tr>
+    <tr><td>12</td><td>Full rehearsal: one family through everything</td><td>Everyone</td><td>All</td><td>half day</td></tr>
   </table>
 
-  <h3>20.2 Hands-on exercises</h3>
-  <div class="ex"><h4>Exercise A: one family, whole process (session 10)</h4>
+  <h3>22.2 Hands-on exercises</h3>
+  <div class="ex"><h4>Exercise A: one family, whole process (session 12)</h4>
     <ol class="steps">
       <li>Record an enquiry for a child; plan a follow-up.</li>
       <li>Start the application; add a sibling; upload the required documents; submit.</li>
@@ -886,6 +1030,7 @@
       <li>Mark attendance for the class; enter marks for an exam; print the report card.</li>
       <li>Raise a certificate request as the parent; issue it at the office.</li>
       <li>Promote the class and check the ID card.</li>
+      <li>On a phone, sign in to the app with the parent's mobile number; pick the right account if asked; find the fee, the report card and the hostel details.</li>
     </ol></div>
   <div class="ex"><h4>Exercise B: break it on purpose (all sessions)</h4>
     <ul>
@@ -894,6 +1039,7 @@
       <li>Enter a mark higher than the maximum.</li>
       <li>Try to issue a book that is already on loan to the same student.</li>
       <li>Try to enrol an applicant who has not been approved.</li>
+      <li>In the app, sign in with a wrong password, and with a number nobody has: read the message.</li>
     </ul>
     <p class="small">The aim is for staff to meet each refusal in training, so it does not frighten them in real use.</p></div>
   <div class="ex"><h4>Exercise C: recover (administrators)</h4>
@@ -903,7 +1049,7 @@
       <li>Download a manual backup. On a <b>test copy</b>, restore it.</li>
     </ul></div>
 
-  <h3>20.3 Before going live</h3>
+  <h3>22.3 Before going live</h3>
   <ul class="check">
     <li>Admin password, secret key and database password changed from the examples.</li>
     <li>School profile, academic year, classes, subject map, staff and fee structure filled in; the Setup guide is all ticked.</li>
@@ -911,11 +1057,13 @@
     <li>Email and SMS credentials set, and a test message delivered (Settings &rarr; Integrations).</li>
     <li>Teacher logins created, with the same email as each staff profile.</li>
     <li>Backup folder is copied off the server on a schedule; one restore has been practised on a test copy.</li>
+    <li>The school is connected to the global registry: its <b>Last report</b> is recent and a test parent, teacher and student can sign in on a phone with their mobile numbers.</li>
+    <li>Mobile numbers on staff, parent and student records are correct.</li>
     <li>One real class rehearsed end to end; what the pilot showed has been fixed.</li>
     <li>Everyone has changed their temporary password.</li>
   </ul>
 
-  <h3>20.4 Sign-off sheet</h3>
+  <h3>22.4 Sign-off sheet</h3>
   <table>
     <tr><th>Name</th><th>Role</th><th>Sessions completed</th><th>Exercise A</th><th>Exercise B</th><th>Signature / date</th></tr>
     <tr><td>&nbsp;<br>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>

@@ -1269,3 +1269,54 @@ describe('global sign-in', () => {
     assert.equal((await call('POST', '/global-sync', { token: plain.token })).status, 403);
   });
 });
+
+describe('student hostel', () => {
+  test('a boarder and their parent see the room, the mess menu, the roll call and visitors; a day scholar sees none; nobody sees another child', async () => {
+    const cls = await create('/classes', { name: `Ho${RUN}`.slice(0, 12), section: 'A' });
+    const boarder = await create('/students', { admissionNo: `HB${RUN}`, firstName: 'Board', lastName: 'Er', gender: 'male', classId: cls.id });
+    const day = await create('/students', { admissionNo: `HD${RUN}`, firstName: 'Day', lastName: 'Scholar', gender: 'male', classId: cls.id });
+    const hostel = await create('/hostel/hostels', { name: `Hostel ${RUN}`, type: 'boys', wardenName: 'Mr Warden', wardenPhone: '+919800000099' });
+    const room = await create('/hostel/rooms', { hostelId: hostel.id, roomNo: `R${RUN}`.slice(0, 8), capacity: 2, monthlyFee: 1500 });
+    assert.equal((await asAdmin('POST', '/hostel/allocations', { body: { studentId: boarder.id, roomId: room.id, bedNo: 'B1', mealPlan: 'veg', localGuardianName: 'Local Guardian', localGuardianPhone: '+919800000098' } })).status, 201);
+    cleanups.unshift(() => asAdmin('DELETE', `/hostel/allocations/${boarder.id}`));
+    for (const [d, m, items] of [['tue', 'lunch', 'Dal and rice'], ['mon', 'dinner', 'Roti and sabzi'], ['mon', 'breakfast', 'Poha']]) {
+      const meal = await asAdmin('POST', '/hostel/meals', { body: { hostelId: hostel.id, day: d, meal: m, items } });
+      assert.equal(meal.status, 201);
+    }
+    const date = new Date().toISOString().slice(0, 10);
+    assert.equal((await asAdmin('POST', '/hostel/attendance', { body: { date, records: [{ studentId: boarder.id, status: 'present' }] } })).status, 200);
+    assert.equal((await asAdmin('POST', '/hostel/visitors', { body: { studentId: boarder.id, visitorName: 'Visiting Uncle', relation: 'Uncle', purpose: 'Meeting' } })).status, 201);
+
+    const login = async (student, name) => {
+      await create('/student-accounts', { studentId: student.id, email: `${name}-${RUN}@test.local`, password: 'password123' });
+      const first = await call('POST', '/auth/login', { body: { email: `${name}-${RUN}@test.local`, password: 'password123' } });
+      await call('POST', '/auth/change-password', { token: first.data.token, body: { currentPassword: 'password123', newPassword: 'password-45678' } });
+      return (await call('POST', '/auth/login', { body: { email: `${name}-${RUN}@test.local`, password: 'password-45678' } })).data.token;
+    };
+    const boarderToken = await login(boarder, 'boarder');
+    const dayToken = await login(day, 'dayscholar');
+    const get = (token, id, tail) => call('GET', `/portal/children/${id}/hostel${tail}`, { token });
+
+    const mine = (await get(boarderToken, boarder.id, '')).data;
+    assert.equal(mine.allocated, true);
+    assert.deepEqual([mine.hostel, mine.room.startsWith('R'), mine.bedNo, mine.mealPlan, mine.wardenName, mine.localGuardianName], [`Hostel ${RUN}`, true, 'B1', 'veg', 'Mr Warden', 'Local Guardian']);
+    assert.equal(Number(mine.monthlyFee), 1500);
+
+    const meals = (await get(boarderToken, boarder.id, '/meals')).data;
+    assert.deepEqual(meals.map((m) => `${m.day} ${m.meal}`), ['mon breakfast', 'mon dinner', 'tue lunch'], 'in day and meal order');
+    const roll = (await get(boarderToken, boarder.id, '/attendance')).data;
+    assert.deepEqual([roll[0].status, String(roll[0].date).slice(0, 10)], ['present', date]);
+    const visitors = (await get(boarderToken, boarder.id, '/visitors')).data;
+    assert.deepEqual([visitors[0].visitorName, visitors[0].checkOut], ['Visiting Uncle', null]);
+
+    // a day scholar is not a boarder, and sees an empty hostel, not an error
+    assert.deepEqual((await get(dayToken, day.id, '')).data, { allocated: false });
+    assert.deepEqual((await get(dayToken, day.id, '/meals')).data, []);
+    assert.deepEqual((await get(dayToken, day.id, '/visitors')).data, []);
+    // nobody else's child, and it is read only
+    assert.equal((await get(dayToken, boarder.id, '')).status, 404);
+    assert.equal((await get(dayToken, boarder.id, '/meals')).status, 404);
+    assert.equal((await call('POST', `/portal/children/${boarder.id}/hostel`, { token: boarderToken, body: {} })).status, 403, 'students cannot write here');
+    assert.equal((await call('GET', `/portal/children/${boarder.id}/hostel`, { token: undefined })).status, 401);
+  });
+});

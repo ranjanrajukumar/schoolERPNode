@@ -1,8 +1,10 @@
 import { niceDate } from '../ui';
-import { badgeFor } from './format';
+import { badgeFor, dateTime } from './format';
 
 const dot = (...xs) => xs.filter((x) => x !== null && x !== undefined && x !== '').join(' · ');
 const kid = (c, tail) => `/portal/children/${c?.id}${tail}`;
+const DAY = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+const cap = (s) => String(s ?? '').replace(/^./, (c) => c.toUpperCase());
 
 /**
  * What a parent or student can open in the app. The home screen shows each module here as a titled section of icons (Academic, Exam,
@@ -34,6 +36,24 @@ export const FAMILY_MODULES = [
     key: 'fees', title: 'Fees',
     screens: [
       { key: 'fees', title: 'Fees & payments', scope: 'child', kind: 'custom', route: 'Fees' },
+    ],
+  },
+  {
+    key: 'hostel', title: 'Hostel',
+    screens: [
+      {
+        key: 'details', title: 'Room & warden', scope: 'child', kind: 'stats', path: (c) => kid(c, '/hostel'),
+        tiles: (d) => (d.allocated
+          ? [{ label: 'Hostel', value: d.hostel }, { label: 'Room', value: d.room }, { label: 'Bed', value: d.bedNo ?? '—' }, { label: 'Meal plan', value: d.mealPlan ?? '—', tone: 'green' }]
+          : [{ label: 'Hostel', value: 'Not a boarder', tone: 'amber' }]),
+        lists: [
+          { title: 'Warden', rows: (d) => (d.allocated && d.wardenName ? [d] : []), row: (d) => ({ title: d.wardenName, sub: dot(d.wardenPhone, d.address) }), empty: 'No warden is recorded.' },
+          { title: 'Local guardian', rows: (d) => (d.allocated && d.localGuardianName ? [d] : []), row: (d) => ({ title: d.localGuardianName, sub: dot(d.localGuardianRelation, d.localGuardianPhone) }), empty: 'No local guardian is recorded.' },
+        ],
+      },
+      { key: 'meals', title: 'Mess menu', scope: 'child', kind: 'list', path: (c) => kid(c, '/hostel/meals'), row: (r) => ({ title: `${DAY[r.day] ?? r.day} · ${cap(r.meal)}`, sub: r.items }), empty: 'The mess menu has not been set.' },
+      { key: 'attendance', title: 'Night roll call', scope: 'child', kind: 'list', path: (c) => kid(c, '/hostel/attendance'), row: (r) => ({ title: niceDate(r.date), badge: { text: r.status, tone: { present: 'green', absent: 'red', leave: 'amber' }[r.status] ?? 'grey' } }), empty: 'No roll call recorded in the last month.' },
+      { key: 'visitors', title: 'Visitors', scope: 'child', kind: 'list', path: (c) => kid(c, '/hostel/visitors'), row: (r) => ({ title: r.visitorName, sub: dot(r.relation, r.purpose, dateTime(r.checkIn)), badge: r.checkOut ? { text: 'Left', tone: 'grey' } : { text: 'Inside', tone: 'amber' } }), empty: 'No visitors recorded.' },
     ],
   },
   {

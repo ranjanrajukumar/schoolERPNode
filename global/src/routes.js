@@ -4,7 +4,7 @@ import express from 'express';
 import { checkLoginAllowed, rateLimit, recordLoginFailure, recordLoginSuccess, requireAdminKey } from './middleware.js';
 import { publicKey } from './config/keys.js';
 import { login } from './services/auth.service.js';
-import { create, findActiveByCode, listAll, remove, rotateKey, search, update, verifyClientKey } from './services/clients.service.js';
+import { checkSchool, create, findActiveByCode, listAll, remove, rotateKey, search, update, verifyClientKey } from './services/clients.service.js';
 import { countFor, deactivateIdentity, upsertIdentities } from './services/provision.service.js';
 import { unauthorized } from './utils/httpError.js';
 
@@ -52,6 +52,7 @@ admin.get('/clients', asyncHandler(async (_req, res) => res.json(await listAll()
 // POST { code, name, city?, state?, logoUrl?, apiUrl, notes?, verify? }: the school's server is asked to answer unless verify is false
 admin.post('/clients', asyncHandler(async (req, res) => res.status(201).json(await create(req.body, { verify: req.body?.verify !== false }))));
 admin.put('/clients/:code', asyncHandler(async (req, res) => res.json(await update(req.params.code, req.body, { verify: req.body?.verify === true }))));
+admin.post('/clients/:code/check', asyncHandler(async (req, res) => res.json(await checkSchool(req.params.code))));
 admin.post('/clients/:code/rotate-key', asyncHandler(async (req, res) => res.json(await rotateKey(req.params.code))));
 admin.delete('/clients/:code', asyncHandler(async (req, res) => { await remove(req.params.code); res.json({ ok: true }); }));
 router.use('/admin', admin);

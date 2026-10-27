@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School registry</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="bar">
+    <div><b>School registry</b><small>Schools and their connection to the mobile app</small></div>
+    <div class="bar-actions" id="barActions" hidden>
+      <button type="button" class="ghost light" id="refresh">Refresh</button>
+      <button type="button" class="ghost light" id="signOut">Lock</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="gate" class="card narrow">
+      <h1>Enter the admin key</h1>
+      <p class="hint">The key is <code>GLOBAL_ADMIN_KEY</code> in the registry's <code>.env</code>. It is kept in this browser tab only, and cleared when you lock or close it.</p>
+      <form id="gateForm">
+        <label>Admin key<input type="password" id="keyInput" autocomplete="off" required></label>
+        <p class="error" id="gateError" role="alert" hidden></p>
+        <button type="submit">Open</button>
+      </form>
+    </section>
+
+    <section id="panel" hidden>
+      <div class="tiles" id="tiles"></div>
+      <p class="notice" id="notice" hidden></p>
+      <p class="error" id="error" role="alert" hidden></p>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Schools</h2>
+          <div class="toolbar">
+            <input type="search" id="search" placeholder="Search schools…" aria-label="Search schools">
+            <button type="button" id="addSchool">+ Add a school</button>
+          </div>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>School</th><th>API address</th><th>Status</th><th>Logins</th><th>Last report</th><th>Key</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <p class="hint" id="emptyHint" hidden>No schools yet. Add the first one.</p>
+      </div>
+      <p class="hint">A school reports its logins every 15 minutes and whenever one changes. "Never" means its server has not been connected yet: put the code and key in its <code>.env</code> and restart it.</p>
+    </section>
+  </main>
+
+  <dialog id="schoolDialog">
+    <form id="schoolForm" method="dialog">
+      <h2 id="schoolTitle">Add a school</h2>
+      <div class="grid">
+        <label>Code<input id="fCode" maxlength="30" required placeholder="greenfield" pattern="[a-zA-Z0-9][a-zA-Z0-9\-]{1,29}"><small>Lower-case letters, numbers and hyphens. People type this if they cannot find the school.</small></label>
+        <label>Name<input id="fName" maxlength="120" required placeholder="Greenfield Public School"></label>
+        <label>City<input id="fCity" maxlength="80"></label>
+        <label>State<input id="fState" maxlength="80"></label>
+        <label class="wide">API address<input id="fApi" type="url" required placeholder="https://erp.greenfield.edu/api"><small>The school's own server, ending in /api. Phones must be able to reach it.</small></label>
+        <label class="wide">Logo address (optional)<input id="fLogo" type="url" placeholder="https://…/logo.png"></label>
+        <label class="wide">Notes (only you see these)<input id="fNotes" maxlength="300"></label>
+        <label class="check wide"><input type="checkbox" id="fVerify" checked> Check that the school's server answers before saving</label>
+      </div>
+      <p class="error" id="schoolError" role="alert" hidden></p>
+      <div class="actions"><button type="button" class="ghost" id="schoolCancel">Cancel</button><button type="submit" id="schoolSave">Save</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="keyDialog">
+    <h2 id="keyTitle">Key for the school's server</h2>
+    <p class="hint">This key is shown <b>once</b>. Copy it now: only a fingerprint is kept.</p>
+    <pre id="keySnippet"></pre>
+    <div class="actions"><button type="button" class="ghost" id="keyCopy">Copy</button><button type="button" id="keyDone">I have saved it</button></div>
+  </dialog>
+
+  <script src="admin.js"></script>
+</body>
+</html>

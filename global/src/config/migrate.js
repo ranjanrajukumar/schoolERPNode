@@ -25,6 +25,7 @@ export async function migrate() {
   await sequelize.sync();
   const clients = await queryInterface.describeTable('clients');
   if (!clients.api_key_hash) await sequelize.query('ALTER TABLE `clients` ADD COLUMN `api_key_hash` VARCHAR(64) NULL');
+  if (!clients.last_sync_at) await sequelize.query('ALTER TABLE `clients` ADD COLUMN `last_sync_at` DATETIME NULL');
   for (const code of ROLES) await Role.findOrCreate({ where: { code } });
 
   if (legacy) await moveLegacyIdentities();

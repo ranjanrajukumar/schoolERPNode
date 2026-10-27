@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -9,6 +11,8 @@ if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PRO
 app.use(helmet());
 app.use(cors()); // the list is public, and the admin API is protected by its key, so any origin may call it
 app.use(express.json({ limit: '50kb' }));
+// the admin page: plain files, so the content-security policy of helmet (scripts from this site only) applies as it is
+app.use('/admin', express.static(path.join(path.dirname(fileURLToPath(import.meta.url)), '../public/admin')));
 app.use('/api', routes);
 app.use('/api', notFoundHandler);
 app.use(errorHandler);

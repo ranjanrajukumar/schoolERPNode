@@ -1,4 +1,4 @@
-import { Credential, Identity, MobileNumber, Role, sequelize } from '../models/index.js';
+import { Client, Credential, Identity, MobileNumber, Role, sequelize } from '../models/index.js';
 import { badRequest } from '../utils/httpError.js';
 import { digitsOf, mobileKeyOf } from './auth.service.js';
 
@@ -33,6 +33,18 @@ async function mobileNumberId(numberKey, digits, transaction) {
   return row.id;
 }
 
+// Two schools may report at the same moment, and a phone number can be shared by logins at both: the database then picks one of the two
+// transactions to retry. Retrying it is the correct answer, so a report is repeated a few times before it is given up on.
+const RETRYABLE = (err) => ['ER_LOCK_DEADLOCK', 'ER_LOCK_WAIT_TIMEOUT'].includes(err?.original?.code) || err?.name === 'SequelizeUniqueConstraintError';
+async function withRetry(fn, tries = 5) {
+  for (let attempt = 1; ; attempt += 1) {
+    try { return await fn(); } catch (err) {
+      if (attempt >= tries || !RETRYABLE(err)) throw err;
+      await new Promise((ok) => setTimeout(ok, 30 * attempt + Math.random() * 60));
+    }
+  }
+}
+
 /** Phone numbers no login points to any more are not kept. */
 export const pruneMobileNumbers = (transaction) => sequelize.query('DELETE FROM mobile_numbers WHERE id NOT IN (SELECT mobile_number_id FROM identities WHERE mobile_number_id IS NOT NULL)', { transaction });
 
@@ -46,7 +58,10 @@ export async function upsertIdentities(client, list, { full = false } = {}) {
   const rows = list.map(clean);
   if (new Set(rows.map((r) => r.localUserId)).size !== rows.length) throw badRequest('The same login is listed twice');
 
-  return sequelize.transaction(async (transaction) => {
+  // phone numbers are locked in the same order by every report, so two reports sharing a number wait for each other instead of deadlocking
+  rows.sort((a, b) => String(a.numberKey ?? '~').localeCompare(String(b.numberKey ?? '~')) || a.localUserId - b.localUserId);
+
+  const result = await withRetry(() => sequelize.transaction(async (transaction) => {
     const roles = new Map((await Role.findAll({ transaction })).map((r) => [r.code, r.id]));
     const existing = new Map((await Identity.findAll({ where: { clientId: client.id }, transaction })).map((r) => [r.localUserId, r]));
     let created = 0; let updated = 0;
@@ -69,9 +84,12 @@ export async function upsertIdentities(client, list, { full = false } = {}) {
         if (!keep.has(id) && have.active) { await have.update({ active: false, updatedAt: new Date() }, { transaction }); deactivated += 1; }
       }
     }
-    await pruneMobileNumbers(transaction);
     return { created, updated, deactivated };
-  });
+  }));
+  // housekeeping after the report is safely saved: a failure here must not undo or fail it
+  await pruneMobileNumbers().catch(() => {});
+  await Client.update({ lastSyncAt: new Date() }, { where: { id: client.id } }); // the registry's admin page shows this
+  return result;
 }
 
 export async function deactivateIdentity(client, localUserId) {

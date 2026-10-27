@@ -5,6 +5,7 @@ import {
   TransportRoute, TransportStop,
 } from '../../models/index.js';
 import { loadExtras } from '../admissions/recordExtras.js';
+import { attendanceOf as hostelAttendanceOf, hostelOf, mealsOf, visitorsOf } from './hostelPortal.service.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { badRequest, forbidden, notFound } from '../../utils/httpError.js';
 import { daysFromNow, fromCents, toCents, today } from '../../utils/money.js';
@@ -155,6 +156,12 @@ router.get('/children/:studentId/transport', ownChild, asyncHandler(async (req, 
     tripType: row.tripType, startDate: row.startDate, authorizedPickupName: row.authorizedPickupName, authorizedPickupPhone: row.authorizedPickupPhone,
   });
 }));
+
+// The hostel, for a student who boards: where they live, the mess menu, the night roll call and visitors. A day scholar gets { allocated: false }.
+router.get('/children/:studentId/hostel', ownChild, asyncHandler(async (req, res) => res.json(await hostelOf(req.student.id))));
+router.get('/children/:studentId/hostel/meals', ownChild, asyncHandler(async (req, res) => res.json(await mealsOf(req.student.id))));
+router.get('/children/:studentId/hostel/attendance', ownChild, asyncHandler(async (req, res) => res.json(await hostelAttendanceOf(req.student.id, req.query.from, req.query.to))));
+router.get('/children/:studentId/hostel/visitors', ownChild, asyncHandler(async (req, res) => res.json(await visitorsOf(req.student.id))));
 
 // GET /api/portal/children/:id/bus-location -> where the student's bus was last seen, or null when it has no GPS reading yet
 router.get('/children/:studentId/bus-location', ownChild, asyncHandler(async (req, res) => {
