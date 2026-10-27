@@ -1,7 +1,7 @@
-import { store } from './api';
+import { scopedKey, store } from './api';
 
 // How often each home tile was opened on this phone, so "Frequently used" shows what this person really uses.
-const key = (userId) => `schoolerp.usage.${userId}`;
+const key = (userId) => scopedKey('schoolerp.usage', userId);
 
 export async function loadUsage(userId) {
   try { return JSON.parse((await store.getItemAsync(key(userId))) ?? '{}'); } catch { return {}; }

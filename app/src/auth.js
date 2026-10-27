@@ -30,6 +30,12 @@ export function AuthProvider({ children }) {
       await saveToken(result.token);
       await refresh();
     },
+    /** Signs in with the ticket the global registry gave after checking the person's mobile number or email and password. */
+    async signInWithTicket(ticket) {
+      const result = await api('/auth/sso', { method: 'POST', body: { ticket } });
+      await saveToken(result.token);
+      await refresh();
+    },
     async changePassword(currentPassword, newPassword) {
       await api('/auth/change-password', { method: 'POST', body: { currentPassword, newPassword } });
       await refresh();

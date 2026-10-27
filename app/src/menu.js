@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api, store } from './api';
+import { api, scopedKey, store } from './api';
 import { useAuth, audienceOf } from './auth';
 import { buildDefaultMenu } from './registry/defaultMenu';
 import { PASSWORD_TILE, STAFF_QUICK } from './registry/extras';
@@ -12,7 +12,7 @@ import { findScreen } from './registry';
 const MenuContext = createContext({ items: [], source: 'builtin', reload: () => {} });
 export const useMenu = () => useContext(MenuContext);
 
-const cacheKey = (userId) => `schoolerp.menu.${userId}`;
+const cacheKey = (userId) => scopedKey('schoolerp.menu', userId);
 
 /** The built-in menu filtered the way the server filters it: this audience, this role, parents' roles inherited by their pages. */
 function builtinFor(role) {

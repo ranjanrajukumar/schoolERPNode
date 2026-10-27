@@ -15,6 +15,11 @@ export async function login(identifier, password) {
   const user = !who ? null : who.includes('@') ? await User.findOne({ where: { email: who } }) : await userForAdmissionNo(who);
   const valid = await bcrypt.compare(typeof password === 'string' ? password : '', user?.passwordHash ?? DUMMY_HASH);
   if (!user || !valid) return null;
+  return sessionFor(user);
+}
+
+/** The sign-in answer for a user whose identity has already been established: a token, who they are, and whether a new password is due. */
+export function sessionFor(user) {
   const payload = { id: user.id, name: user.name, role: user.role };
   return { token: jwt.sign(payload, env.jwtSecret(), { expiresIn: '8h' }), user: payload, mustChangePassword: Boolean(user.mustChangePassword) };
 }

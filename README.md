@@ -4,6 +4,8 @@
 - `client/` â€“ React (Vite) admin UI
 
 ## Mobile app
+One app serves many schools: the person signs in with a mobile number (or email) and password, the **global registry** (`global/`, its own small service and database) finds their school and role, and the app signs in at that school's own server with a short-lived signed ticket. See [global/README.md](global/README.md).
+
 `app/` is a React Native (Expo) app for parents, students and teachers that uses the same API. Its menu (labels, icons, order, roles, visibility) is stored in the database and edited under Settings, Mobile App Menu. See [app/README.md](app/README.md) to run it on a phone.
 
 ## Structure

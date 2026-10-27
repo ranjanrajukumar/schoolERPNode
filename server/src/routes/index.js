@@ -71,6 +71,7 @@ import inventoryRoutes from '../modules/inventory/inventory.routes.js';
 import inventoryRequestRoutes from '../modules/inventory/requests.routes.js';
 import hostelRoutes from '../modules/hostel/hostel.routes.js';
 import appMenuRoutes from '../modules/appmenu/appmenu.routes.js';
+import globalSyncRoutes from '../modules/globalauth/globalSync.routes.js';
 
 const router = Router();
 
@@ -98,6 +99,7 @@ router.use('/student-accounts', requireRole('admin'), studentAccountsRoutes);
 router.use('/parents', requireRole('admin'), parentsRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/users', requireRole('admin'), usersRoutes);
+router.use('/global-sync', requireRole('admin'), globalSyncRoutes); // report this school's logins to the global registry
 
 router.use('/my-class', requireRole('admin', 'teacher'), myClassRoutes);
 router.use('/classes', writeRoles('admin'), classesRoutes);

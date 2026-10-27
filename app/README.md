@@ -2,6 +2,8 @@
 
 A React Native (Expo) app that uses the same API as the web app. It sits next to `client/` (web) and `server/` (API).
 
+**One app for every school.** With `EXPO_PUBLIC_GLOBAL_URL` set to the [global registry](../global/README.md), a **student, teacher or parent** signs in with a **mobile number (or email) and password**; students can also use the admission number. The registry works out which school and role the login belongs to, the app connects to that school's own server and signs in with a short-lived ticket, and the home screen, menu and data all come from that school. If one number is a login at more than one school or role, the app asks which account. The phone remembers the school; **Profile, Switch account** signs out so someone else can sign in. Cached menus and "Frequently Used" counts are kept per school. Without the registry address the app serves a single school, as before.
+
 The home page of both apps is an icon menu: a navy bar with the person's greeting (search the menu, notices, sign out), **Frequently Used** (the four tiles this person opens most, learned on the phone), a summary card for today, and every area as a four-column icon grid. Staff see one grid of modules. Parents and students see titled sections (Academic, Exam, Fees, Library, Administration, Other services), each with its icons, under a swipeable pair of cards: attendance as a ring, and payment due. The bottom bar holds the main tabs and Profile (change password, sign out); for a parent or student it is Home, Time Table, Ask Query (feedback and grievances) and Profile.
 
 | Who signs in | What they get |

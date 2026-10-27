@@ -37,6 +37,15 @@ export async function restoreSession() {
   return Boolean(token);
 }
 
+/** Forgets the school's address (used when the person chooses another school). */
+export async function clearServerUrl() {
+  baseUrl = DEFAULT_API_URL;
+  await store.deleteItemAsync(SERVER_KEY);
+}
+
+/** A storage key for something kept per school and per person: ids repeat from school to school, so the school's address is part of it. */
+export const scopedKey = (name, userId) => `${name}.${baseUrl}.${userId}`.replace(/[^A-Za-z0-9._-]/g, '_');
+
 export async function saveServerUrl(url) {
   const clean = String(url ?? '').trim().replace(/\/+$/, '');
   if (!/^https?:\/\/.+/i.test(clean)) throw new ApiError('The server address must start with http:// or https://', 0);

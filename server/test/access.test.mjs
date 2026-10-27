@@ -1229,3 +1229,43 @@ describe('app menu', () => {
     await restore();
   });
 });
+
+describe('global sign-in', () => {
+  test('logins reach the registry, a ticket signs in once, a password change follows, and a deleted login stops working', async (t) => {
+    const status = (await asAdmin('GET', '/global-sync')).data;
+    if (!status.enabled) return t.skip('this school is not connected to the global registry (GLOBAL_URL, GLOBAL_CLIENT_CODE, GLOBAL_CLIENT_KEY)');
+    const registry = (path, body) => fetch(`${status.url}${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(async (r) => ({ status: r.status, data: await r.json().catch(() => ({})) }));
+    const waitFor = async (check, what) => { for (let i = 0; i < 20; i += 1) { const r = await check(); if (r) return r; await new Promise((ok) => setTimeout(ok, 400)); } assert.fail(`timed out waiting for ${what}`); };
+
+    // a new login is reported on its own, within a moment, and can be found by email and password
+    const teacher = await userWithRole('teacher');
+    const email = (await asAdmin('GET', '/users')).data.find((u) => u.id === teacher.id).email;
+    const account = await waitFor(async () => (await registry('/auth/login', { identifier: email, password: PASSWORD })).data.accounts?.[0], 'the new login to reach the registry');
+    assert.deepEqual([account.clientCode, account.role], [status.code, 'teacher']);
+
+    // the ticket signs in at this school, once
+    const sso = (ticket) => call('POST', '/auth/sso', { body: { ticket } });
+    const session = await sso(account.ticket);
+    assert.equal(session.status, 200, JSON.stringify(session.data));
+    assert.equal(session.data.user.id, teacher.id);
+    assert.equal((await call('GET', '/auth/me', { token: session.data.token })).data.role, 'teacher', 'and the session works');
+    assert.equal((await sso(account.ticket)).status, 401, 'a ticket works once');
+    assert.equal((await sso('not.a.ticket')).status, 401);
+    assert.equal((await sso(undefined)).status, 401);
+
+    // a password changed here is the password in the registry shortly after
+    assert.equal((await call('POST', '/auth/change-password', { token: teacher.token, body: { currentPassword: PASSWORD, newPassword: 'changed-pass-9' } })).status, 200);
+    await waitFor(async () => (await registry('/auth/login', { identifier: email, password: 'changed-pass-9' })).status === 200, 'the new password to reach the registry');
+    assert.equal((await registry('/auth/login', { identifier: email, password: PASSWORD })).status, 401, 'the old password no longer works there');
+
+    // a login deleted here stops working in the app once the registry is told
+    assert.equal((await asAdmin('DELETE', `/users/${teacher.id}`)).status, 200);
+    assert.equal((await asAdmin('POST', '/global-sync')).status, 200);
+    assert.equal((await registry('/auth/login', { identifier: email, password: 'changed-pass-9' })).status, 401, 'switched off in the registry');
+
+    // only admins see or start the sync
+    const plain = await userWithRole('teacher');
+    assert.equal((await call('GET', '/global-sync', { token: plain.token })).status, 403);
+    assert.equal((await call('POST', '/global-sync', { token: plain.token })).status, 403);
+  });
+});

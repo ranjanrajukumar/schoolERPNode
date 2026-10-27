@@ -7,6 +7,7 @@ import { requireAuth } from '../../middleware/authMiddleware.js';
 import { checkLoginAllowed, recordLoginFailure, recordLoginSuccess } from '../../middleware/loginLimiter.js';
 import { recordLogin } from './loginActivity.js';
 import { login } from './auth.service.js';
+import { ssoLogin } from '../globalauth/globalAuth.service.js';
 import { classesOf } from '../academics/myClass.service.js';
 
 const router = Router();
@@ -21,6 +22,14 @@ router.post('/login', checkLoginAllowed, asyncHandler(async (req, res) => {
   recordLoginSuccess(req);
   await recordLogin(req, { email: req.body.email, user: result.user, success: true });
   res.json(result);
+}));
+
+// POST /api/auth/sso { ticket }: sign in with the ticket the global registry gave after checking the person's mobile number or email and password.
+// Used by the one mobile app that serves many schools; the ticket works once, for two minutes, and only at the school it names.
+router.post('/sso', asyncHandler(async (req, res) => {
+  const { user, session } = await ssoLogin(req.body?.ticket);
+  await recordLogin(req, { email: user.email, user: session.user, success: true });
+  res.json(session);
 }));
 
 // The signed-in user's current access, so the UI can hide what a custom role does not include.
