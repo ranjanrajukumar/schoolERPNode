@@ -136,6 +136,7 @@ import Roles from '../modules/platform/Roles.jsx';
 import Permissions from '../modules/platform/Permissions.jsx';
 import UserGroups from '../modules/platform/UserGroups.jsx';
 import Branches from '../modules/settings/Branches.jsx';
+import AppMenu from '../modules/settings/AppMenu.jsx';
 import Integrations from '../modules/settings/Integrations.jsx';
 import DataTools from '../modules/settings/DataTools.jsx';
 import BackupRestore from '../modules/settings/BackupRestore.jsx';
@@ -270,6 +271,7 @@ export default function AppRoutes() {
           <Route path="permissions" element={<Permissions />} />
           <Route path="user-groups" element={<UserGroups />} />
           <Route path="branches" element={<Branches />} />
+          <Route path="app-menu" element={<AppMenu />} />
           <Route path="integrations" element={<Integrations />} />
           <Route path="data-tools" element={<DataTools />} />
           <Route path="backup-restore" element={<BackupRestore />} />

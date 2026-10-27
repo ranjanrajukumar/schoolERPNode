@@ -157,7 +157,7 @@ export const MENU = [
     ['School Profile', '/school-profile'], ['Leave Types & Approval', '/leave-types'], ['Public Links', '/public-links'], ['Branches / Campuses', '/branches'], ['Academic Years', '/academic-years'], ['Classes & Sections', '/classes'],
     ['Master Data', '/master-data'], ['Grade Setup', '/grade-setup'], ['ID Card Design', '/id-card-design'],
     ['Notification Settings', '/settings?group=Notifications'], ['Student Login Settings', '/settings?group=Student login'], ['Payment Settings', '/settings?group=Payments'], ['Integrations', '/integrations'],
-    ['Data Import / Export', '/data-tools'], ['Backup & Restore', '/backup-restore'], ['System Preferences', '/settings'],
+    ['Data Import / Export', '/data-tools'], ['Backup & Restore', '/backup-restore'], ['Mobile App Menu', '/app-menu'], ['System Preferences', '/settings'],
   ]),
   module('Help & Support', ALL, [
     ['Setup & Go-Live Guide', '/setup', ADMIN], ['Process Map', '/process-map'], ['Class Readiness', '/class-map', ADMIN], ['Help Center', '/help'], ['User Guide', '/user-guide'], ['Submit a Support Request', '/support'], ['System Updates', '/system-updates'], ['About School ERP', '/about'],

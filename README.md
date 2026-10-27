@@ -3,6 +3,9 @@
 - `server/` â€“ Node.js + Express + Sequelize (MySQL) REST API, JWT auth
 - `client/` â€“ React (Vite) admin UI
 
+## Mobile app
+`app/` is a React Native (Expo) app for parents, students and teachers that uses the same API. Its menu (labels, icons, order, roles, visibility) is stored in the database and edited under Settings, Mobile App Menu. See [app/README.md](app/README.md) to run it on a phone.
+
 ## Structure
 ```
 server/src
@@ -181,7 +184,7 @@ List pages: the simple list pages (subjects, fee types, routes and so on) share 
 - Sign-in is limited to 8 failed attempts per email per address (40 per address) in 15 minutes; set `TRUST_PROXY=1` behind a reverse proxy. Unknown and known emails take the same time to reject.
 - `helmet` security headers; database error text is logged, not sent to clients.
 - Before going live: change `JWT_SECRET`, the seeded admin password (`admin123`) and the MySQL password.
-- `npm test --prefix server` (46 checks) runs end-to-end checks of the rules that must not regress (token revocation, upload validation, student isolation, custom roles, staff field visibility, student registration, the restore guard, library cards, the audit log, the school profile, the setup guide, bulk import, enquiries and the enquiry form, photos, registrations, the application pipeline, type-ahead search, the class teacher link, hostel capacity and billing, stock concurrency, messaging validation) against the running API. It deletes everything it creates.
+- `npm test --prefix server` (47 checks) runs end-to-end checks of the rules that must not regress (token revocation, upload validation, student isolation, custom roles, staff field visibility, student registration, the restore guard, library cards, the audit log, the school profile, the setup guide, bulk import, enquiries and the enquiry form, photos, registrations, the application pipeline, type-ahead search, the class teacher link, hostel capacity and billing, stock concurrency, messaging validation) against the running API. It deletes everything it creates.
 - Money rules: a fee with any payment history (even fully refunded) cannot be deleted, moved to another student or re-priced except through discounts/fines; fee amounts must be above zero. Marks and attendance only accept students and subjects that belong to the exam or class, valid statuses and non-future dates; loan periods are limited to 1-90 days.
 - Marks entry: admins can enter any subject; a teacher only the subjects assigned to them under **Class subjects**. A teacher login is matched to a staff profile by **email**, so the login email must equal the staff profile email; a login with no matching profile is read-only.
 - Data integrity: older tables were created before some relationships existed and have no database foreign keys, so deleting a parent could leave orphaned rows (and crash listings). On every start the server adds each missing foreign key that has no orphans; `npm run db:orphans` lists the ones still blocked by orphaned rows and `npm run db:orphans -- --delete` removes those rows and adds the keys. Payslips and issued certificates are never auto-deleted: staff with payslips and students with certificates cannot be deleted (mark them inactive). Fresh databases get every key from the start.

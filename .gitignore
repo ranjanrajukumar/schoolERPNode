@@ -6,3 +6,6 @@ server/uploads/
 server/backups/
 *.tmp.mjs
 .DS_Store
+app/.claude/
+app/LICENSE
+app/AGENTS.md

@@ -237,6 +237,13 @@ async function ensureFilesInDatabase() {
   if (moved || missing) console.log(`Files moved into the database: ${moved}${missing ? `; ${missing} could not be found on disk` : ''}`);
 }
 
+/** The mobile app's menu lives in the database; add any default tile or page the table does not have yet. */
+async function ensureAppMenuItems() {
+  const { ensureAppMenu } = await import('../modules/appmenu/appmenu.service.js');
+  const added = await ensureAppMenu();
+  if (added) console.log(`App menu: added ${added} item(s)`);
+}
+
 export async function migrateDatabase() {
   await ensureDatabase();
   await sequelize.sync();
@@ -244,6 +251,7 @@ export async function migrateDatabase() {
   await ensureAdmissionStatuses();
   await ensureColumns();
   await ensureFilesInDatabase();
+  await ensureAppMenuItems();
   await ensureLeaveTypes();
   await enforceRelationships();
   await seedAdmin();

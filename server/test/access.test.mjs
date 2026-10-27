@@ -1149,3 +1149,83 @@ describe('class teacher', () => {
     assert.equal((await asAdmin('GET', `/my-class/${rival.id}`)).status, 200, 'an admin can open any class');
   });
 });
+
+describe('app menu', () => {
+  test('every role reads its own menu; an admin renames, hides, limits and re-icons tiles; pictures are checked by their bytes', async () => {
+    const keysOf = async (token) => (await call('GET', '/app-menu', { token })).data.map((i) => i.key);
+    const teacher = await userWithRole('teacher');
+    const accountant = await userWithRole('accountant');
+
+    // what each staff role sees
+    const adminKeys = await keysOf(admin);
+    assert.ok(adminKeys.includes('fees') && adminKeys.includes('fees.payments') && adminKeys.includes('admissions') && adminKeys.includes('q.myclass'));
+    const teacherKeys = await keysOf(teacher.token);
+    assert.ok(teacherKeys.includes('q.myclass') && teacherKeys.includes('students') && teacherKeys.includes('inventory.requests'));
+    assert.ok(!teacherKeys.includes('fees') && !teacherKeys.includes('admissions') && !teacherKeys.includes('inventory.items'), 'a teacher does not get finance, admissions or admin-only inventory pages');
+    const accountantKeys = await keysOf(accountant.token);
+    assert.ok(accountantKeys.includes('fees') && accountantKeys.includes('hr.payslips') && !accountantKeys.includes('q.myclass'));
+
+    // a student gets the family menu, not the staff one
+    const cls = await create('/classes', { name: `Mn${RUN}`.slice(0, 12), section: 'A' });
+    const stu = await create('/students', { admissionNo: `MN${RUN}`, firstName: 'Menu', lastName: 'Kid', gender: 'male', classId: cls.id });
+    await create('/student-accounts', { studentId: stu.id, email: `menu-${RUN}@test.local`, password: 'password123' });
+    const first = await call('POST', '/auth/login', { body: { email: `menu-${RUN}@test.local`, password: 'password123' } });
+    await call('POST', '/auth/change-password', { token: first.data.token, body: { currentPassword: 'password123', newPassword: 'password-45678' } });
+    const studentToken = (await call('POST', '/auth/login', { body: { email: `menu-${RUN}@test.local`, password: 'password-45678' } })).data.token;
+    const familyKeys = await keysOf(studentToken);
+    assert.ok(familyKeys.includes('fees') && familyKeys.includes('fees.fees') && familyKeys.includes('academic.homework') && familyKeys.includes('other.password'), 'a student gets sections and their pages');
+    assert.ok(!familyKeys.includes('fees.payments') && !familyKeys.includes('admissions'), 'and none of the staff pages');
+    assert.equal((await call('GET', '/app-menu', { token: undefined })).status, 401, 'signing in is required');
+
+    // only an admin edits; the editor lists every item
+    const items = (await asAdmin('GET', '/app-menu/admin?audience=staff')).data;
+    const fees = items.find((i) => i.key === 'fees');
+    const payments = items.find((i) => i.key === 'fees.payments');
+    assert.ok(fees && payments && fees.icon && Array.isArray(items));
+    assert.equal((await call('PUT', `/app-menu/${fees.id}`, { token: teacher.token, body: { label: 'Nope' } })).status, 403);
+    assert.equal((await call('GET', '/app-menu/admin?audience=staff', { token: teacher.token })).status, 403);
+    const restore = () => asAdmin('PUT', `/app-menu/${fees.id}`, { body: { label: fees.label, icon: fees.icon, position: fees.position, active: true, roles: fees.roles } });
+    cleanups.unshift(restore);
+    cleanups.unshift(() => asAdmin('DELETE', `/app-menu/${fees.id}/image`));
+
+    // rename, re-icon, move
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { label: `Money ${RUN}`, icon: 'cash-outline', position: 5 } })).status, 200);
+    const renamed = (await call('GET', '/app-menu', { token: accountant.token })).data.find((i) => i.key === 'fees');
+    assert.deepEqual([renamed.label, renamed.icon, renamed.position], [`Money ${RUN}`, 'cash-outline', 5]);
+
+    // validation
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { label: '  ' } })).status, 400, 'a label is needed');
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { icon: 'Not An Icon!' } })).status, 400, 'an icon name has a fixed shape');
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { roles: ['wizard'] } })).status, 400, 'roles come from the known list');
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { roles: ['parent'] } })).status, 400, 'the staff menu is not for parents');
+    assert.equal((await asAdmin('PUT', '/app-menu/99999999', { body: { label: 'x' } })).status, 404);
+
+    // limit to admins, then hide
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { roles: ['admin'] } })).status, 200);
+    assert.ok(!(await keysOf(accountant.token)).includes('fees'), 'limited to admins');
+    assert.ok(!(await keysOf(accountant.token)).includes('fees.payments'), 'its pages go with it');
+    assert.ok((await keysOf(admin)).includes('fees'));
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { roles: null, active: false } })).status, 200);
+    assert.ok(!(await keysOf(admin)).includes('fees') && !(await keysOf(admin)).includes('fees.payments'), 'hidden for everyone, pages included');
+    assert.equal((await asAdmin('PUT', `/app-menu/${fees.id}`, { body: { active: true } })).status, 200);
+    assert.ok((await keysOf(accountant.token)).includes('fees'), 'visible again');
+
+    // an uploaded icon is kept in the database and judged by its bytes
+    const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+    const put = (id, body, token = admin) => fetch(`${API}/app-menu/${id}/image`, { method: 'PUT', headers: { 'Content-Type': 'application/octet-stream', Authorization: `Bearer ${token}` }, body });
+    assert.equal((await put(fees.id, Buffer.from('<html>'))).status, 400, 'HTML is not an icon');
+    assert.equal((await put(fees.id, Buffer.from('%PDF-1.4 x'))).status, 400, 'a PDF is not an icon');
+    assert.ok((await put(fees.id, Buffer.concat([PNG, Buffer.alloc(70 * 1024)]))).status >= 400, 'over 60 KB is refused');
+    assert.equal((await put(fees.id, PNG, teacher.token)).status, 403, 'only an admin uploads');
+    assert.equal((await put(fees.id, PNG)).status, 200);
+    const withImage = (await call('GET', '/app-menu', { token: accountant.token })).data.find((i) => i.key === 'fees');
+    assert.match(withImage.iconData, /^data:image\/png;base64,/);
+    assert.equal((await asAdmin('GET', '/app-menu/admin?audience=staff')).data.find((i) => i.key === 'fees').hasImage, true);
+    assert.equal((await asAdmin('DELETE', `/app-menu/${fees.id}/image`)).status, 200);
+    assert.equal((await call('GET', '/app-menu', { token: accountant.token })).data.find((i) => i.key === 'fees').iconData, null);
+
+    // putting a menu back needs an explicit confirmation
+    assert.equal((await asAdmin('POST', '/app-menu/reset?audience=staff')).status, 400);
+    await restore();
+  });
+});

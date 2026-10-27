@@ -231,6 +231,29 @@ describe('browser journeys', { skip: !CHROME && 'Chrome was not found (set CHROM
     assert.ok(card.includes(`Uimark ${RUN}`) && subjectLine.split(String.fromCharCode(9)).includes("41"), `the report card carries the student, the subject and the marks typed: ${JSON.stringify(subjectLine)}`);
   });
 
+  test('the mobile app menu is edited on the website: a tile is renamed and hidden, and the app menu follows', async () => {
+    const items = (await api('/app-menu/admin?audience=staff')).data;
+    const lib = items.find((i) => i.key === 'library');
+    cleanups.unshift(() => api(`/app-menu/${lib.id}`, { method: 'PUT', body: { label: lib.label, active: true } }));
+    await go('/app-menu');
+    await page.waitForSelector('input[aria-label="Label for library"]', { timeout: 15000 });
+    const input = await page.$('input[aria-label="Label for library"]');
+    await input.evaluate((e) => e.select()); // replace what is there
+    await input.type(`Reading ${RUN}`);
+    await page.keyboard.press('Tab'); // leaving the box saves it
+    await wait(1200);
+    assert.equal((await api('/app-menu/admin?audience=staff')).data.find((i) => i.key === 'library').label, `Reading ${RUN}`, 'the new label is stored');
+    // hide it with its checkbox
+    const hidden = await page.evaluate(() => {
+      const row = [...document.querySelectorAll('tbody tr')].find((r) => r.innerText.includes('library') && !r.innerText.includes('library.'));
+      const box = [...row.querySelectorAll('input[type=checkbox]')].pop(); box.click(); return Boolean(box);
+    });
+    assert.ok(hidden);
+    await wait(1200);
+    const appMenu = (await api('/app-menu')).data;
+    assert.ok(!appMenu.some((i) => i.key === 'library' || i.parentKey === 'library'), 'the app no longer gets the library or its pages');
+  });
+
   test('a class is chosen on the ID card page and each active student gets a card', async () => {
     const cls = await make('/classes', { name: `UiI${RUN}`.slice(0, 12), section: 'A' });
     const kid = await make('/students', { firstName: 'Uicard', lastName: RUN, classId: cls.id });

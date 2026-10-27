@@ -391,7 +391,7 @@ Verified by: `run-process.mjs` step 12.
 
 | Check | Command | Covers |
 |---|---|---|
-| Integration tests | `npm test --prefix server` (API running) | Rules in sections 2 to 15 against the real API, 46 checks; they delete what they create |
+| Integration tests | `npm test --prefix server` (API running) | Rules in sections 2 to 15 against the real API, 47 checks; they delete what they create |
 | Browser journeys | `npm run test:ui --prefix server` (API and client running, Chrome) | Sign in, enquiry, application with documents and siblings, enrolment, attendance, marks and report card, ID cards, fee payment, subject map, staff |
 | Process run | `npm run run:process --prefix server` | One family through 12 steps from enquiry to promotion; says which step breaks |
 | Flow check | `npm run check:flow --prefix server` | Where two modules disagree (enrolled applicant is a real student, one fee row per structure item, paid equals payments, receipts, attendance coverage, marks belong to the class, counts agree) and the database relationship check |

@@ -70,6 +70,7 @@ import safetyRoutes from '../modules/safety/safety.routes.js';
 import inventoryRoutes from '../modules/inventory/inventory.routes.js';
 import inventoryRequestRoutes from '../modules/inventory/requests.routes.js';
 import hostelRoutes from '../modules/hostel/hostel.routes.js';
+import appMenuRoutes from '../modules/appmenu/appmenu.routes.js';
 
 const router = Router();
 
@@ -87,6 +88,7 @@ router.use(auditTrail);
 router.use('/audit', requireRole('admin'), auditRoutes);
 
 router.use('/push', pushRoutes); // every signed-in user manages their own device; sending is admin only (inside)
+router.use('/app-menu', appMenuRoutes); // the mobile app's menu: every role reads it, only an admin edits it (inside)
 
 // Parents and students get the portal and nothing else: every staff-facing route below is closed to them.
 router.use('/portal', requireRole('parent', 'student'), portalRoutes);

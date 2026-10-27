@@ -227,7 +227,7 @@ router.get('/children/:studentId/results', ownChild, asyncHandler(async (req, re
   for (const exam of exams) {
     const { rows } = await getResults(exam.id);
     const summary = rows.find((r) => r.studentId === req.student.id);
-    if (summary) out.push({ examId: exam.id, name: exam.name, ...summary });
+    if (summary) out.push({ ...summary, examId: exam.id, name: exam.name }); // the exam's name, not the student's, is the row's name
   }
   res.json(out);
 }));
