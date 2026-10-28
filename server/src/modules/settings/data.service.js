@@ -6,6 +6,7 @@ import { badRequest } from '../../utils/httpError.js';
 import { parseCsv, toCsv } from '../../utils/csv.js';
 import { DETAIL_KEYS } from '../academics/studentFields.js';
 import { validateStudent } from '../academics/students.validation.js';
+import { getLmsFile, restoreLmsFile } from '../academics/lmsFiles.service.js';
 
 const MAX_IMPORT_ROWS = 2000;
 
@@ -204,7 +205,7 @@ export async function importStudentCsv(text) {
 /* ---------- Backup and restore ---------- */
 
 const FORMAT = 'school-erp-backup';
-const VERSION = 1;
+const VERSION = 2;
 const pad = (n) => String(n).padStart(2, '0');
 const stamp = (d) => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
 
@@ -225,7 +226,11 @@ export async function createBackup() {
       return [column, value];
     })));
   }
-  return { format: FORMAT, version: VERSION, createdAt: new Date().toISOString(), tables: data };
+  const lmsFiles = {};
+  for (const table of ['lms_lessons', 'lms_lesson_parts', 'lms_materials', 'lms_submissions']) {
+    for (const row of data[table] ?? []) if (row.attachment_key) lmsFiles[row.attachment_key] = (await getLmsFile(row.attachment_key)).toString('base64');
+  }
+  return { format: FORMAT, version: VERSION, createdAt: new Date().toISOString(), tables: data, files: { lms: lmsFiles } };
 }
 
 export const backupSummary = async () => {
@@ -237,12 +242,12 @@ export const backupSummary = async () => {
 /**
  * Replaces ALL data with the backup, in one transaction: if anything fails the database is left as it was.
  * Only tables that exist are accepted and column names are checked against the live schema, so a damaged or
- * foreign file cannot write anywhere unexpected. Uploaded files (photos, documents) are kept in the database, so a backup carries them.
+ * foreign file cannot write anywhere unexpected. LMS resources are included by opaque storage key; the remaining platform files are in table data.
  */
 export async function restoreBackup(text) {
   let backup;
   try { backup = JSON.parse(text); } catch { throw badRequest('That is not a valid backup file'); }
-  if (backup?.format !== FORMAT || backup.version !== VERSION || typeof backup.tables !== 'object') throw badRequest('That is not a School ERP backup file');
+  if (backup?.format !== FORMAT || ![1, VERSION].includes(backup.version) || typeof backup.tables !== 'object') throw badRequest('That is not a School ERP backup file');
 
   const known = new Set(tables());
   const queryInterface = sequelize.getQueryInterface();
@@ -257,6 +262,15 @@ export async function restoreBackup(text) {
     }
   }
   if (!backup.tables.users?.length) throw badRequest('The backup has no user accounts, so nobody could sign in afterwards');
+
+  const lmsFiles = backup.version >= 2 ? backup.files?.lms ?? {} : {};
+  if (!lmsFiles || typeof lmsFiles !== 'object' || Array.isArray(lmsFiles)) throw badRequest('The LMS file archive is damaged');
+  for (const [key, encoded] of Object.entries(lmsFiles)) if (!/^[a-f0-9]{64}$/.test(key) || typeof encoded !== 'string' || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(encoded)) throw badRequest('The LMS file archive contains an invalid file');
+  for (const table of ['lms_lessons', 'lms_lesson_parts', 'lms_materials', 'lms_submissions']) for (const row of backup.tables[table] ?? []) {
+    if (row.attachment_key && !lmsFiles[row.attachment_key]) throw badRequest(`The LMS file ${row.attachment_key} is missing from the backup archive`);
+  }
+
+  for (const [key, encoded] of Object.entries(lmsFiles)) await restoreLmsFile(key, Buffer.from(encoded, 'base64'));
 
   let restored = 0;
   await sequelize.transaction(async (transaction) => {

@@ -6,7 +6,7 @@
 export const MODULES = [
   { key: 'admissions', label: 'Admissions', prefixes: ['admissions'] },
   { key: 'students', label: 'Students', prefixes: ['students', 'student-files', 'student-health', 'student-profile', 'behavior', 'alumni', 'student-accounts', 'promotion'] },
-  { key: 'academics', label: 'Academics', prefixes: ['classes', 'my-class', 'subjects', 'class-subjects', 'academic-years', 'homework', 'online-classes', 'syllabus', 'study-materials', 'calendar'] },
+  { key: 'academics', label: 'Academics', prefixes: ['classes', 'my-class', 'subjects', 'class-subjects', 'academic-years', 'homework', 'online-classes', 'syllabus', 'study-materials', 'calendar', 'lms'] },
   { key: 'attendance', label: 'Attendance', prefixes: ['attendance', 'period-attendance', 'student-leaves', 'absence-alerts', 'biometric'] },
   { key: 'examinations', label: 'Examinations', prefixes: ['exams', 'progress-card'] },
   { key: 'fees-and-finance', label: 'Fees & Finance', prefixes: ['fees', 'fee-structures', 'fee-groups', 'accounts'] },

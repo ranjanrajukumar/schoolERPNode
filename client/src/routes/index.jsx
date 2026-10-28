@@ -45,6 +45,10 @@ import Homework from '../modules/academics/Homework.jsx';
 import HomeworkTracker from '../modules/academics/HomeworkTracker.jsx';
 import Syllabus from '../modules/academics/Syllabus.jsx';
 import StudyMaterials from '../modules/academics/StudyMaterials.jsx';
+import Lms from '../modules/academics/Lms.jsx';
+import LmsDashboard from '../modules/academics/LmsDashboard.jsx';
+import LmsProgress from '../modules/academics/LmsProgress.jsx';
+import LmsCourseScreen from '../modules/academics/LmsCourseScreen.jsx';
 import TeacherTimetable from '../modules/academics/TeacherTimetable.jsx';
 import StudentLeaves from '../modules/attendance/StudentLeaves.jsx';
 import AttendanceCorrections from '../modules/attendance/AttendanceCorrections.jsx';
@@ -312,6 +316,14 @@ export default function AppRoutes() {
           <Route path="homework/:id" element={<HomeworkTracker />} />
           <Route path="syllabus" element={<Syllabus />} />
           <Route path="study-materials" element={<StudyMaterials />} />
+          <Route path="lms-dashboard" element={<LmsDashboard />} />
+          <Route path="lms" element={<Lms />} />
+          <Route path="lms-progress" element={<LmsProgress />} />
+          <Route path="lms-materials" element={<LmsCourseScreen kind="materials" />} />
+          <Route path="lms-enrollment" element={<LmsCourseScreen kind="enrollment" />} />
+          <Route path="lms-announcements" element={<LmsCourseScreen kind="announcements" />} />
+          <Route path="lms-assignments" element={<LmsCourseScreen kind="assignments" />} />
+          <Route path="lms-quizzes" element={<LmsCourseScreen kind="quizzes" />} />
           <Route path="teacher-timetable" element={<TeacherTimetable />} />
           <Route path="departments" element={<Departments />} />
           <Route path="designations" element={<Designations />} />

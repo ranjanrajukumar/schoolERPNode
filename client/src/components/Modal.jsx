@@ -9,7 +9,7 @@ import { createPortal } from 'react-dom';
  *
  * Forms inside can call `onClose` themselves (Cancel, after saving) through the same prop they were given.
  */
-export default function Modal({ open, title, onClose, children, wide = true }) {
+export default function Modal({ open, title, onClose, children, wide = true, className = '' }) {
   const dirty = useRef(false);
   const panel = useRef(null);
 
@@ -35,7 +35,7 @@ export default function Modal({ open, title, onClose, children, wide = true }) {
 
   if (!open) return null;
   return createPortal(
-    <div className="modal-backdrop">
+    <div className={`modal-backdrop${className ? ` ${className}` : ''}`}>
       <div ref={panel} className={`modal${wide ? ' wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}
         onChangeCapture={() => { dirty.current = true; }} onInputCapture={() => { dirty.current = true; }}>
         <header className="modal-head">

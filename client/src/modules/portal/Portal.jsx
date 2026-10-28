@@ -1,20 +1,22 @@
 import TableCard from '../../components/TableCard.jsx';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSchoolBrand } from '../../hooks/useSchoolBrand.js';
 import { QualificationTable, SiblingsTable } from '../admissions/AdmissionSections.jsx';
-import { api } from '../../services/api.js';
+import { api, fetchBlob, uploadFile } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import PushToggle from '../../components/PushToggle.jsx';
 import { BusMap, ago } from '../transport/BusTracking.jsx';
 import { GrievanceLadder, Timeline } from '../../components/GrievanceLadder.jsx';
 import { localDate } from '../../utils/dates.js';
+import '../academics/lms.css';
+import LmsStudentHome from '../academics/LmsStudentHome.jsx';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const TABS = ['Overview', 'Profile', 'Attendance', 'Timetable', 'Homework', 'OnlineClasses', 'Materials', 'Results', 'Fees', 'Library', 'Activities', 'Notices', 'Messages', 'Calendar', 'Transport', 'Leave', 'Feedback', 'Documents', 'Help'];
+const TABS = ['Overview', 'Profile', 'Attendance', 'Timetable', 'LMS', 'Homework', 'OnlineClasses', 'Materials', 'Results', 'Fees', 'Library', 'Activities', 'Notices', 'Messages', 'Calendar', 'Transport', 'Leave', 'Feedback', 'Documents', 'Help'];
 // Answering activity consents stays with parents; a student's portal is read-only (leave requests and certificates can be read, not made).
 const STUDENT_TABS = TABS.filter((t) => t !== 'Activities');
-const LABELS = { Overview: 'Dashboard', Attendance: 'Attendance', Timetable: 'Class Timetable', Homework: 'Homework & Assignments', OnlineClasses: 'Online Classes', Materials: 'Learning Materials', Results: 'Exams & Results', Fees: 'Fees & Payments', Notices: 'Notices & Announcements', Calendar: 'Events & Calendar', Transport: 'Transport Tracking', Documents: 'Certificates & Documents', Feedback: 'Feedback & Grievance', Help: 'Help & Support' };
+const LABELS = { Overview: 'Dashboard', Attendance: 'Attendance', Timetable: 'Class Timetable', LMS: 'Courses & Lessons', Homework: 'Homework & Assignments', OnlineClasses: 'Online Classes', Materials: 'Learning Materials', Results: 'Exams & Results', Fees: 'Fees & Payments', Notices: 'Notices & Announcements', Calendar: 'Events & Calendar', Transport: 'Transport Tracking', Documents: 'Certificates & Documents', Feedback: 'Feedback & Grievance', Help: 'Help & Support' };
 const label = (t, isStudent) => (t === 'Leave' ? (isStudent ? 'Leave Requests' : 'Apply for Leave') : t === 'Profile' ? (isStudent ? 'My Profile' : 'Child Profile') : LABELS[t] ?? t);
 
 /** The class teacher: who to ask about the class, with a way to call or write. */
@@ -349,6 +351,111 @@ function Materials({ base }) {
       </tbody>
     </TableCard>
   );
+}
+
+// One part of a topic: text, a video or web link, or a protected file (videos play in the page).
+function LessonPart({ base, part, onError }) {
+  const [videoUrl, setVideoUrl] = useState(null);
+  const blob = () => fetchBlob(`${base}/lms/parts/${part.id}/file`);
+  const download = async () => { try { const url = URL.createObjectURL(await blob()); const a = document.createElement('a'); a.href = url; a.download = part.attachmentName || 'lesson-file'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); } catch (e) { onError(e.message); } };
+  const watch = async () => { try { setVideoUrl(URL.createObjectURL(await blob())); } catch (e) { onError(e.message); } };
+  useEffect(() => () => { if (videoUrl) URL.revokeObjectURL(videoUrl); }, [videoUrl]);
+  return <div><b>{part.title}</b>
+    {part.kind === 'text' && <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{part.content}</p>}
+    {part.kind === 'video' && <div className="link-buttons"><a className="btn" href={part.url} target="_blank" rel="noopener noreferrer">Watch video</a></div>}
+    {part.kind === 'link' && <div className="link-buttons"><a className="btn" href={part.url} target="_blank" rel="noopener noreferrer">Open link</a></div>}
+    {part.kind === 'file' && <div>{part.content && <p>{part.content}</p>}{part.hasAttachment ? <><button type="button" className="ghost" onClick={download}>Download {part.attachmentName}</button>{part.attachmentMime?.startsWith('video/') && <button type="button" onClick={watch}>Play video</button>}{videoUrl && <video controls playsInline src={videoUrl} style={{ display: 'block', width: '100%', maxHeight: 420, marginTop: 10 }} />}</> : <small className="hint">File coming soon.</small>}</div>}
+  </div>;
+}
+
+function LmsCourses({ base, readOnly }) {
+  const [courses, setCourses] = useState(null);
+  const [error, setError] = useState('');
+  const [assignmentValues, setAssignmentValues] = useState({});
+  const [quizValues, setQuizValues] = useState({});
+  const [quizScores, setQuizScores] = useState({});
+  const [videoSource, setVideoSource] = useState(null);
+  const [uploading, setUploading] = useState(null);
+  const load = () => api(`${base}/lms`).then(setCourses).catch((e) => setError(e.message));
+  useEffect(() => { load(); }, [base]); // eslint-disable-line react-hooks/exhaustive-deps
+  const complete = async (lesson) => {
+    try { await api(`${base}/lms/lessons/${lesson.id}/complete`, { method: 'POST', body: {} }); await load(); }
+    catch (e) { setError(e.message); }
+  };
+  const markRead = async (lesson) => {
+    try { await api(`${base}/lms/lessons/${lesson.id}/view`, { method: 'POST', body: {} }); await load(); }
+    catch (e) { setError(e.message); }
+  };
+  const submitAssignment = async (assignment) => {
+    const values = assignmentValues[assignment.id] ?? {};
+    try { await api(`${base}/lms/assignments/${assignment.id}/submit`, { method: 'POST', body: values }); setError(''); await load(); }
+    catch (e) { setError(e.message); }
+  };
+  const submitQuiz = async (quiz) => {
+    try { const result = await api(`${base}/lms/quizzes/${quiz.id}/attempts`, { method: 'POST', body: { answers: quizValues[quiz.id] ?? {} } }); setQuizScores({ ...quizScores, [quiz.id]: result }); setError(''); await load(); }
+    catch (e) { setError(e.message); }
+  };
+  const uploadAssignment = async (assignment, file) => {
+    if (!file) return;
+    setUploading(assignment.id); setError('');
+    try { await uploadFile(`${base}/lms/assignments/${assignment.id}/file?name=${encodeURIComponent(file.name)}`, file); await load(); }
+    catch (e) { setError(e.message); } finally { setUploading(null); }
+  };
+  const downloadAssignment = async (assignment) => {
+    try {
+      const blob = await fetchBlob(`${base}/lms/assignments/${assignment.id}/file`);
+      const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = assignment.submission.attachmentName || 'submission'; link.click(); URL.revokeObjectURL(url);
+    } catch (e) { setError(e.message); }
+  };
+  const downloadLesson = async (lesson) => {
+    try { const blob = await fetchBlob(`${base}/lms/lessons/${lesson.id}/file`); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = lesson.attachmentName || 'lesson-document'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+    catch (e) { setError(e.message); }
+  };
+  const downloadMaterial = async (m) => {
+    try { const blob = await fetchBlob(`${base}/lms/materials/${m.id}/file`); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = m.attachmentName || 'material'; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }
+    catch (e) { setError(e.message); }
+  };
+  const watchUploadedVideo = async (lesson) => {
+    try {
+      if (videoSource?.url) URL.revokeObjectURL(videoSource.url);
+      const blob = await fetchBlob(`${base}/lms/lessons/${lesson.id}/file`);
+      setVideoSource({ id: lesson.id, url: URL.createObjectURL(blob) });
+    } catch (e) { setError(e.message); }
+  };
+  return <div className="lms-ns">
+    {error && <p className="error" role="alert">{error}</p>}
+    {!courses && !error && <p>Loading courses…</p>}
+    {courses?.length > 0 && <LmsStudentHome courses={courses} base={base} readOnly={readOnly} />}
+    {courses?.map((course) => <section className="card" id={`lms-course-${course.id}`} key={course.id} style={{ marginBottom: 14 }}>
+      <div className="profile-head"><div><h2>{course.title}</h2><p className="hint">{course.subjectName} · {course.completed}/{course.total} lessons complete · {course.status}</p></div><span className="badge">{course.completionPercent}%</span></div>
+      {course.description && <p>{course.description}</p>}
+      {course.announcements?.length > 0 && <section><h3>Course announcements</h3>{course.announcements.map((a) => <article className="card" key={`announcement-${a.id}`} style={{ margin: '10px 0', padding: 16 }}><b>{a.title}</b><p style={{ whiteSpace: 'pre-wrap' }}>{a.body}</p><small>{a.createdByName} · {new Date(a.createdAt).toLocaleString()}</small></article>)}</section>}
+      {course.materials?.length > 0 && <section><h3>Course materials</h3>{course.materials.map((m) => <div className="lms-row" key={`material-${m.id}`}><span className="lms-icon file">{m.kind === 'file' ? (m.attachmentName?.split('.').pop() || 'FILE').slice(0, 4).toUpperCase() : m.kind === 'video' ? 'LINK' : 'WEB'}</span><div><b>{m.title}</b>{m.description && <small className="block">{m.description}</small>}{m.kind === 'file' && <small className="block">{m.attachmentName}</small>}</div>{m.kind === 'file' ? (m.hasAttachment && <button type="button" className="ghost" onClick={() => downloadMaterial(m)}>Download</button>) : <a className="btn" href={m.url} target="_blank" rel="noopener noreferrer">Open</a>}</div>)}</section>}
+      {!course.lessons.length && <p className="hint">No published lessons yet.</p>}
+      {course.lessons.map((lesson, index) => <Fragment key={lesson.id}>{lesson.moduleTitle && lesson.moduleTitle !== course.lessons[index - 1]?.moduleTitle && <h3 style={{ marginTop: 18 }}>Section {lesson.moduleSequence}: {lesson.moduleTitle}</h3>}<article className="card" style={{ margin: '10px 0', padding: 16 }}>
+        <div className="profile-head"><div><h3>{lesson.sequence}. {lesson.title}</h3><small>{lesson.viewCount ?? 0} reads{lesson.viewedAt ? ` · last read ${new Date(lesson.viewedAt).toLocaleDateString()}` : ''}</small></div>{readOnly ? <span className={`badge ${lesson.completedAt ? 'active' : 'partial'}`}>{lesson.completedAt ? 'Completed' : 'Not completed'}</span> : <div className="row-actions"><button type="button" className="ghost" onClick={() => markRead(lesson)}>{lesson.viewCount ? 'Record another read' : 'Mark as read'}</button>{lesson.completedAt ? <span className="badge active">Completed</span> : <button type="button" onClick={() => complete(lesson)}>Mark complete</button>}</div>}</div>
+        {lesson.content && <p style={{ whiteSpace: 'pre-wrap' }}>{lesson.content}</p>}
+        <div className="link-buttons">{lesson.videoUrl && <a className="btn" href={lesson.videoUrl} target="_blank" rel="noopener noreferrer">Watch lesson</a>}{lesson.resourceUrl && <a className="btn" href={lesson.resourceUrl} target="_blank" rel="noopener noreferrer">Open resource</a>}</div>
+        {lesson.hasAttachment && <div><button type="button" className="ghost" onClick={() => downloadLesson(lesson)}>Download {lesson.attachmentName || 'lesson resource'}</button>{lesson.attachmentMime?.startsWith('video/') && <button type="button" onClick={() => watchUploadedVideo(lesson)}>Watch uploaded video</button>}{videoSource?.id === lesson.id && <video controls playsInline src={videoSource.url} style={{ display: 'block', width: '100%', maxHeight: 420, marginTop: 10 }} />}</div>}
+        {lesson.parts?.length > 0 && <ol style={{ paddingLeft: 20, marginTop: 12 }}>{lesson.parts.map((part) => <li key={part.id} style={{ margin: '12px 0' }}><LessonPart base={base} part={part} onError={setError} /></li>)}</ol>}
+      </article></Fragment>)}
+      {course.assignments?.length > 0 && <><h3>Assignments</h3>{course.assignments.map((a) => <article className="card" key={`a${a.id}`} style={{ margin: '10px 0', padding: 16 }}>
+        <h3>{a.title} <small>· out of {a.maxScore}{a.dueOn ? ` · due ${a.dueOn}` : ''}</small>{a.overdue && <span className="badge rejected" style={{ marginLeft: 8 }}>Overdue</span>}{a.submission?.isLate && <span className="badge rejected" style={{ marginLeft: 8 }}>Submitted late</span>}</h3>
+        {a.instructions && <p style={{ whiteSpace: 'pre-wrap' }}>{a.instructions}</p>}
+        {a.submission?.score != null && <p><b>Score:</b> {a.submission.score}/{a.maxScore}{a.submission.feedback && <> · <b>Feedback:</b> {a.submission.feedback}</>}</p>}
+        {a.submission?.submittedAt && <p className="hint">Last submitted {new Date(a.submission.submittedAt).toLocaleString()}</p>}
+        {a.submission?.attachmentName && <button type="button" className="ghost" onClick={() => downloadAssignment(a)}>Download {a.submission.attachmentName}</button>}
+        {!readOnly && a.submission?.gradedAt == null && <div className="enq-grid"><label className="wide"><span>Your response</span><textarea rows={3} value={assignmentValues[a.id]?.response ?? a.submission?.response ?? ''} onChange={(e) => setAssignmentValues({ ...assignmentValues, [a.id]: { ...assignmentValues[a.id], response: e.target.value } })} /></label><label className="wide"><span>Work link (optional)</span><input type="url" placeholder="https://" value={assignmentValues[a.id]?.resourceUrl ?? a.submission?.resourceUrl ?? ''} onChange={(e) => setAssignmentValues({ ...assignmentValues, [a.id]: { ...assignmentValues[a.id], resourceUrl: e.target.value } })} /></label><label className="wide"><span>Attach PDF or image (max 5 MB)</span><input type="file" accept=".pdf,image/jpeg,image/png,image/webp" disabled={uploading === a.id} onChange={(e) => uploadAssignment(a, e.target.files?.[0])} />{uploading === a.id && <small>Uploading…</small>}</label><button type="button" onClick={() => submitAssignment(a)}>{a.submission ? 'Update submission' : 'Submit assignment'}</button></div>}
+      </article>)}</>}
+      {course.quizzes?.length > 0 && <><h3>Quizzes</h3>{course.quizzes.map((q) => <article className="card" key={`q${q.id}`} style={{ margin: '10px 0', padding: 16 }}>
+        <h3>{q.title} <small>· {q.questions.length} questions · {q.attemptCount}/{q.maxAttempts} attempts{q.dueOn ? ` · due ${q.dueOn}` : ''}</small>{q.overdue && <span className="badge rejected" style={{ marginLeft: 8 }}>Past due</span>}</h3>{q.description && <p>{q.description}</p>}
+        {q.latestAttempt && <><p><b>Latest:</b> {q.latestAttempt.score}/{q.latestAttempt.maxScore} · {q.latestAttempt.reviewStatus === 'pending_review' ? 'Awaiting teacher review' : 'Reviewed'}{q.bestScore != null && ` · best ${q.bestScore}/${q.maxScore}`}</p>{q.latestAttempt.feedback && <p><b>Teacher feedback:</b> {q.latestAttempt.feedback}</p>}{q.latestAttempt.questions?.map((result) => <p key={result.id}>{result.prompt}: {Array.isArray(result.answer) ? result.answer.map((i) => q.questions.find((question) => question.id === result.id)?.choices[i]).join(', ') : result.type === 'single_choice' || result.type === 'true_false' ? q.questions.find((question) => question.id === result.id)?.choices[result.answer] : result.answer} · {result.awarded}/{result.points}{result.correct === false && result.correctAnswer !== null ? ` · Correct answer: ${Array.isArray(result.correctAnswer) ? result.correctAnswer.map((i) => q.questions.find((question) => question.id === result.id)?.choices[i]).join(', ') : q.questions.find((question) => question.id === result.id)?.choices[result.correctAnswer]}` : ''}</p>)}</>}
+        {!readOnly && q.attemptCount < q.maxAttempts && <><div className="enq-grid">{q.questions.map((question) => { const type = question.type || 'single_choice'; const value = quizValues[q.id]?.[question.id]; return <fieldset className="wide" key={question.id}><legend>{question.prompt}</legend>{type === 'short_answer' ? <textarea rows={3} maxLength={2000} value={value ?? ''} onChange={(e) => setQuizValues({ ...quizValues, [q.id]: { ...quizValues[q.id], [question.id]: e.target.value } })} /> : question.choices.map((choice, index) => <label key={index} style={{ display: 'block', margin: '6px 0' }}><input type={type === 'multiple_choice' ? 'checkbox' : 'radio'} name={`quiz-${q.id}-${question.id}`} checked={type === 'multiple_choice' ? (value ?? []).includes(index) : Number(value) === index} onChange={(e) => setQuizValues({ ...quizValues, [q.id]: { ...quizValues[q.id], [question.id]: type === 'multiple_choice' ? [...new Set([...(value ?? []).filter((x) => x !== index), ...(e.target.checked ? [index] : [])])] : index } })} /> {choice}</label>)}</fieldset>; })}</div><button type="button" onClick={() => submitQuiz(q)}>Submit quiz</button></>}
+        {quizScores[q.id] && <p className="success">Attempt score: {quizScores[q.id].score}/{quizScores[q.id].maxScore}</p>}
+      </article>)}</>}
+    </section>)}
+    {courses?.length === 0 && <p className="hint">No courses have been published for this class yet.</p>}
+  </div>;
 }
 
 function Activities({ base }) {
@@ -700,7 +807,7 @@ function Feedback({ base }) {
   );
 }
 
-const VIEWS = { Overview, Profile, Fees, Attendance, Leave, Results, Homework, Materials, Library, Transport, Messages, Feedback, Activities, Timetable, Documents, Notices, Calendar, OnlineClasses, Help };
+const VIEWS = { Overview, Profile, Fees, Attendance, Leave, Results, Homework, Materials, Lms: LmsCourses, Library, Transport, Messages, Feedback, Activities, Timetable, Documents, Notices, Calendar, OnlineClasses, Help };
 
 export default function Portal() {
   const isStudent = useAuth().user?.role === 'student';
@@ -741,7 +848,9 @@ export default function Portal() {
             {child && <span className="hint">Adm. no {child.admissionNo} · {child.relation}</span>}
           </div>}
           {isStudent && child && <p className="hint">{child.name} · {child.className ?? 'no class'} · Adm. no {child.admissionNo}</p>}
-          <View base={`/portal/children/${childId}`} childId={childId} notices={notices} readOnly={isStudent} />
+          {tab === 'LMS'
+            ? <View base={`/portal/children/${childId}`} readOnly={!isStudent} />
+            : <View base={`/portal/children/${childId}`} childId={childId} notices={notices} readOnly={isStudent} />}
         </>
       )}
 

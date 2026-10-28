@@ -7,7 +7,8 @@ import { saveExtras } from '../modules/admissions/recordExtras.js';
 import { AUDIT_COLUMNS } from '../models/auditSoftDelete.js';
 import bcrypt from 'bcryptjs';
 import { Sequelize } from 'sequelize';
-import { LeaveType, Setting, sequelize, User } from '../models/index.js';
+import { LeaveType, LmsCourse, LmsEnrollment, LmsLesson, LmsSubmission, Setting, Student, sequelize, User } from '../models/index.js';
+import { migrateLegacyLmsFiles } from '../modules/academics/lmsFiles.service.js';
 import { env } from './env.js';
 import { ensureForeignKeys } from './integrity.js';
 
@@ -34,7 +35,7 @@ async function seedAdmin() {
     passwordHash: await bcrypt.hash(env.adminPassword(), 10),
     role: 'admin',
   });
-  console.log(`Seeded ${env.adminEmail()} / ${env.adminPassword()} (change after first login)`);
+  console.log(`Seeded the initial administrator account (${env.adminEmail()}).`);
 }
 
 /**
@@ -55,6 +56,23 @@ async function ensureAdmissionStatuses() {
 
 /** Columns added to a model after its table already existed; sync() will not add them. */
 const ADDED_COLUMNS = [
+  { table: 'lms_progress', column: 'viewed_at', definition: 'DATETIME NULL' },
+  { table: 'lms_progress', column: 'view_count', definition: 'INT NOT NULL DEFAULT 0' },
+  { table: 'lms_quizzes', column: 'due_on', definition: 'DATE NULL' },
+  { table: 'lms_lessons', column: 'attachment_data', definition: 'LONGTEXT NULL' },
+  { table: 'lms_lessons', column: 'module_id', definition: 'INT NULL' },
+  { table: 'lms_quiz_attempts', column: 'review_status', definition: "VARCHAR(20) NOT NULL DEFAULT 'reviewed'" },
+  { table: 'lms_quiz_attempts', column: 'feedback', definition: 'VARCHAR(1000) NULL' },
+  { table: 'lms_quiz_attempts', column: 'question_scores', definition: 'JSON NULL' },
+  { table: 'lms_lessons', column: 'attachment_key', definition: 'VARCHAR(64) NULL' },
+  { table: 'lms_lessons', column: 'attachment_name', definition: 'VARCHAR(255) NULL' },
+  { table: 'lms_lessons', column: 'attachment_mime', definition: 'VARCHAR(80) NULL' },
+  { table: 'lms_lessons', column: 'attachment_size', definition: 'INT NULL' },
+  { table: 'lms_submissions', column: 'attachment_data', definition: 'LONGTEXT NULL' },
+  { table: 'lms_submissions', column: 'attachment_key', definition: 'VARCHAR(64) NULL' },
+  { table: 'lms_submissions', column: 'attachment_name', definition: 'VARCHAR(255) NULL' },
+  { table: 'lms_submissions', column: 'attachment_mime', definition: 'VARCHAR(80) NULL' },
+  { table: 'lms_submissions', column: 'attachment_size', definition: 'INT NULL' },
   { table: 'student_files', column: 'data', definition: 'LONGTEXT NULL' },
   { table: 'staff_files', column: 'data', definition: 'LONGTEXT NULL' },
   { table: 'class_subjects', column: 'practical_share', definition: 'INT NULL' },
@@ -174,6 +192,17 @@ async function ensureColumns() {
   for (const { table, column, definition } of ADDED_COLUMNS) {
     const existing = await queryInterface.describeTable(table);
     if (!existing[column]) await sequelize.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
+  }
+  await sequelize.query('ALTER TABLE lms_progress MODIFY COLUMN completed_at DATETIME NULL');
+  await sequelize.query('ALTER TABLE lms_quiz_attempts MODIFY COLUMN score DECIMAL(8,2) NOT NULL');
+  await sequelize.query('ALTER TABLE lms_quiz_attempts MODIFY COLUMN max_score DECIMAL(8,2) NOT NULL');
+  await sequelize.query('UPDATE lms_progress SET viewed_at = completed_at, view_count = 1 WHERE completed_at IS NOT NULL AND viewed_at IS NULL');
+  const movedLmsFiles = await migrateLegacyLmsFiles([LmsLesson, LmsSubmission]);
+  if (movedLmsFiles) console.log(`Moved ${movedLmsFiles} LMS file(s) into ${process.env.LMS_STORAGE_DIR || 'uploads/lms'}.`);
+  const courses = await LmsCourse.findAll({ attributes: ['id', 'classId'] });
+  for (const course of courses) {
+    const students = await Student.findAll({ where: { classId: course.classId, status: 'active' }, attributes: ['id'], raw: true });
+    if (students.length) await LmsEnrollment.bulkCreate(students.map((student) => ({ courseId: course.id, studentId: student.id, active: true })), { ignoreDuplicates: true });
   }
   // the audit and soft-delete columns on every table, old ones included
   for (const model of Object.values(sequelize.models)) {

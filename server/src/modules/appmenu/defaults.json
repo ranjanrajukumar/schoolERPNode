@@ -1,1320 +1,1441 @@
 [
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "q.myclass",
-    "label": "My Class",
-    "icon": "people-outline",
-    "kind": "quick",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "q.mark",
-    "label": "Mark Attendance",
-    "icon": "checkbox-outline",
-    "kind": "quick",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "q.marks",
-    "label": "Enter Marks",
-    "icon": "create-outline",
-    "kind": "quick",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin"
-    ],
-    "key": "admissions",
-    "label": "Admissions",
-    "icon": "document-text-outline",
-    "kind": "module",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "admissions",
-    "roles": null,
-    "key": "admissions.enquiries",
-    "label": "Enquiries",
-    "icon": "help-circle-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "admissions",
-    "roles": null,
-    "key": "admissions.applications",
-    "label": "Applications",
-    "icon": "document-text-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "admissions",
-    "roles": null,
-    "key": "admissions.offers",
-    "label": "Offers and enrolment",
-    "icon": "checkmark-circle-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "admissions",
-    "roles": null,
-    "key": "admissions.summary",
-    "label": "Admissions summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "students",
-    "label": "Students",
-    "icon": "school-outline",
-    "kind": "module",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "students",
-    "roles": null,
-    "key": "students.students",
-    "label": "Students",
-    "icon": "school-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "students",
-    "roles": null,
-    "key": "students.summary",
-    "label": "Student summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "students",
-    "roles": null,
-    "key": "students.health",
-    "label": "Health records",
-    "icon": "medical-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "students",
-    "roles": null,
-    "key": "students.behavior",
-    "label": "Behaviour",
-    "icon": "list-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "students",
-    "roles": null,
-    "key": "students.alumni",
-    "label": "Alumni",
-    "icon": "ribbon-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "students",
-    "roles": [
-      "admin"
-    ],
-    "key": "students.accounts",
-    "label": "Student logins",
-    "icon": "key-outline",
-    "kind": "list",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "academics",
-    "label": "Academics",
-    "icon": "book-outline",
-    "kind": "module",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.classes",
-    "label": "Classes",
-    "icon": "layers-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.subjects",
-    "label": "Subjects",
-    "icon": "book-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.years",
-    "label": "Academic years",
-    "icon": "calendar-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.homework",
-    "label": "Homework",
-    "icon": "create-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.materials",
-    "label": "Study materials",
-    "icon": "folder-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.online",
-    "label": "Online classes",
-    "icon": "videocam-outline",
-    "kind": "list",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.syllabus",
-    "label": "Syllabus",
-    "icon": "list-outline",
-    "kind": "list",
-    "position": 70
-  },
-  {
-    "audience": "staff",
-    "parentKey": "academics",
-    "roles": null,
-    "key": "academics.calendar",
-    "label": "Calendar and holidays",
-    "icon": "calendar-outline",
-    "kind": "list",
-    "position": 80
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "attendance",
-    "label": "Attendance and leave",
-    "icon": "checkbox-outline",
-    "kind": "module",
-    "position": 70
-  },
-  {
-    "audience": "staff",
-    "parentKey": "attendance",
-    "roles": null,
-    "key": "attendance.mark",
-    "label": "Mark attendance",
-    "icon": "checkbox-outline",
-    "kind": "custom",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "attendance",
-    "roles": null,
-    "key": "attendance.myclass",
-    "label": "My class today",
-    "icon": "people-outline",
-    "kind": "custom",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "attendance",
-    "roles": null,
-    "key": "attendance.leaves",
-    "label": "Student leave",
-    "icon": "mail-open-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "exams",
-    "label": "Examinations",
-    "icon": "create-outline",
-    "kind": "module",
-    "position": 80
-  },
-  {
-    "audience": "staff",
-    "parentKey": "exams",
-    "roles": null,
-    "key": "exams.marks",
-    "label": "Enter marks",
-    "icon": "create-outline",
-    "kind": "custom",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "exams",
-    "roles": null,
-    "key": "exams.exams",
-    "label": "Exams",
-    "icon": "document-text-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "exams",
-    "roles": null,
-    "key": "exams.reval",
-    "label": "Revaluation requests",
-    "icon": "clipboard-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "exams",
-    "roles": null,
-    "key": "exams.grading",
-    "label": "Grade scale",
-    "icon": "trending-up-outline",
-    "kind": "stats",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "accountant"
-    ],
-    "key": "fees",
-    "label": "Fees and finance",
-    "icon": "wallet-outline",
-    "kind": "module",
-    "position": 90
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.fees",
-    "label": "Fees and payments",
-    "icon": "wallet-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.payments",
-    "label": "Payments and receipts",
-    "icon": "receipt-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.structure",
-    "label": "Fee structure",
-    "icon": "layers-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.groups",
-    "label": "Fee groups",
-    "icon": "pricetag-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.defaulters",
-    "label": "Defaulters",
-    "icon": "alert-circle-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.finance",
-    "label": "Income and expenses",
-    "icon": "cash-outline",
-    "kind": "stats",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.collection",
-    "label": "Collection this month",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 70
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "transport",
-    "label": "Transport",
-    "icon": "bus-outline",
-    "kind": "module",
-    "position": 100
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.summary",
-    "label": "Transport summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.vehicles",
-    "label": "Vehicles",
-    "icon": "bus-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.routes",
-    "label": "Routes",
-    "icon": "map-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.stops",
-    "label": "Stops",
-    "icon": "location-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.assignments",
-    "label": "Riders",
-    "icon": "people-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.staff",
-    "label": "Drivers and attendants",
-    "icon": "person-outline",
-    "kind": "list",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": "transport",
-    "roles": null,
-    "key": "transport.tracking",
-    "label": "Live bus tracking",
-    "icon": "navigate-outline",
-    "kind": "list",
-    "position": 70
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "hostel",
-    "label": "Hostel",
-    "icon": "bed-outline",
-    "kind": "module",
-    "position": 110
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.summary",
-    "label": "Hostel summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.hostels",
-    "label": "Hostels",
-    "icon": "business-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.rooms",
-    "label": "Rooms",
-    "icon": "bed-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.allocations",
-    "label": "Boarders",
-    "icon": "people-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.visitors",
-    "label": "Visitor log",
-    "icon": "walk-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.meals",
-    "label": "Mess menu",
-    "icon": "restaurant-outline",
-    "kind": "list",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "library",
-    "label": "Library",
-    "icon": "library-outline",
-    "kind": "module",
-    "position": 120
-  },
-  {
-    "audience": "staff",
-    "parentKey": "library",
-    "roles": null,
-    "key": "library.summary",
-    "label": "Library summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "library",
-    "roles": null,
-    "key": "library.books",
-    "label": "Books",
-    "icon": "book-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "library",
-    "roles": null,
-    "key": "library.issues",
-    "label": "Loans",
-    "icon": "swap-horizontal-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "library",
-    "roles": null,
-    "key": "library.members",
-    "label": "Library cards",
-    "icon": "id-card-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "library",
-    "roles": null,
-    "key": "library.reservations",
-    "label": "Reservations",
-    "icon": "bookmark-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "inventory",
-    "label": "Inventory",
-    "icon": "cube-outline",
-    "kind": "module",
-    "position": 130
-  },
-  {
-    "audience": "staff",
-    "parentKey": "inventory",
-    "roles": null,
-    "key": "inventory.requests",
-    "label": "Item requests",
-    "icon": "paper-plane-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "inventory",
-    "roles": [
-      "admin"
-    ],
-    "key": "inventory.summary",
-    "label": "Stock summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "inventory",
-    "roles": [
-      "admin"
-    ],
-    "key": "inventory.items",
-    "label": "Items",
-    "icon": "cube-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "inventory",
-    "roles": [
-      "admin"
-    ],
-    "key": "inventory.orders",
-    "label": "Purchase orders",
-    "icon": "cart-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "inventory",
-    "roles": [
-      "admin"
-    ],
-    "key": "inventory.movements",
-    "label": "Stock movements",
-    "icon": "swap-horizontal-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "inventory",
-    "roles": [
-      "admin"
-    ],
-    "key": "inventory.suppliers",
-    "label": "Suppliers",
-    "icon": "storefront-outline",
-    "kind": "list",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher",
-      "accountant"
-    ],
-    "key": "hr",
-    "label": "Staff and HR",
-    "icon": "people-outline",
-    "kind": "module",
-    "position": 140
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hr",
-    "roles": [
-      "admin",
-      "teacher",
-      "accountant"
-    ],
-    "key": "hr.staff",
-    "label": "Staff directory",
-    "icon": "people-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hr",
-    "roles": [
-      "admin"
-    ],
-    "key": "hr.summary",
-    "label": "HR summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hr",
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "hr.leaves",
-    "label": "Staff leave",
-    "icon": "mail-open-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hr",
-    "roles": [
-      "admin",
-      "accountant"
-    ],
-    "key": "hr.payslips",
-    "label": "Payslips this month",
-    "icon": "cash-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hr",
-    "roles": [
-      "admin",
-      "accountant"
-    ],
-    "key": "hr.salaries",
-    "label": "Salary terms",
-    "icon": "wallet-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "staff",
-    "parentKey": "hr",
-    "roles": [
-      "admin"
-    ],
-    "key": "hr.openings",
-    "label": "Recruitment",
-    "icon": "briefcase-outline",
-    "kind": "list",
-    "position": 60
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin"
-    ],
-    "key": "safety",
-    "label": "Health and safety",
-    "icon": "medkit-outline",
-    "kind": "module",
-    "position": 150
-  },
-  {
-    "audience": "staff",
-    "parentKey": "safety",
-    "roles": null,
-    "key": "safety.summary",
-    "label": "Safety summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "safety",
-    "roles": null,
-    "key": "safety.incidents",
-    "label": "Incidents",
-    "icon": "alert-circle-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "key": "activities",
-    "label": "Events and activities",
-    "icon": "ribbon-outline",
-    "kind": "module",
-    "position": 160
-  },
-  {
-    "audience": "staff",
-    "parentKey": "activities",
-    "roles": null,
-    "key": "activities.activities",
-    "label": "Activities",
-    "icon": "ribbon-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "activities",
-    "roles": null,
-    "key": "activities.summary",
-    "label": "Activity summary",
-    "icon": "stats-chart-outline",
-    "kind": "stats",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin"
-    ],
-    "key": "documents",
-    "label": "Certificates",
-    "icon": "document-attach-outline",
-    "kind": "module",
-    "position": 170
-  },
-  {
-    "audience": "staff",
-    "parentKey": "documents",
-    "roles": null,
-    "key": "documents.requests",
-    "label": "Requests and register",
-    "icon": "document-attach-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin",
-      "teacher",
-      "accountant"
-    ],
-    "key": "communication",
-    "label": "Communication",
-    "icon": "chatbubbles-outline",
-    "kind": "module",
-    "position": 180
-  },
-  {
-    "audience": "staff",
-    "parentKey": "communication",
-    "roles": null,
-    "key": "communication.notices",
-    "label": "Notices",
-    "icon": "megaphone-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "communication",
-    "roles": [
-      "admin"
-    ],
-    "key": "communication.history",
-    "label": "Message history",
-    "icon": "chatbubbles-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "communication",
-    "roles": [
-      "admin"
-    ],
-    "key": "communication.feedback",
-    "label": "Feedback and grievances",
-    "icon": "heart-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": [
-      "admin"
-    ],
-    "key": "portal",
-    "label": "Parents and logins",
-    "icon": "people-circle-outline",
-    "kind": "module",
-    "position": 190
-  },
-  {
-    "audience": "staff",
-    "parentKey": "portal",
-    "roles": null,
-    "key": "portal.parents",
-    "label": "Parent accounts",
-    "icon": "people-circle-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "staff",
-    "parentKey": "portal",
-    "roles": null,
-    "key": "portal.users",
-    "label": "Users",
-    "icon": "person-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "staff",
-    "parentKey": "portal",
-    "roles": null,
-    "key": "portal.logins",
-    "label": "Login history",
-    "icon": "shield-checkmark-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "staff",
-    "parentKey": null,
-    "roles": null,
-    "key": "password",
-    "label": "Change Password",
-    "icon": "key-outline",
-    "kind": "quick",
-    "position": 200
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "academic",
-    "label": "Academic",
-    "icon": "book-outline",
-    "kind": "section",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.timetable",
-    "label": "Timetable",
-    "icon": "time-outline",
-    "kind": "custom",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.calendar",
-    "label": "Calendar",
-    "icon": "calendar-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.homework",
-    "label": "Homework",
-    "icon": "create-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.materials",
-    "label": "Learning materials",
-    "icon": "folder-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.online",
-    "label": "Online classes",
-    "icon": "videocam-outline",
-    "kind": "list",
-    "position": 50
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.attendance",
-    "label": "Attendance",
-    "icon": "checkbox-outline",
-    "kind": "custom",
-    "position": 60
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.leave",
-    "label": "Student leave",
-    "icon": "mail-outline",
-    "kind": "custom",
-    "position": 70
-  },
-  {
-    "audience": "family",
-    "parentKey": "academic",
-    "roles": null,
-    "key": "academic.balance",
-    "label": "Leave balance",
-    "icon": "bar-chart-outline",
-    "kind": "list",
-    "position": 80
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "exam",
-    "label": "Exam",
-    "icon": "create-outline",
-    "kind": "section",
-    "position": 20
-  },
-  {
-    "audience": "family",
-    "parentKey": "exam",
-    "roles": null,
-    "key": "exam.results",
-    "label": "Exams & results",
-    "icon": "document-text-outline",
-    "kind": "custom",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": "exam",
-    "roles": null,
-    "key": "exam.revaluations",
-    "label": "Revaluation requests",
-    "icon": "clipboard-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "fees",
-    "label": "Fees",
-    "icon": "wallet-outline",
-    "kind": "section",
-    "position": 30
-  },
-  {
-    "audience": "family",
-    "parentKey": "fees",
-    "roles": null,
-    "key": "fees.fees",
-    "label": "Fees & payments",
-    "icon": "wallet-outline",
-    "kind": "custom",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "hostel",
-    "label": "Hostel",
-    "icon": "bed-outline",
-    "kind": "section",
-    "position": 40
-  },
-  {
-    "audience": "family",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.details",
-    "label": "Room & warden",
-    "icon": "bed-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.meals",
-    "label": "Mess menu",
-    "icon": "restaurant-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "family",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.attendance",
-    "label": "Night roll call",
-    "icon": "moon-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "family",
-    "parentKey": "hostel",
-    "roles": null,
-    "key": "hostel.visitors",
-    "label": "Visitors",
-    "icon": "walk-outline",
-    "kind": "list",
-    "position": 40
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "library",
-    "label": "Library",
-    "icon": "library-outline",
-    "kind": "section",
-    "position": 50
-  },
-  {
-    "audience": "family",
-    "parentKey": "library",
-    "roles": null,
-    "key": "library.library",
-    "label": "Library",
-    "icon": "library-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "admin",
-    "label": "Administration",
-    "icon": "document-attach-outline",
-    "kind": "section",
-    "position": 60
-  },
-  {
-    "audience": "family",
-    "parentKey": "admin",
-    "roles": null,
-    "key": "admin.documents",
-    "label": "Certificates",
-    "icon": "document-attach-outline",
-    "kind": "list",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": "admin",
-    "roles": null,
-    "key": "admin.feedback",
-    "label": "Feedback & grievance",
-    "icon": "heart-outline",
-    "kind": "list",
-    "position": 20
-  },
-  {
-    "audience": "family",
-    "parentKey": "admin",
-    "roles": null,
-    "key": "admin.messages",
-    "label": "Messages from the school",
-    "icon": "chatbubbles-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "family",
-    "parentKey": null,
-    "roles": null,
-    "key": "other",
-    "label": "Other services",
-    "icon": "apps-outline",
-    "kind": "section",
-    "position": 70
-  },
-  {
-    "audience": "family",
-    "parentKey": "other",
-    "roles": null,
-    "key": "other.transport",
-    "label": "Transport",
-    "icon": "bus-outline",
-    "kind": "stats",
-    "position": 10
-  },
-  {
-    "audience": "family",
-    "parentKey": "other",
-    "roles": null,
-    "key": "other.notices",
-    "label": "Notices",
-    "icon": "megaphone-outline",
-    "kind": "custom",
-    "position": 20
-  },
-  {
-    "audience": "family",
-    "parentKey": "other",
-    "roles": null,
-    "key": "other.activities",
-    "label": "Activities",
-    "icon": "ribbon-outline",
-    "kind": "list",
-    "position": 30
-  },
-  {
-    "audience": "family",
-    "parentKey": "other",
-    "roles": null,
-    "key": "other.password",
-    "label": "Change password",
-    "icon": "key-outline",
-    "kind": "custom",
-    "position": 40
-  }
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "q.myclass",
+        "label":  "My Class",
+        "icon":  "people-outline",
+        "kind":  "quick",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "q.mark",
+        "label":  "Mark Attendance",
+        "icon":  "checkbox-outline",
+        "kind":  "quick",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "q.marks",
+        "label":  "Enter Marks",
+        "icon":  "create-outline",
+        "kind":  "quick",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "admissions",
+        "label":  "Admissions",
+        "icon":  "document-text-outline",
+        "kind":  "module",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "admissions",
+        "roles":  null,
+        "key":  "admissions.enquiries",
+        "label":  "Enquiries",
+        "icon":  "help-circle-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "admissions",
+        "roles":  null,
+        "key":  "admissions.applications",
+        "label":  "Applications",
+        "icon":  "document-text-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "admissions",
+        "roles":  null,
+        "key":  "admissions.offers",
+        "label":  "Offers and enrolment",
+        "icon":  "checkmark-circle-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "admissions",
+        "roles":  null,
+        "key":  "admissions.summary",
+        "label":  "Admissions summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "students",
+        "label":  "Students",
+        "icon":  "school-outline",
+        "kind":  "module",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "students",
+        "roles":  null,
+        "key":  "students.students",
+        "label":  "Students",
+        "icon":  "school-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "students",
+        "roles":  null,
+        "key":  "students.summary",
+        "label":  "Student summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "students",
+        "roles":  null,
+        "key":  "students.health",
+        "label":  "Health records",
+        "icon":  "medical-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "students",
+        "roles":  null,
+        "key":  "students.behavior",
+        "label":  "Behaviour",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "students",
+        "roles":  null,
+        "key":  "students.alumni",
+        "label":  "Alumni",
+        "icon":  "ribbon-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "students",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "students.accounts",
+        "label":  "Student logins",
+        "icon":  "key-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "academics",
+        "label":  "Academics",
+        "icon":  "book-outline",
+        "kind":  "module",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.classes",
+        "label":  "Classes",
+        "icon":  "layers-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.subjects",
+        "label":  "Subjects",
+        "icon":  "book-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.years",
+        "label":  "Academic years",
+        "icon":  "calendar-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.homework",
+        "label":  "Homework",
+        "icon":  "create-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.materials",
+        "label":  "Study materials",
+        "icon":  "folder-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.online",
+        "label":  "Online classes",
+        "icon":  "videocam-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.syllabus",
+        "label":  "Syllabus",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  70
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "academics",
+        "roles":  null,
+        "key":  "academics.calendar",
+        "label":  "Calendar and holidays",
+        "icon":  "calendar-outline",
+        "kind":  "list",
+        "position":  80
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "lms",
+        "label":  "Learning Management",
+        "icon":  "book-outline",
+        "kind":  "module",
+        "position":  70
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "lms",
+        "roles":  null,
+        "key":  "lms.courses",
+        "label":  "Learning courses",
+        "icon":  "open-outline",
+        "kind":  "custom",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "attendance",
+        "label":  "Attendance and leave",
+        "icon":  "checkbox-outline",
+        "kind":  "module",
+        "position":  80
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "attendance",
+        "roles":  null,
+        "key":  "attendance.mark",
+        "label":  "Mark attendance",
+        "icon":  "checkbox-outline",
+        "kind":  "custom",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "attendance",
+        "roles":  null,
+        "key":  "attendance.myclass",
+        "label":  "My class today",
+        "icon":  "people-outline",
+        "kind":  "custom",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "attendance",
+        "roles":  null,
+        "key":  "attendance.leaves",
+        "label":  "Student leave",
+        "icon":  "mail-open-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "exams",
+        "label":  "Examinations",
+        "icon":  "create-outline",
+        "kind":  "module",
+        "position":  90
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "exams",
+        "roles":  null,
+        "key":  "exams.marks",
+        "label":  "Enter marks",
+        "icon":  "create-outline",
+        "kind":  "custom",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "exams",
+        "roles":  null,
+        "key":  "exams.exams",
+        "label":  "Exams",
+        "icon":  "document-text-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "exams",
+        "roles":  null,
+        "key":  "exams.reval",
+        "label":  "Revaluation requests",
+        "icon":  "clipboard-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "exams",
+        "roles":  null,
+        "key":  "exams.grading",
+        "label":  "Grade scale",
+        "icon":  "trending-up-outline",
+        "kind":  "stats",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "accountant"
+                  ],
+        "key":  "fees",
+        "label":  "Fees and finance",
+        "icon":  "wallet-outline",
+        "kind":  "module",
+        "position":  100
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.fees",
+        "label":  "Fees and payments",
+        "icon":  "wallet-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.payments",
+        "label":  "Payments and receipts",
+        "icon":  "receipt-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.structure",
+        "label":  "Fee structure",
+        "icon":  "layers-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.groups",
+        "label":  "Fee groups",
+        "icon":  "pricetag-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.defaulters",
+        "label":  "Defaulters",
+        "icon":  "alert-circle-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.finance",
+        "label":  "Income and expenses",
+        "icon":  "cash-outline",
+        "kind":  "stats",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.collection",
+        "label":  "Collection this month",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  70
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "transport",
+        "label":  "Transport",
+        "icon":  "bus-outline",
+        "kind":  "module",
+        "position":  110
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.summary",
+        "label":  "Transport summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.vehicles",
+        "label":  "Vehicles",
+        "icon":  "bus-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.routes",
+        "label":  "Routes",
+        "icon":  "map-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.stops",
+        "label":  "Stops",
+        "icon":  "location-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.assignments",
+        "label":  "Riders",
+        "icon":  "people-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.staff",
+        "label":  "Drivers and attendants",
+        "icon":  "person-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "transport",
+        "roles":  null,
+        "key":  "transport.tracking",
+        "label":  "Live bus tracking",
+        "icon":  "navigate-outline",
+        "kind":  "list",
+        "position":  70
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "hostel",
+        "label":  "Hostel",
+        "icon":  "bed-outline",
+        "kind":  "module",
+        "position":  120
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.summary",
+        "label":  "Hostel summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.hostels",
+        "label":  "Hostels",
+        "icon":  "business-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.rooms",
+        "label":  "Rooms",
+        "icon":  "bed-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.allocations",
+        "label":  "Boarders",
+        "icon":  "people-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.visitors",
+        "label":  "Visitor log",
+        "icon":  "walk-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.meals",
+        "label":  "Mess menu",
+        "icon":  "restaurant-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "library",
+        "label":  "Library",
+        "icon":  "library-outline",
+        "kind":  "module",
+        "position":  130
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.summary",
+        "label":  "Library summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.books",
+        "label":  "Books",
+        "icon":  "book-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.issues",
+        "label":  "Loans",
+        "icon":  "swap-horizontal-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.categories",
+        "label":  "Book categories",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.members",
+        "label":  "Library cards",
+        "icon":  "id-card-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.reservations",
+        "label":  "Reservations",
+        "icon":  "bookmark-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "inventory",
+        "label":  "Inventory",
+        "icon":  "cube-outline",
+        "kind":  "module",
+        "position":  140
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  null,
+        "key":  "inventory.requests",
+        "label":  "Item requests",
+        "icon":  "paper-plane-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.summary",
+        "label":  "Stock summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.categories",
+        "label":  "Categories",
+        "icon":  "pricetags-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.items",
+        "label":  "Items",
+        "icon":  "cube-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.orders",
+        "label":  "Purchase orders",
+        "icon":  "cart-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.movements",
+        "label":  "Stock movements",
+        "icon":  "swap-horizontal-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.suppliers",
+        "label":  "Suppliers",
+        "icon":  "storefront-outline",
+        "kind":  "list",
+        "position":  70
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.assets",
+        "label":  "Assets",
+        "icon":  "laptop-outline",
+        "kind":  "list",
+        "position":  80
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.assetSummary",
+        "label":  "Asset summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  90
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "inventory",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "inventory.maintenance",
+        "label":  "Asset maintenance",
+        "icon":  "construct-outline",
+        "kind":  "list",
+        "position":  100
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher",
+                      "accountant"
+                  ],
+        "key":  "hr",
+        "label":  "Staff and HR",
+        "icon":  "people-outline",
+        "kind":  "module",
+        "position":  150
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hr",
+        "roles":  [
+                      "admin",
+                      "teacher",
+                      "accountant"
+                  ],
+        "key":  "hr.staff",
+        "label":  "Staff directory",
+        "icon":  "people-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hr",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "hr.summary",
+        "label":  "HR summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hr",
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "hr.leaves",
+        "label":  "Staff leave",
+        "icon":  "mail-open-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hr",
+        "roles":  [
+                      "admin",
+                      "accountant"
+                  ],
+        "key":  "hr.payslips",
+        "label":  "Payslips this month",
+        "icon":  "cash-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hr",
+        "roles":  [
+                      "admin",
+                      "accountant"
+                  ],
+        "key":  "hr.salaries",
+        "label":  "Salary terms",
+        "icon":  "wallet-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "hr",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "hr.openings",
+        "label":  "Recruitment",
+        "icon":  "briefcase-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "safety",
+        "label":  "Health and safety",
+        "icon":  "medkit-outline",
+        "kind":  "module",
+        "position":  160
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "safety",
+        "roles":  null,
+        "key":  "safety.summary",
+        "label":  "Safety summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "safety",
+        "roles":  null,
+        "key":  "safety.incidents",
+        "label":  "Incidents",
+        "icon":  "alert-circle-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher"
+                  ],
+        "key":  "activities",
+        "label":  "Events and activities",
+        "icon":  "ribbon-outline",
+        "kind":  "module",
+        "position":  170
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "activities",
+        "roles":  null,
+        "key":  "activities.activities",
+        "label":  "Activities",
+        "icon":  "ribbon-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "activities",
+        "roles":  null,
+        "key":  "activities.summary",
+        "label":  "Activity summary",
+        "icon":  "stats-chart-outline",
+        "kind":  "stats",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "documents",
+        "label":  "Certificates",
+        "icon":  "document-attach-outline",
+        "kind":  "module",
+        "position":  180
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "documents",
+        "roles":  null,
+        "key":  "documents.requests",
+        "label":  "Requests and register",
+        "icon":  "document-attach-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin",
+                      "teacher",
+                      "accountant"
+                  ],
+        "key":  "communication",
+        "label":  "Communication",
+        "icon":  "chatbubbles-outline",
+        "kind":  "module",
+        "position":  190
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "communication",
+        "roles":  null,
+        "key":  "communication.notices",
+        "label":  "Notices",
+        "icon":  "megaphone-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "communication",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "communication.history",
+        "label":  "Message history",
+        "icon":  "chatbubbles-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "communication",
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "communication.feedback",
+        "label":  "Feedback and grievances",
+        "icon":  "heart-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  [
+                      "admin"
+                  ],
+        "key":  "portal",
+        "label":  "Parents and logins",
+        "icon":  "people-circle-outline",
+        "kind":  "module",
+        "position":  200
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "portal",
+        "roles":  null,
+        "key":  "portal.parents",
+        "label":  "Parent accounts",
+        "icon":  "people-circle-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "portal",
+        "roles":  null,
+        "key":  "portal.users",
+        "label":  "Users",
+        "icon":  "person-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  "portal",
+        "roles":  null,
+        "key":  "portal.logins",
+        "label":  "Login history",
+        "icon":  "shield-checkmark-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "staff",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "password",
+        "label":  "Change Password",
+        "icon":  "key-outline",
+        "kind":  "quick",
+        "position":  210
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "academic",
+        "label":  "Academic",
+        "icon":  "book-outline",
+        "kind":  "section",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.timetable",
+        "label":  "Timetable",
+        "icon":  "time-outline",
+        "kind":  "custom",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.calendar",
+        "label":  "Calendar",
+        "icon":  "calendar-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.homework",
+        "label":  "Homework",
+        "icon":  "create-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.materials",
+        "label":  "Learning materials",
+        "icon":  "folder-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.lms",
+        "label":  "Courses \u0026 lessons",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  50
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.lmsannouncements",
+        "label":  "Course announcements",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  60
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.lmsassignments",
+        "label":  "Course assignments",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  70
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.lmsquizzes",
+        "label":  "Course quizzes",
+        "icon":  "list-outline",
+        "kind":  "list",
+        "position":  80
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.online",
+        "label":  "Online classes",
+        "icon":  "videocam-outline",
+        "kind":  "list",
+        "position":  90
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.attendance",
+        "label":  "Attendance",
+        "icon":  "checkbox-outline",
+        "kind":  "custom",
+        "position":  100
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.leave",
+        "label":  "Student leave",
+        "icon":  "mail-outline",
+        "kind":  "custom",
+        "position":  110
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "academic",
+        "roles":  null,
+        "key":  "academic.balance",
+        "label":  "Leave balance",
+        "icon":  "bar-chart-outline",
+        "kind":  "list",
+        "position":  120
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "exam",
+        "label":  "Exam",
+        "icon":  "create-outline",
+        "kind":  "section",
+        "position":  20
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "exam",
+        "roles":  null,
+        "key":  "exam.results",
+        "label":  "Exams \u0026 results",
+        "icon":  "document-text-outline",
+        "kind":  "custom",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "exam",
+        "roles":  null,
+        "key":  "exam.revaluations",
+        "label":  "Revaluation requests",
+        "icon":  "clipboard-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "fees",
+        "label":  "Fees",
+        "icon":  "wallet-outline",
+        "kind":  "section",
+        "position":  30
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "fees",
+        "roles":  null,
+        "key":  "fees.fees",
+        "label":  "Fees \u0026 payments",
+        "icon":  "wallet-outline",
+        "kind":  "custom",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "hostel",
+        "label":  "Hostel",
+        "icon":  "bed-outline",
+        "kind":  "section",
+        "position":  40
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.details",
+        "label":  "Room \u0026 warden",
+        "icon":  "bed-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.meals",
+        "label":  "Mess menu",
+        "icon":  "restaurant-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.attendance",
+        "label":  "Night roll call",
+        "icon":  "moon-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "hostel",
+        "roles":  null,
+        "key":  "hostel.visitors",
+        "label":  "Visitors",
+        "icon":  "walk-outline",
+        "kind":  "list",
+        "position":  40
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "library",
+        "label":  "Library",
+        "icon":  "library-outline",
+        "kind":  "section",
+        "position":  50
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "library",
+        "roles":  null,
+        "key":  "library.library",
+        "label":  "Library",
+        "icon":  "library-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "admin",
+        "label":  "Administration",
+        "icon":  "document-attach-outline",
+        "kind":  "section",
+        "position":  60
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "admin",
+        "roles":  null,
+        "key":  "admin.documents",
+        "label":  "Certificates",
+        "icon":  "document-attach-outline",
+        "kind":  "list",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "admin",
+        "roles":  null,
+        "key":  "admin.feedback",
+        "label":  "Feedback \u0026 grievance",
+        "icon":  "heart-outline",
+        "kind":  "list",
+        "position":  20
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "admin",
+        "roles":  null,
+        "key":  "admin.messages",
+        "label":  "Messages from the school",
+        "icon":  "chatbubbles-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "family",
+        "parentKey":  null,
+        "roles":  null,
+        "key":  "other",
+        "label":  "Other services",
+        "icon":  "apps-outline",
+        "kind":  "section",
+        "position":  70
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "other",
+        "roles":  null,
+        "key":  "other.transport",
+        "label":  "Transport",
+        "icon":  "bus-outline",
+        "kind":  "stats",
+        "position":  10
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "other",
+        "roles":  null,
+        "key":  "other.notices",
+        "label":  "Notices",
+        "icon":  "megaphone-outline",
+        "kind":  "custom",
+        "position":  20
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "other",
+        "roles":  null,
+        "key":  "other.activities",
+        "label":  "Activities",
+        "icon":  "ribbon-outline",
+        "kind":  "list",
+        "position":  30
+    },
+    {
+        "audience":  "family",
+        "parentKey":  "other",
+        "roles":  null,
+        "key":  "other.password",
+        "label":  "Change password",
+        "icon":  "key-outline",
+        "kind":  "custom",
+        "position":  40
+    }
 ]

@@ -17,17 +17,25 @@ export default function ActionModal({ visible, action, row, child = null, onClos
 
   useEffect(() => {
     if (!visible || !action) return;
+    const fields = typeof action.fields === 'function' ? action.fields(row, child) : action.fields ?? [];
     setError('');
-    setValues(Object.fromEntries((action.fields ?? []).map((f) => [f.key, typeof f.default === 'function' ? String(f.default(row) ?? '') : String(f.default ?? '')])));
-    (action.fields ?? []).filter((f) => f.optionsPath).forEach((f) => {
-      api(f.optionsPath).then((list) => setOptions((o) => ({ ...o, [f.key]: [...(f.allLabel ? [{ value: '', label: f.allLabel }] : []), ...list.map((x) => (typeof x === 'string' ? { value: x, label: x } : { value: x.id ?? x.value, label: x.section ? `${x.name}-${x.section}` : x.name ?? x.label })) ] }))).catch(() => {});
+    setValues(Object.fromEntries(fields.map((f) => {
+      const value = typeof f.default === 'function' ? f.default(row) : f.default;
+      return [f.key, f.type === 'lineItems' || f.multi ? (Array.isArray(value) ? value : []) : String(value ?? '')];
+    })));
+    fields.filter((f) => f.optionsPath).forEach((f) => {
+      api(f.optionsPath).then((list) => setOptions((o) => ({ ...o, [f.key]: [...(f.allLabel ? [{ value: '', label: f.allLabel }] : []), ...list.filter((x) => !f.filterOption || f.filterOption(x)).map((x) => (typeof x === 'string' ? { value: x, label: x } : f.mapOption ? f.mapOption(x) : { value: String(x.id ?? x.value), label: x.section ? `${x.name}-${x.section}` : x.name ?? x.label })) ] }))).catch(() => {});
     });
   }, [visible, action, row]);
 
   if (!action) return null;
 
+  const fields = typeof action.fields === 'function' ? action.fields(row, child) : action.fields ?? [];
+
   const submit = async () => {
-    for (const f of action.fields ?? []) {
+    for (const f of fields) {
+      if (f.required && f.type === 'lineItems' && (!Array.isArray(values[f.key]) || !values[f.key].length || values[f.key].some((line) => !line.itemId || !String(line.quantity ?? '').trim()))) { setError(`${f.label} needs an item and quantity on every line.`); return; }
+      if (f.type === 'lineItems') { const ids = (values[f.key] ?? []).map((line) => line.itemId).filter(Boolean); if (new Set(ids).size !== ids.length) { setError('Each item can appear only once on an order.'); return; } }
       if (f.required && !String(values[f.key] ?? '').trim()) { setError(`${f.label} is required.`); return; }
     }
     setBusy(true); setError('');
@@ -51,9 +59,29 @@ export default function ActionModal({ visible, action, row, child = null, onClos
           {action.confirm ? <Muted style={{ marginBottom: space.md }}>{typeof action.confirm === 'function' ? action.confirm(row) : action.confirm}</Muted> : null}
           <ScrollView keyboardShouldPersistTaps="handled">
             <Banner text={error} />
-            {(action.fields ?? []).map((f) => {
+            {fields.map((f) => {
               const choices = f.options ? f.options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o)) : options[f.key];
-              return choices ? (
+              if (f.type === 'lineItems') {
+                const lines = Array.isArray(values[f.key]) ? values[f.key] : [];
+                const updateLine = (index, patch) => setValues((current) => ({ ...current, [f.key]: lines.map((line, i) => i === index ? { ...line, ...patch } : line) }));
+                return <View key={f.key} style={{ marginBottom: space.md }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', marginBottom: 6 }}>{f.label}{f.required ? ' *' : ''}</Text>
+                  {lines.map((line, index) => <View key={`${f.key}-${index}`} style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: color.line, borderRadius: 10, padding: space.sm, marginBottom: space.sm }}>
+                    <Text style={{ color: color.ink, fontWeight: '700', marginBottom: 4 }}>Line {index + 1}</Text>
+                    {choices ? <Chips options={choices.length > 1 ? choices : [...choices, { value: '__', label: '—' }]} value={String(line.itemId ?? '')} onChange={(v) => updateLine(index, { itemId: v === '__' ? '' : v })} /> : <Muted>Loading choices…</Muted>}
+                    <Field label="Quantity" value={String(line.quantity ?? '')} keyboardType="number-pad" onChangeText={(v) => updateLine(index, { quantity: v.replace(/[^0-9]/g, '') })} />
+                    <Field label="Unit cost" value={String(line.unitCost ?? '')} keyboardType="decimal-pad" onChangeText={(v) => updateLine(index, { unitCost: v.replace(/[^0-9.]/g, '') })} />
+                    {lines.length > 1 ? <Button title="Remove line" kind="ghost" onPress={() => setValues((current) => ({ ...current, [f.key]: lines.filter((_, i) => i !== index) }))} /> : null}
+                  </View>)}
+                  <Button title="Add another item" kind="ghost" onPress={() => setValues((current) => ({ ...current, [f.key]: [...lines, { itemId: '', quantity: '', unitCost: '0' }] }))} />
+                </View>;
+              }
+              return choices && f.multi ? (
+                <View key={f.key} style={{ marginBottom: space.sm }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', marginBottom: 4 }}>{f.label}{f.required ? ' *' : ''}</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{choices.map((choice) => { const selected = (values[f.key] ?? []).includes(String(choice.value)); return <Pressable key={choice.value} onPress={() => setValues((current) => ({ ...current, [f.key]: selected ? current[f.key].filter((x) => x !== String(choice.value)) : [...(current[f.key] ?? []), String(choice.value)] }))} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 18, backgroundColor: selected ? color.header : '#fff', borderWidth: 1, borderColor: color.line }}><Text style={{ color: selected ? '#fff' : color.ink }}>{choice.label}</Text></Pressable>; })}</View>
+                </View>
+              ) : choices ? (
                 <View key={f.key} style={{ marginBottom: space.sm }}>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', marginBottom: 4 }}>{f.label}</Text>
                   <Chips options={choices.length > 1 ? choices : [...choices, { value: '__', label: '—' }]} value={values[f.key]} onChange={(v) => setValues((x) => ({ ...x, [f.key]: v }))} />

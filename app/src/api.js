@@ -27,6 +27,31 @@ export class ApiError extends Error {
 }
 
 export const getServerUrl = () => baseUrl;
+export const getAuthToken = () => token;
+
+/** Sends a small file as raw bytes to an authenticated upload endpoint. */
+export async function uploadBinary(path, bytes, contentType = 'application/octet-stream') {
+  const res = await fetch(`${baseUrl}${path}`, { method: 'POST', headers: { 'Content-Type': contentType, ...(token && { Authorization: `Bearer ${token}` }) }, body: bytes });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new ApiError(data.error || `Upload failed (${res.status})`, res.status, data);
+  return data;
+}
+
+export async function openPrivateFile(path, filename = 'school-document') {
+  const res = await fetch(`${baseUrl}${path}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) { const data = await res.json().catch(() => ({})); throw new ApiError(data.error || `Download failed (${res.status})`, res.status, data); }
+  if (Platform.OS === 'web') {
+    const url = URL.createObjectURL(await res.blob());
+    const link = document.createElement('a'); link.href = url; link.download = filename || 'school-document'; link.rel = 'noopener'; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return;
+  }
+  const { File, Paths } = await import('expo-file-system');
+  const safe = String(filename).replace(/[^A-Za-z0-9._-]/g, '_') || 'school-document';
+  const file = new File(Paths.cache, `${Date.now()}-${safe}`);
+  await file.write(new Uint8Array(await res.arrayBuffer()));
+  await File.preview(file);
+}
 export const setUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
 
 /** Loads what was saved on this phone: the server address and the sign-in token. */

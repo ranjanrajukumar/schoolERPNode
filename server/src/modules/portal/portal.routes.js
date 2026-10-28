@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import { Op } from 'sequelize';
 import {
   Attendance, Book, BookIssue, Exam, LibraryMembership, Message, Notice, OnlineClass, Parent, ParentStudent, SchoolClass, Student, StudentAccount, StudentTransport, StudyMaterial, TimetableSlot, Staff, Subject,
@@ -25,18 +25,20 @@ import { routeBus } from '../transport/tracking.service.js';
 import { homeworkForStudent } from '../academics/homework.service.js';
 import { eventsBetween } from '../academics/calendar.routes.js';
 import { materialInclude, shape as shapeMaterial } from '../academics/materials.routes.js';
+import { completeLesson, readStudentAssignmentFile, readStudentLessonFile, readStudentMaterialFile, readStudentPartFile, recordLessonView, studentCourses, submitAssignment, takeQuiz, uploadAssignmentFile } from '../academics/lms.service.js';
+import { MAX_BYTES } from '../files/files.service.js';
 
 const router = Router();
 
 /**
  * Resolves who is signed in and the only students they may see: a parent's linked children, or a
- * student's own record. Students get a read-only view; applying for leave or requesting
- * certificates stays with their parents.
+ * student's own record. Students can change only their own coursework plus the explicitly
+ * allowed leave/certificate requests; other portal data stays read-only.
  */
 router.use(asyncHandler(async (req, _res, next) => {
   if (req.user.role === 'student') {
     // a student's portal is read-only, except that they can apply for leave and withdraw their own request (the class teacher decides) and request a certificate (the office decides)
-    if (req.method !== 'GET' && !/^\/children\/\d+\/(leaves(\/\d+\/cancel)?|documents|feedback)$/.test(req.path)) throw forbidden('Students have a read-only portal. Please ask your parent or the school office.');
+    if (req.method !== 'GET' && !/^\/children\/\d+\/(leaves(\/\d+\/cancel)?|documents|feedback|lms\/lessons\/\d+\/(complete|view)|lms\/assignments\/\d+\/(submit|file)|lms\/quizzes\/\d+\/attempts)$/.test(req.path)) throw forbidden('Students have a read-only portal. Please ask your parent or the school office.');
     const account = await StudentAccount.findOne({ where: { userId: req.user.id }, include: [Student] });
     if (!account) throw notFound('No student profile for this account');
     if (account.Student.status !== 'active') throw forbidden('This account is no longer active');
@@ -303,6 +305,81 @@ router.get('/children/:studentId/materials', ownChild, asyncHandler(async (req, 
   if (!req.student.classId) return res.json([]);
   const rows = await StudyMaterial.findAll({ where: { classId: req.student.classId }, include: materialInclude, order: [['id', 'DESC']] });
   res.json(rows.map(shapeMaterial));
+}));
+
+router.get('/children/:studentId/lms', ownChild, asyncHandler(async (req, res) => {
+  res.json(await studentCourses(req.student));
+}));
+
+router.get('/children/:studentId/lms/announcements', ownChild, asyncHandler(async (req, res) => {
+  const courses = await studentCourses(req.student);
+  res.json(courses.flatMap((course) => course.announcements.map((announcement) => ({ ...announcement.toJSON(), courseTitle: course.title, subjectName: course.subjectName }))));
+}));
+
+router.get('/children/:studentId/lms/lessons', ownChild, asyncHandler(async (req, res) => {
+  const courses = await studentCourses(req.student);
+  res.json(courses.flatMap((course) => course.lessons.map((lesson) => ({ ...lesson, courseTitle: course.title, subjectName: course.subjectName }))));
+}));
+
+router.get('/children/:studentId/lms/lessons/:lessonId/file', ownChild, asyncHandler(async (req, res) => {
+  const { row, buffer } = await readStudentLessonFile(req.student, req.params.lessonId);
+  res.set({ 'Content-Type': row.attachmentMime, 'Content-Length': buffer.length, 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(row.attachmentName)}`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-store' });
+  res.send(buffer);
+}));
+
+router.get('/children/:studentId/lms/parts/:partId/file', ownChild, asyncHandler(async (req, res) => {
+  const { row, buffer } = await readStudentPartFile(req.student, req.params.partId);
+  res.set({ 'Content-Type': row.attachmentMime, 'Content-Length': buffer.length, 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(row.attachmentName)}`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-store' });
+  res.send(buffer);
+}));
+
+router.get('/children/:studentId/lms/materials/:materialId/file', ownChild, asyncHandler(async (req, res) => {
+  const { row, buffer } = await readStudentMaterialFile(req.student, req.params.materialId);
+  res.set({ 'Content-Type': row.attachmentMime, 'Content-Length': buffer.length, 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(row.attachmentName)}`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-store' });
+  res.send(buffer);
+}));
+
+router.get('/children/:studentId/lms/assignments', ownChild, asyncHandler(async (req, res) => {
+  const courses = await studentCourses(req.student);
+  res.json(courses.flatMap((course) => course.assignments.map((assignment) => ({ ...assignment, courseTitle: course.title, subjectName: course.subjectName }))));
+}));
+
+router.get('/children/:studentId/lms/quizzes', ownChild, asyncHandler(async (req, res) => {
+  const courses = await studentCourses(req.student);
+  res.json(courses.flatMap((course) => course.quizzes.map((quiz) => ({ ...quiz, courseTitle: course.title, subjectName: course.subjectName }))));
+}));
+
+router.post('/children/:studentId/lms/lessons/:lessonId/complete', ownChild, asyncHandler(async (req, res) => {
+  if (req.user.role !== 'student') throw forbidden('Only the student can record lesson progress');
+  res.json(await completeLesson(req.student, req.params.lessonId));
+}));
+
+router.post('/children/:studentId/lms/lessons/:lessonId/view', ownChild, asyncHandler(async (req, res) => {
+  if (req.user.role !== 'student') throw forbidden('Only the student can record lesson views');
+  res.json(await recordLessonView(req.student, req.params.lessonId));
+}));
+
+router.post('/children/:studentId/lms/assignments/:assignmentId/submit', ownChild, asyncHandler(async (req, res) => {
+  if (req.user.role !== 'student') throw forbidden('Only the student can submit their work');
+  res.json(await submitAssignment(req.student, req.params.assignmentId, req.body));
+}));
+
+router.post('/children/:studentId/lms/assignments/:assignmentId/file', ownChild, express.raw({ type: () => true, limit: MAX_BYTES }), asyncHandler(async (req, res) => {
+  if (req.user.role !== 'student') throw forbidden('Only the student can submit their work');
+  const result = await uploadAssignmentFile(req.student, req.params.assignmentId, req.body, req.query.name);
+  req.body = { assignmentId: Number(req.params.assignmentId), attachmentName: result.attachmentName, size: result.size };
+  res.json(result);
+}));
+
+router.get('/children/:studentId/lms/assignments/:assignmentId/file', ownChild, asyncHandler(async (req, res) => {
+  const { row, buffer } = await readStudentAssignmentFile(req.student, req.params.assignmentId);
+  res.set({ 'Content-Type': row.attachmentMime, 'Content-Length': buffer.length, 'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(row.attachmentName)}`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-store' });
+  res.send(buffer);
+}));
+
+router.post('/children/:studentId/lms/quizzes/:quizId/attempts', ownChild, asyncHandler(async (req, res) => {
+  if (req.user.role !== 'student') throw forbidden('Only the student can take this quiz');
+  res.json(await takeQuiz(req.student, req.params.quizId, req.body?.answers));
 }));
 
 // Upcoming school calendar for families: holidays, exams and events addressed to everyone or to parents

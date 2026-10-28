@@ -60,6 +60,12 @@ export const STAFF_MODULES = [
     ],
   },
   {
+    key: 'lms', title: 'Learning Management', icon: '\u{1F4DA}', roles: ['admin', 'teacher'],
+    screens: [
+      { key: 'courses', title: 'Learning courses', kind: 'custom', route: 'LmsManage' },
+    ],
+  },
+  {
     key: 'attendance', title: 'Attendance and leave', icon: '✅', roles: ['admin', 'teacher'],
     screens: [
       { key: 'mark', title: 'Mark attendance', kind: 'custom', route: 'MarkAttendance' },
@@ -151,14 +157,56 @@ export const STAFF_MODULES = [
     key: 'library', title: 'Library', icon: '\u{1F4D6}', roles: ['admin', 'teacher'],
     screens: [
       { key: 'summary', title: 'Library summary', kind: 'stats', path: '/library/summary', tiles: (d) => [{ label: 'Titles', value: d.titles }, { label: 'On loan', value: d.onLoan, tone: 'amber' }, { label: 'Overdue', value: d.overdue, tone: 'red' }, { label: 'Fines', value: money(d.finesCharged), tone: 'amber' }], lists: [{ title: 'Most borrowed', rows: (d) => d.mostBorrowed, row: (b) => ({ title: b.title, right: b.loans }) }] },
-      { key: 'books', title: 'Books', kind: 'list', path: '/library/books', row: (r) => ({ title: r.title, sub: dot(r.author, r.LibraryCategory?.name), right: `${r.available}/${r.copies}` }) },
+      {
+        key: 'books', title: 'Books', kind: 'list', path: '/library/books', row: (r) => ({ title: r.title, sub: dot(r.author, r.LibraryCategory?.name), right: `${r.available}/${r.copies}` }),
+        create: { label: 'Add book', path: '/library/books', fields: [
+          { key: 'title', label: 'Title', required: true }, { key: 'author', label: 'Author' },
+          { key: 'categoryId', label: 'Category', optionsPath: '/library/categories', allLabel: 'No category', mapOption: (x) => ({ value: String(x.id), label: x.name }) },
+          { key: 'isbn', label: 'ISBN' }, { key: 'copies', label: 'Copies', keyboard: 'number-pad', required: true, default: 1 },
+        ], body: (v) => ({ ...v, categoryId: v.categoryId ? Number(v.categoryId) : null, copies: Number(v.copies) }), done: () => 'Book added.' },
+        actions: [
+          { label: 'Edit book', path: (r) => `/library/books/${r.id}`, method: 'PUT', fields: [
+            { key: 'title', label: 'Title', required: true, default: (r) => r.title }, { key: 'author', label: 'Author', default: (r) => r.author },
+            { key: 'categoryId', label: 'Category', optionsPath: '/library/categories', allLabel: 'No category', mapOption: (x) => ({ value: String(x.id), label: x.name }), default: (r) => r.categoryId },
+            { key: 'isbn', label: 'ISBN', default: (r) => r.isbn }, { key: 'copies', label: 'Copies', keyboard: 'number-pad', required: true, default: (r) => r.copies },
+          ], body: (v) => ({ ...v, categoryId: v.categoryId ? Number(v.categoryId) : null, copies: Number(v.copies) }), done: () => 'Book updated.' },
+          { label: 'Delete book', tone: 'danger', path: (r) => `/library/books/${r.id}`, method: 'DELETE', confirm: (r) => `Delete “${r.title}”? Books on loan cannot be deleted.`, done: () => 'Book deleted.' },
+        ],
+      },
       {
         key: 'issues', title: 'Loans', kind: 'list', path: '/library/issues', filters: [{ label: 'On loan', test: (r) => !r.returnedOn }, { label: 'Overdue', test: (r) => r.overdue }],
         row: (r) => ({ title: r.bookTitle, sub: dot(r.studentName, `due ${niceDate(r.dueOn)}`), badge: r.returnedOn ? { text: 'Returned', tone: 'green' } : r.overdue ? { text: 'Overdue', tone: 'red' } : { text: 'On loan', tone: 'amber' } }),
-        actions: [{ label: 'Mark returned', when: (r) => !r.returnedOn, path: (r) => `/library/issues/${r.id}/return`, body: () => ({}), confirm: 'Record this book as returned? A late fine is billed if it applies.', done: () => 'Returned.' }],
+        create: { label: 'Issue a book', path: '/library/issues', fields: [
+          { key: 'bookId', label: 'Book', optionsPath: '/library/books', filterOption: (x) => x.available > 0, mapOption: (x) => ({ value: String(x.id), label: `${x.title} (${x.available} available)` }), required: true },
+          { key: 'studentId', label: 'Student', optionsPath: '/students?status=active', mapOption: (x) => ({ value: String(x.id), label: `${x.firstName} ${x.lastName} · ${x.admissionNo}` }), required: true },
+          { key: 'days', label: 'Loan days (optional)', keyboard: 'number-pad' },
+        ], body: (v) => ({ bookId: Number(v.bookId), studentId: Number(v.studentId), ...(v.days ? { days: Number(v.days) } : {}) }), done: () => 'Book issued.' },
+        actions: [{ label: 'Mark returned', when: (r) => !r.returnedOn, path: (r) => `/library/issues/${r.id}/return`, body: () => ({}), confirm: 'Record this book as returned? A late fine is billed if it applies.', done: (result) => Number(result.fine) > 0 ? `Returned ${result.lateDays} day(s) late. Fine ${result.fine} was added to fees.` : 'Returned on time.' }],
       },
-      { key: 'members', title: 'Library cards', kind: 'list', path: '/library/memberships', row: (r) => ({ title: r.studentName, sub: dot(r.cardNo, `${r.onLoan} on loan`, r.expired ? 'expired' : null), badge: badgeFor(r.status) }) },
-      { key: 'reservations', title: 'Reservations', kind: 'list', path: '/library/reservations', empty: 'No reservations.' },
+      { key: 'categories', title: 'Book categories', kind: 'list', path: '/library/categories', row: (r) => ({ title: r.name, right: `${r.bookCount} books` }), create: { label: 'Add category', path: '/library/categories', fields: [{ key: 'name', label: 'Category name', required: true }] }, actions: [{ label: 'Delete category', tone: 'danger', path: (r) => `/library/categories/${r.id}`, method: 'DELETE', confirm: (r) => r.bookCount ? `${r.bookCount} book(s) still use this category.` : `Delete ${r.name}?`, when: (r) => r.bookCount === 0, done: () => 'Category deleted.' }] },
+      {
+        key: 'members', title: 'Library cards', kind: 'list', path: '/library/memberships', row: (r) => ({ title: r.studentName, sub: dot(r.cardNo, `${r.onLoan} on loan`, r.expired ? 'expired' : null), badge: badgeFor(r.status) }),
+        create: { label: 'Create library card', path: '/library/memberships', fields: [
+          { key: 'studentId', label: 'Student', optionsPath: '/students?status=active', mapOption: (x) => ({ value: String(x.id), label: `${x.firstName} ${x.lastName} · ${x.admissionNo}` }), required: true },
+          { key: 'memberSince', label: 'Member since (YYYY-MM-DD)' }, { key: 'validUntil', label: 'Valid until (optional, YYYY-MM-DD)' },
+          { key: 'maxBooks', label: 'Maximum books', keyboard: 'number-pad' }, { key: 'notes', label: 'Notes', multiline: true },
+        ], body: (v) => ({ ...v, studentId: Number(v.studentId), maxBooks: v.maxBooks ? Number(v.maxBooks) : undefined }), done: () => 'Library card created.' },
+        actions: [
+          { label: 'Edit card', path: (r) => `/library/memberships/${r.id}`, method: 'PUT', fields: [
+            { key: 'memberSince', label: 'Member since (YYYY-MM-DD)', default: (r) => r.memberSince }, { key: 'validUntil', label: 'Valid until (optional, YYYY-MM-DD)', default: (r) => r.validUntil },
+            { key: 'maxBooks', label: 'Maximum books', keyboard: 'number-pad', default: (r) => r.maxBooks }, { key: 'status', label: 'Status', options: ['active', 'suspended'], default: (r) => r.status }, { key: 'notes', label: 'Notes', multiline: true, default: (r) => r.notes },
+          ], body: (v) => ({ ...v, maxBooks: Number(v.maxBooks) }), done: () => 'Library card updated.' },
+          { label: 'Delete card', tone: 'danger', path: (r) => `/library/memberships/${r.id}`, method: 'DELETE', confirm: 'Delete this card? The student must return all books first.', done: () => 'Library card deleted.' },
+        ],
+      },
+      {
+        key: 'reservations', title: 'Reservations', kind: 'list', path: '/library/reservations', empty: 'No reservations.', row: (r) => ({ title: r.bookTitle, sub: dot(r.studentName, r.status === 'active' && r.queuePosition ? `queue #${r.queuePosition}` : null), badge: badgeFor(r.status) }),
+        create: { label: 'Reserve unavailable book', path: '/library/reservations', fields: [
+          { key: 'bookId', label: 'Book', optionsPath: '/library/books', filterOption: (x) => x.available < 1, mapOption: (x) => ({ value: String(x.id), label: `${x.title} (${x.available} available)` }), required: true },
+          { key: 'studentId', label: 'Student', optionsPath: '/students?status=active', mapOption: (x) => ({ value: String(x.id), label: `${x.firstName} ${x.lastName} · ${x.admissionNo}` }), required: true },
+        ], body: (v) => ({ bookId: Number(v.bookId), studentId: Number(v.studentId) }), done: () => 'Reservation added.' },
+        actions: [{ label: 'Cancel reservation', tone: 'danger', when: (r) => r.status === 'active', path: (r) => `/library/reservations/${r.id}/cancel`, method: 'POST', body: () => ({}), confirm: 'Cancel this reservation?', done: () => 'Reservation cancelled.' }],
+      },
     ],
   },
   {
@@ -167,6 +215,10 @@ export const STAFF_MODULES = [
       {
         key: 'requests', title: 'Item requests', kind: 'list', path: '/inventory-requests',
         row: (r) => ({ title: r.itemName, sub: dot(`${r.quantity} ${r.unit ?? ''}`.trim(), r.requestedByName, r.reason), badge: badgeFor(r.status) }),
+        create: { label: 'Request stock', path: '/inventory-requests', fields: [
+          { key: 'itemId', label: 'Item', optionsPath: '/inventory-requests/catalog', mapOption: (x) => ({ value: String(x.id), label: `${x.name} · ${x.inStock} ${x.unit} in stock` }), required: true },
+          { key: 'quantity', label: 'Quantity', keyboard: 'number-pad', required: true }, { key: 'reason', label: 'What do you need it for?', required: true, multiline: true },
+        ], body: (v) => ({ itemId: Number(v.itemId), quantity: Number(v.quantity), reason: v.reason }), done: () => 'Request sent to the office.' },
         actions: [
           { label: 'Approve', roles: ['admin'], when: (r) => r.status === 'pending', path: (r) => `/inventory-requests/${r.id}/approve`, fields: [{ key: 'quantity', label: 'Quantity to issue', keyboard: 'number-pad', default: (r) => r.quantity }], body: (v) => ({ quantity: v.quantity }), submit: 'Approve', done: () => 'Approved and issued from stock.' },
           { label: 'Reject', tone: 'danger', roles: ['admin'], when: (r) => r.status === 'pending', path: (r) => `/inventory-requests/${r.id}/reject`, fields: [{ key: 'remarks', label: 'Reason', required: true, multiline: true }], submit: 'Reject', done: () => 'Rejected.' },
@@ -174,10 +226,51 @@ export const STAFF_MODULES = [
         ],
       },
       { key: 'summary', title: 'Stock summary', kind: 'stats', roles: ['admin'], path: '/inventory/summary', tiles: (d) => [{ label: 'Items', value: d.itemCount }, { label: 'Stock value', value: money(d.totalValue), tone: 'green' }, { label: 'Low stock', value: d.lowStock?.length ?? 0, tone: 'red' }, { label: 'Open orders', value: d.openOrders, tone: 'amber' }], lists: [{ title: 'Low on stock', rows: (d) => d.lowStock, row: (i) => ({ title: i.name, sub: `reorder at ${i.reorderLevel}`, right: `${i.quantity} ${i.unit ?? ''}` }), empty: 'Nothing is low.' }] },
-      { key: 'items', title: 'Items', kind: 'list', roles: ['admin'], path: '/inventory/items', row: (r) => ({ title: r.name, sub: dot(r.categoryName, r.lowStock ? 'low stock' : null), right: `${r.quantity} ${r.unit ?? ''}`, badge: r.lowStock ? { text: 'Low', tone: 'red' } : null }) },
-      { key: 'orders', title: 'Purchase orders', kind: 'list', roles: ['admin'], path: '/inventory/orders', row: (r) => ({ title: r.supplierName, sub: dot(niceDate(r.orderDate), r.expectedDate ? `expected ${niceDate(r.expectedDate)}` : null), badge: badgeFor(r.status), right: money(r.total) }) },
-      { key: 'movements', title: 'Stock movements', kind: 'list', roles: ['admin'], path: '/inventory/movements', row: (r) => ({ title: r.itemName, sub: dot(r.type, niceDate(r.date), r.party), right: `${r.type === 'in' ? '+' : '-'}${r.quantity}` }) },
-      { key: 'suppliers', title: 'Suppliers', kind: 'list', roles: ['admin'], path: '/inventory/suppliers', row: (r) => ({ title: r.name, sub: dot(r.contactPerson, r.phone) }) },
+      { key: 'categories', title: 'Categories', kind: 'list', roles: ['admin'], path: '/inventory/categories', row: (r) => ({ title: r.name, right: `${r.itemCount} items` }), create: { label: 'Add category', path: '/inventory/categories', fields: [{ key: 'name', label: 'Category name', required: true }] }, actions: [{ label: 'Delete category', tone: 'danger', when: (r) => r.itemCount === 0, path: (r) => `/inventory/categories/${r.id}`, method: 'DELETE', confirm: (r) => `Delete ${r.name}?`, done: () => 'Category deleted.' }] },
+      {
+        key: 'items', title: 'Items', kind: 'list', roles: ['admin'], path: '/inventory/items', row: (r) => ({ title: r.name, sub: dot(r.categoryName, r.lowStock ? 'low stock' : null), right: `${r.quantity} ${r.unit ?? ''}`, badge: r.lowStock ? { text: 'Low', tone: 'red' } : null }),
+        create: { label: 'Add stock item', path: '/inventory/items', fields: [
+          { key: 'name', label: 'Item name', required: true }, { key: 'categoryId', label: 'Category', optionsPath: '/inventory/categories', allLabel: 'No category', mapOption: (x) => ({ value: String(x.id), label: x.name }) },
+          { key: 'unit', label: 'Unit', default: 'pcs' }, { key: 'reorderLevel', label: 'Reorder level', keyboard: 'number-pad', default: 0 },
+        ], body: (v) => ({ ...v, categoryId: v.categoryId ? Number(v.categoryId) : null, reorderLevel: Number(v.reorderLevel || 0) }), done: () => 'Stock item added.' },
+        actions: [
+          { label: 'Edit item', path: (r) => `/inventory/items/${r.id}`, method: 'PUT', fields: [
+            { key: 'name', label: 'Item name', required: true, default: (r) => r.name }, { key: 'categoryId', label: 'Category', optionsPath: '/inventory/categories', allLabel: 'No category', mapOption: (x) => ({ value: String(x.id), label: x.name }), default: (r) => r.categoryId },
+            { key: 'unit', label: 'Unit', default: (r) => r.unit }, { key: 'reorderLevel', label: 'Reorder level', keyboard: 'number-pad', default: (r) => r.reorderLevel },
+          ], body: (v) => ({ ...v, categoryId: v.categoryId ? Number(v.categoryId) : null, reorderLevel: Number(v.reorderLevel || 0) }), done: () => 'Stock item updated.' },
+          { label: 'Delete item', tone: 'danger', path: (r) => `/inventory/items/${r.id}`, method: 'DELETE', confirm: 'Delete this item? Items with movement or order history are retained.', done: () => 'Item deleted.' },
+        ],
+      },
+      {
+        key: 'orders', title: 'Purchase orders', kind: 'list', roles: ['admin'], path: '/inventory/orders', row: (r) => ({ title: r.supplierName, sub: dot(niceDate(r.orderDate), r.expectedDate ? `expected ${niceDate(r.expectedDate)}` : null, `${r.lines?.length ?? 0} line(s)`), badge: badgeFor(r.status), right: money(r.total) }),
+        create: { label: 'Create purchase order', path: '/inventory/orders', fields: [
+          { key: 'supplierId', label: 'Supplier', optionsPath: '/inventory/suppliers', mapOption: (x) => ({ value: String(x.id), label: x.name }), required: true },
+          { key: 'lines', label: 'Order items', type: 'lineItems', optionsPath: '/inventory/items', mapOption: (x) => ({ value: String(x.id), label: `${x.name} (${x.unit})` }), required: true, default: [{ itemId: '', quantity: '', unitCost: '0' }] },
+          { key: 'orderDate', label: 'Order date (YYYY-MM-DD)', default: today }, { key: 'expectedDate', label: 'Expected date (optional)' }, { key: 'note', label: 'Note' },
+        ], body: (v) => ({ supplierId: Number(v.supplierId), orderDate: v.orderDate, expectedDate: v.expectedDate || null, note: v.note, lines: v.lines.map((line) => ({ itemId: Number(line.itemId), quantity: Number(line.quantity), unitCost: Number(line.unitCost || 0) })) }), done: () => 'Purchase order created.' },
+        actions: [
+          { label: 'Receive order', when: (r) => r.status === 'ordered', path: (r) => `/inventory/orders/${r.id}/receive`, confirm: (r) => `Receive all ${r.lines?.length ?? ''} order line(s) into stock?`, done: () => 'Order received into stock.' },
+          { label: 'Cancel order', tone: 'danger', when: (r) => r.status === 'ordered', path: (r) => `/inventory/orders/${r.id}/cancel`, confirm: 'Cancel this order?', done: () => 'Order cancelled.' },
+        ],
+      },
+      {
+        key: 'movements', title: 'Stock movements', kind: 'list', roles: ['admin'], path: '/inventory/movements', row: (r) => ({ title: r.itemName, sub: dot(r.type === 'in' ? 'Stock in' : 'Stock out', niceDate(r.date), r.party, r.note), right: `${r.type === 'in' ? '+' : '-'}${r.quantity} ${r.unit ?? ''}` }),
+        create: { label: 'Record stock movement', path: '/inventory/movements', fields: [
+          { key: 'itemId', label: 'Item', optionsPath: '/inventory/items', mapOption: (x) => ({ value: String(x.id), label: `${x.name} · ${x.quantity} ${x.unit} in stock` }), required: true },
+          { key: 'type', label: 'Movement', options: [{ value: 'in', label: 'Stock in' }, { value: 'out', label: 'Stock out' }], required: true, default: 'in' },
+          { key: 'quantity', label: 'Quantity', keyboard: 'number-pad', required: true }, { key: 'unitCost', label: 'Unit cost (stock in)', keyboard: 'decimal-pad' },
+          { key: 'supplierId', label: 'Supplier (optional)', optionsPath: '/inventory/suppliers', allLabel: 'No supplier', mapOption: (x) => ({ value: String(x.id), label: x.name }) },
+          { key: 'party', label: 'Issued to / source' }, { key: 'date', label: 'Date (YYYY-MM-DD)', default: today }, { key: 'note', label: 'Note' },
+        ], body: (v) => ({ ...v, itemId: Number(v.itemId), quantity: Number(v.quantity), unitCost: v.unitCost === '' ? null : Number(v.unitCost), supplierId: v.supplierId ? Number(v.supplierId) : null }), done: () => 'Stock movement recorded.' },
+      },
+      {
+        key: 'suppliers', title: 'Suppliers', kind: 'list', roles: ['admin'], path: '/inventory/suppliers', row: (r) => ({ title: r.name, sub: dot(r.contactPerson, r.phone, r.email) }),
+        create: { label: 'Add supplier', path: '/inventory/suppliers', fields: [{ key: 'name', label: 'Supplier name', required: true }, { key: 'contactPerson', label: 'Contact person' }, { key: 'phone', label: 'Phone' }, { key: 'email', label: 'Email' }, { key: 'address', label: 'Address', multiline: true }] },
+        actions: [{ label: 'Edit supplier', path: (r) => `/inventory/suppliers/${r.id}`, method: 'PUT', fields: [{ key: 'name', label: 'Supplier name', required: true, default: (r) => r.name }, { key: 'contactPerson', label: 'Contact person', default: (r) => r.contactPerson }, { key: 'phone', label: 'Phone', default: (r) => r.phone }, { key: 'email', label: 'Email', default: (r) => r.email }, { key: 'address', label: 'Address', multiline: true, default: (r) => r.address }] }, { label: 'Delete supplier', tone: 'danger', path: (r) => `/inventory/suppliers/${r.id}`, method: 'DELETE', confirm: 'Delete this supplier? Suppliers with purchase orders are retained.' }],
+      },
+      { key: 'assets', title: 'Assets', kind: 'list', roles: ['admin'], path: '/inventory/assets', row: (r) => ({ title: r.name, sub: dot(r.assetTag, r.categoryName, r.location), badge: badgeFor(r.status) }), create: { label: 'Add asset', path: '/inventory/assets', fields: [{ key: 'assetTag', label: 'Asset tag', required: true }, { key: 'name', label: 'Name', required: true }, { key: 'categoryId', label: 'Category', optionsPath: '/inventory/categories', allLabel: 'No category', mapOption: (x) => ({ value: String(x.id), label: x.name }) }, { key: 'location', label: 'Location' }, { key: 'purchaseDate', label: 'Purchase date (YYYY-MM-DD)' }, { key: 'cost', label: 'Cost', keyboard: 'decimal-pad', default: 0 }, { key: 'status', label: 'Status', options: ['in_use', 'in_store', 'under_repair', 'disposed'], default: 'in_use' }, { key: 'notes', label: 'Notes' }], body: (v) => ({ ...v, categoryId: v.categoryId ? Number(v.categoryId) : null, cost: Number(v.cost || 0) }), done: () => 'Asset added.' }, actions: [{ label: 'Edit asset', path: (r) => `/inventory/assets/${r.id}`, method: 'PUT', fields: [{ key: 'assetTag', label: 'Asset tag', required: true, default: (r) => r.assetTag }, { key: 'name', label: 'Name', required: true, default: (r) => r.name }, { key: 'categoryId', label: 'Category', optionsPath: '/inventory/categories', allLabel: 'No category', mapOption: (x) => ({ value: String(x.id), label: x.name }), default: (r) => r.categoryId }, { key: 'location', label: 'Location', default: (r) => r.location }, { key: 'purchaseDate', label: 'Purchase date (YYYY-MM-DD)', default: (r) => r.purchaseDate }, { key: 'cost', label: 'Cost', keyboard: 'decimal-pad', default: (r) => r.cost }, { key: 'status', label: 'Status', options: ['in_use', 'in_store', 'under_repair', 'disposed'], default: (r) => r.status }, { key: 'notes', label: 'Notes', default: (r) => r.notes }], body: (v) => ({ ...v, categoryId: v.categoryId ? Number(v.categoryId) : null, cost: Number(v.cost || 0) }), done: () => 'Asset updated.' }, { label: 'Delete asset', tone: 'danger', path: (r) => `/inventory/assets/${r.id}`, method: 'DELETE', confirm: 'Delete this asset? An asset with maintenance history cannot be deleted.' }] },
+      { key: 'assetSummary', title: 'Asset summary', kind: 'stats', roles: ['admin'], path: '/inventory/assets/summary', tiles: (d) => [{ label: 'Assets', value: d.total }, { label: 'In use', value: d.inUse }, { label: 'In repair', value: d.underRepair, tone: d.underRepair ? 'amber' : 'green' }, { label: 'Maintenance due', value: d.maintenanceDue?.length ?? 0, tone: d.maintenanceDue?.length ? 'amber' : 'green' }] },
+      { key: 'maintenance', title: 'Asset maintenance', kind: 'list', roles: ['admin'], path: '/inventory/asset-maintenance', row: (r) => ({ title: r.assetName, sub: dot(niceDate(r.serviceDate), r.description, r.nextDue ? `next due ${niceDate(r.nextDue)}` : null), right: money(r.cost) }), create: { label: 'Record maintenance', path: '/inventory/asset-maintenance', fields: [{ key: 'assetId', label: 'Asset', optionsPath: '/inventory/assets', mapOption: (x) => ({ value: String(x.id), label: `${x.assetTag} · ${x.name}` }), required: true }, { key: 'serviceDate', label: 'Service date (YYYY-MM-DD)', required: true, default: today }, { key: 'description', label: 'Work performed', required: true }, { key: 'cost', label: 'Cost', keyboard: 'decimal-pad', default: 0 }, { key: 'nextDue', label: 'Next due (optional, YYYY-MM-DD)' }], body: (v) => ({ ...v, assetId: Number(v.assetId), cost: Number(v.cost || 0), nextDue: v.nextDue || null }), done: () => 'Maintenance recorded.' } },
     ],
   },
   {

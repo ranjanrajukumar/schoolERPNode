@@ -43,6 +43,7 @@ const portalMenu = (who) => {
     ['Homework & Assignments', '/portal?tab=Homework'],
     ['Online Classes', '/portal?tab=OnlineClasses'],
     ['Learning Materials', '/portal?tab=Materials'],
+    ['Courses & Lessons', '/portal?tab=LMS'],
     ['Exams & Results', '/portal?tab=Results'],
     ['Fees & Payments', '/portal?tab=Fees'],
     ['Library', '/portal?tab=Library'],
@@ -81,6 +82,10 @@ export const MENU = [
     ['Class Map', '/class-profile'], ['Subject Map', '/class-subjects'], ['Class Timetable', '/timetable'],
     ['Teacher Timetable', '/teacher-timetable'], ['Syllabus & Lesson Plans', '/syllabus'], ['Homework & Assignments', '/homework'], ['Online Classes', '/online-classes', TEACHING],
     ['Study Materials', '/study-materials'], ['Academic Calendar', '/calendar'], ['List of Holidays', '/holidays'],
+  ]),
+  module('Learning Management', TEACHING, [
+    ['Dashboard', '/lms-dashboard'], ['Courses & Lessons', '/lms'], ['Content Library', '/lms-materials'], ['Enrollment', '/lms-enrollment'], ['Announcements', '/lms-announcements'],
+    ['Assignments', '/lms-assignments'], ['Quizzes & Tests', '/lms-quizzes'], ['Student Progress', '/lms-progress'],
   ]),
   module('Timetable', ALL, [
     ['Class Timetable', '/timetable'], ['Teacher Timetable', '/teacher-timetable'],

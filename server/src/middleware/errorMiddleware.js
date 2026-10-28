@@ -11,7 +11,7 @@ const CLIENT_ERRORS = new Set([
 // eslint-disable-next-line no-unused-vars
 export function errorHandler(err, _req, res, _next) {
   if (err instanceof HttpError) return res.status(err.status).json({ error: err.message });
-  if (err.type === 'entity.too.large') return res.status(413).json({ error: 'File is too large (5 MB maximum)' });
+  if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Request body is too large for this endpoint' });
   if (err.name === 'SequelizeForeignKeyConstraintError') {
     // 1451: a parent being deleted is still referenced; 1452: a referenced parent does not exist. Table names stay in the log.
     console.error(err.parent?.sqlMessage || err.message);

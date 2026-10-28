@@ -23,7 +23,7 @@ Object.assign(SCREEN_ICON, {
   'transport.vehicles': 'bus-outline', 'transport.routes': 'map-outline', 'transport.stops': 'location-outline', 'transport.assignments': 'people-outline', 'transport.staff': 'person-outline', 'transport.tracking': 'navigate-outline',
   'hostel.hostels': 'business-outline', 'hostel.rooms': 'bed-outline', 'hostel.allocations': 'people-outline', 'hostel.visitors': 'walk-outline', 'hostel.meals': 'restaurant-outline',
   'library.books': 'book-outline', 'library.issues': 'swap-horizontal-outline', 'library.members': 'id-card-outline', 'library.reservations': 'bookmark-outline',
-  'inventory.requests': 'paper-plane-outline', 'inventory.items': 'cube-outline', 'inventory.orders': 'cart-outline', 'inventory.movements': 'swap-horizontal-outline', 'inventory.suppliers': 'storefront-outline',
+  'inventory.requests': 'paper-plane-outline', 'inventory.categories': 'pricetags-outline', 'inventory.items': 'cube-outline', 'inventory.orders': 'cart-outline', 'inventory.movements': 'swap-horizontal-outline', 'inventory.suppliers': 'storefront-outline', 'inventory.assets': 'laptop-outline', 'inventory.assetSummary': 'stats-chart-outline', 'inventory.maintenance': 'construct-outline',
   'hr.staff': 'people-outline', 'hr.leaves': 'mail-open-outline', 'hr.payslips': 'cash-outline', 'hr.salaries': 'wallet-outline', 'hr.openings': 'briefcase-outline',
   'safety.incidents': 'alert-circle-outline', 'activities.activities': 'ribbon-outline',
   'documents.requests': 'document-attach-outline',

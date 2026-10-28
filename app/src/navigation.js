@@ -26,6 +26,7 @@ import ExamsScreen from './screens/staff/ExamsScreen';
 import MarkAttendanceScreen from './screens/staff/MarkAttendanceScreen';
 import MarksScreen from './screens/staff/MarksScreen';
 import MyClassScreen from './screens/staff/MyClassScreen';
+import LmsManageScreen from './screens/staff/LmsManageScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -132,6 +133,7 @@ function StaffHome() {
       <Stack.Screen name="Marks" component={MarksScreen} />
       <Stack.Screen name="MarkAttendance" component={MarkAttendanceScreen} />
       <Stack.Screen name="MyClass" component={MyClassScreen} />
+      <Stack.Screen name="LmsManage" component={LmsManageScreen} />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
     </Stack.Navigator>
   );

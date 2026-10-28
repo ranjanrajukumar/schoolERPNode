@@ -28,7 +28,7 @@ async function login() {
 }
 
 async function remove() {
-  const order = [['notices', (id) => call('DELETE', `/notices/${id}`)], ['libraryMemberships', (id) => call('DELETE', `/library/memberships/${id}`)], ['libraryBooks', (id) => call('DELETE', `/library/books/${id}`)], ['libraryCategories', (id) => call('DELETE', `/library/categories/${id}`)], ['exams', (id) => call('DELETE', `/exams/${id}`)], ['enquiries', (id) => call('DELETE', `/admissions/${id}`).then(() => call('DELETE', `/admissions/${id}?permanent=1`))],
+  const order = [['lmsCourses', (id) => call('DELETE', `/lms/courses/${id}`)], ['studentAccounts', (id) => call('DELETE', `/student-accounts/${id}`)], ['notices', (id) => call('DELETE', `/notices/${id}`)], ['libraryMemberships', (id) => call('DELETE', `/library/memberships/${id}`)], ['libraryBooks', (id) => call('DELETE', `/library/books/${id}`)], ['libraryCategories', (id) => call('DELETE', `/library/categories/${id}`)], ['exams', (id) => call('DELETE', `/exams/${id}`)], ['enquiries', (id) => call('DELETE', `/admissions/${id}`).then(() => call('DELETE', `/admissions/${id}?permanent=1`))],
     ['payslips', (id) => call('DELETE', `/payroll/payslips/${id}`)],
     ['hostelAllocations', (id) => call('DELETE', `/hostel/allocations/${id}`)], ['hostelRooms', (id) => call('DELETE', `/hostel/rooms/${id}`)], ['hostels', (id) => call('DELETE', `/hostel/hostels/${id}`)],
     ['activities', (id) => call('DELETE', `/activities/${id}`)], ['feeGroups', (id) => call('DELETE', `/fee-groups/${id}`)],
@@ -188,6 +188,8 @@ async function seedAcademics() {
     for (const [i, st] of pupils.entries()) await call('PUT', `/students/${st.id}/electives`, { classSubjectIds: [i % 2 === 0 ? hindi.id : fr.id] });
   }
 
+  await seedLms(demoClasses, subject);
+
   // class teachers, rooms and a weekly timetable (a different subject per class in each period, so no teacher is in two places)
   const homeroom = ['Neha', 'Rohit', 'Priya', 'Imran', 'Sunita', 'Neha'];
   const names = Object.keys(subject);
@@ -274,6 +276,177 @@ async function seedAcademics() {
 }
 
 // Phase 3: hostel, transport and inventory
+// Student logins for the LMS demo: created with a temporary password, which a student must change before using the portal.
+const STUDENT_TEMP = 'student123'; const STUDENT_PASS = 'Student@123';
+async function studentSession(student, accounts) {
+  const email = `${student.firstName.toLowerCase()}.${student.lastName.toLowerCase()}@demo.student`;
+  if (!accounts.some((a) => a.studentId === student.id)) track('studentAccounts', (await call('POST', '/student-accounts', { studentId: student.id, email, password: STUDENT_TEMP })).id);
+  const signIn = async (password) => { const res = await fetch(`${API}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); return res.ok ? (await res.json()).token : null; };
+  let t = await signIn(STUDENT_PASS);
+  if (!t) {
+    t = await signIn(STUDENT_TEMP);
+    if (t) { await fetch(`${API}/auth/change-password`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` }, body: JSON.stringify({ currentPassword: STUDENT_TEMP, newPassword: STUDENT_PASS }) }); t = await signIn(STUDENT_PASS); }
+  }
+  if (!t) return null;
+  return async (method, p, body) => {
+    const res = await fetch(`${API}/portal/children/${student.id}${p}`, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${t}` }, body: body ? JSON.stringify(body) : undefined });
+    const data = await res.json().catch(() => ({})); if (!res.ok) throw new Error(`${method} ${p}: ${data.error ?? res.status}`); return data;
+  };
+}
+
+// LMS: several published courses with modules, lessons, assignments, quizzes of every type and announcements, then real student activity
+// (reads, completions, submissions, quiz attempts) and teacher grading, all through the normal API. Safe to run again.
+async function seedLms(demoClasses, subject) {
+  const find = (key) => demoClasses.find((c) => `${c.name}-${c.section}` === key);
+  const specs = [
+    { cls: 'Grade 5-A', sub: 'Mathematics', title: 'Demo · Fractions and decimals', description: 'Fractions, equivalent fractions and decimals, with practice and a unit test.',
+      modules: [{ title: 'Fractions', lessons: [
+        ['Equivalent fractions', 'Fractions can look different and still have the same value. Multiply or divide the numerator and denominator by the same number.', 'https://www.khanacademy.org/math/arithmetic/fraction-arithmetic'],
+        ['Add fractions with like denominators', 'Keep the denominator and add the numerators. Simplify the result when possible.'],
+        ['Compare fractions', 'Use a common denominator, or compare with 1/2, to decide which fraction is larger.'] ] },
+      { title: 'Decimals', lessons: [
+        ['Tenths and hundredths', 'A decimal is a fraction with a denominator of 10, 100 or 1000. 0.5 = 5/10 = 1/2.'],
+        ['Add and subtract decimals', 'Line up the decimal points, then add or subtract as with whole numbers.'] ] }],
+      assignments: [
+        { title: 'Fraction practice', instructions: 'Write the steps for adding 2/5 and 1/5, then simplify 6/8.', dueOn: 7, maxScore: 10, published: true },
+        { title: 'Decimal word problems', instructions: 'Solve the five word problems on page 42 and write your working.', dueOn: 14, maxScore: 20, published: true },
+        { title: 'Project: fractions in the kitchen (draft)', instructions: 'Find three recipes and list the fractions they use.', dueOn: 21, maxScore: 25, published: false }],
+      quizzes: [
+        { title: 'Fraction check', description: 'A short automatically graded practice test.', dueOn: 10, maxAttempts: 3, published: true, questions: [
+          { id: 'fq1', type: 'single_choice', prompt: 'Which fraction is equal to 1/2?', choices: ['2/4', '2/3', '3/5'], correctIndex: 0, points: 1 },
+          { id: 'fq2', type: 'true_false', prompt: '3/6 is equivalent to 1/2.', correctIndex: 0, points: 1 } ] },
+        { title: 'Unit test: fractions and decimals', description: 'Objective questions plus one written response reviewed by the teacher.', dueOn: 18, maxAttempts: 2, published: true, questions: [
+          { id: 'ut1', type: 'single_choice', prompt: 'What is 0.25 as a fraction?', choices: ['1/4', '1/2', '2/5'], correctIndex: 0, points: 2 },
+          { id: 'ut2', type: 'multiple_choice', prompt: 'Select all fractions equal to 1/2.', choices: ['2/4', '3/6', '2/5', '4/8'], correctIndexes: [0, 1, 3], points: 3 },
+          { id: 'ut3', type: 'true_false', prompt: '0.5 is greater than 0.25.', correctIndex: 0, points: 1 },
+          { id: 'ut4', type: 'short_answer', prompt: 'Explain how you add 0.3 and 0.45.', expectedAnswer: 'Line up the decimal points and add: 0.75.', points: 4 } ] }],
+      announcements: [['Welcome to the fractions course', 'Start with the equivalent fractions lesson. The written practice is due next week.'], ['Unit test date', 'The unit test opens now and closes in 18 days. You have two attempts.']] },
+    { cls: 'Grade 5-A', sub: 'Science', title: 'Demo · Plants and photosynthesis', description: 'How plants make food, the parts of a plant and a simple experiment.',
+      modules: [{ title: 'Parts of a plant', lessons: [['Roots, stems and leaves', 'Roots take in water, stems carry it, and leaves make food using sunlight.'], ['Flowers and seeds', 'Flowers make seeds so new plants can grow.']] },
+      { title: 'Photosynthesis', lessons: [['How plants make food', 'Plants use sunlight, water and carbon dioxide to make sugar and oxygen.', 'https://www.youtube.com/results?search_query=photosynthesis+for+kids']] }],
+      assignments: [{ title: 'Label a plant', instructions: 'Draw a plant and label the root, stem, leaf and flower. Upload a photo or write the labels.', dueOn: 9, maxScore: 10, published: true }],
+      quizzes: [{ title: 'Plants quick quiz', description: 'Five minutes, two attempts.', dueOn: 12, maxAttempts: 2, published: true, questions: [
+        { id: 'pq1', type: 'single_choice', prompt: 'Which part of a plant takes in water?', choices: ['Root', 'Leaf', 'Flower'], correctIndex: 0, points: 1 },
+        { id: 'pq2', type: 'multiple_choice', prompt: 'What do plants need for photosynthesis?', choices: ['Sunlight', 'Water', 'Plastic', 'Carbon dioxide'], correctIndexes: [0, 1, 3], points: 2 }] }],
+      announcements: [['Bring a leaf', 'Please bring one fallen leaf to the next science class.']] },
+    { cls: 'Grade 5-A', sub: 'English', title: 'Demo · Reading comprehension', description: 'Reading short passages and answering questions in full sentences.',
+      modules: [{ title: 'Reading skills', lessons: [['Finding the main idea', 'The main idea is what the whole passage is mostly about. Ask: what is the author telling me?'], ['Using context clues', 'When you meet a new word, read the sentences around it for hints.']] }],
+      assignments: [{ title: 'Summarise the passage', instructions: 'Read “The Lost Kite” and write a 5-sentence summary.', dueOn: 6, maxScore: 10, published: true }],
+      quizzes: [{ title: 'Main idea check', description: 'Choose the best answer.', dueOn: 11, maxAttempts: 3, published: true, questions: [{ id: 'eq1', type: 'single_choice', prompt: 'The main idea of a passage is…', choices: ['A small detail', 'What the passage is mostly about', 'The title only'], correctIndex: 1, points: 1 }] }],
+      announcements: [['Library visit', 'We will visit the library on Friday to borrow reading books.']] },
+    { cls: 'Grade 3-B', sub: 'Science', title: 'Demo · Living and non-living things', description: 'Sorting things around us into living and non-living.',
+      modules: [{ title: 'Around us', lessons: [['What is alive?', 'Living things grow, need food and air, and can have babies.'], ['Sorting game', 'Sort pictures into living and non-living groups.']] }],
+      assignments: [{ title: 'My living things list', instructions: 'List five living and five non-living things in your home.', dueOn: 8, maxScore: 10, published: true }],
+      quizzes: [{ title: 'Living or not?', description: 'True or false.', dueOn: 12, maxAttempts: 3, published: true, questions: [{ id: 'lq1', type: 'true_false', prompt: 'A stone is a living thing.', correctIndex: 1, points: 1 }, { id: 'lq2', type: 'true_false', prompt: 'A tree is a living thing.', correctIndex: 0, points: 1 }] }],
+      announcements: [] },
+    { cls: 'Grade 1-A', sub: 'English', title: 'Demo · Phonics and sounds', description: 'Letter sounds and simple three-letter words.',
+      modules: [{ title: 'Letter sounds', lessons: [['Vowel sounds', 'The vowels are a, e, i, o and u. Say each sound aloud.'], ['Three-letter words', 'Blend sounds together: c-a-t makes cat.']] }],
+      assignments: [{ title: 'Word hunt', instructions: 'Find five three-letter words at home and write them down.', dueOn: 5, maxScore: 5, published: true }],
+      quizzes: [], announcements: [['Reading at home', 'Please read together for ten minutes every evening.']] },
+  ];
+
+  const allCourses = await call('GET', '/lms/courses');
+  const out = {};
+  for (const spec of specs) {
+    const cls = find(spec.cls); if (!cls || !subject[spec.sub]) continue;
+    let course = allCourses.find((c) => c.classId === cls.id && c.subjectId === subject[spec.sub] && c.title === spec.title);
+    if (!course) { const id = (await call('POST', '/lms/courses', { classId: cls.id, subjectId: subject[spec.sub], title: spec.title, description: spec.description })).id; track('lmsCourses', id); course = { id }; }
+    const base = `/lms/courses/${course.id}`;
+    const mods = await call('GET', `${base}/modules`); const lessons = await call('GET', `${base}/lessons`);
+    let lessonNo = 0;
+    for (const [mi, m] of spec.modules.entries()) {
+      let mod = mods.find((x) => x.title === m.title);
+      if (!mod) mod = { id: (await call('POST', `${base}/modules`, { title: m.title, description: '', sequence: mi + 1, published: true })).id };
+      for (const [title, content, resourceUrl] of m.lessons) {
+        lessonNo += 1;
+        if (!lessons.some((l) => l.title === title)) await call('POST', `${base}/lessons`, { moduleId: mod.id, sequence: lessonNo, title, content, resourceUrl: resourceUrl || null, published: true });
+      }
+    }
+    const haveA = await call('GET', `${base}/assignments`);
+    for (const a of spec.assignments) if (!haveA.some((x) => x.title === a.title)) await call('POST', `${base}/assignments`, { ...a, dueOn: day(a.dueOn) });
+    const haveQ = await call('GET', `${base}/quizzes`);
+    for (const q of spec.quizzes) if (!haveQ.some((x) => x.title === q.title)) await call('POST', `${base}/quizzes`, { ...q, dueOn: day(q.dueOn) });
+    const haveN = await call('GET', `${base}/announcements`);
+    for (const [title, body] of spec.announcements) if (!haveN.some((x) => x.title === title)) await call('POST', `${base}/announcements`, { title, body });
+    if (!course.published) await call('PUT', base, { published: true });
+    out[spec.title] = course.id;
+
+    // Content library: a reference document and two links per course.
+    const haveM = await call('GET', `${base}/materials`);
+    for (const m of [
+      { kind: 'file', title: `${spec.sub} study guide (PDF)`, description: 'A short guide to read before the lessons.', file: true },
+      { kind: 'link', title: 'Practice and revision site', description: 'Free exercises to practise at home.', url: 'https://www.khanacademy.org/' },
+      { kind: 'video', title: `${spec.sub} introduction video`, description: 'A short introduction to the topic.', url: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${spec.sub} for kids`) },
+    ]) {
+      if (haveM.some((x) => x.title === m.title)) continue;
+      const { file, ...body } = m;
+      const id = (await call('POST', `${base}/materials`, { ...body, published: true })).id;
+      if (file) {
+        const pdf = Buffer.from(`%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n4 0 obj<</Length 60>>stream\nBT /F1 14 Tf 20 80 Td (${spec.sub} study guide) Tj ET\nendstream endobj\n5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R/Size 6>>\n%%EOF\n`);
+        const res = await fetch(`${API}${base}/materials/${id}/file?name=${encodeURIComponent('study-guide.pdf')}`, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', Authorization: `Bearer ${token}` }, body: pdf });
+        if (!res.ok) console.log(`  LMS material file: ${(await res.json().catch(() => ({}))).error ?? res.status}`);
+      }
+    }
+
+    // Topic parts: each lesson gets ordered parts to read in turn; the first lesson of a course also has a video link and a worksheet file.
+    for (const [li, lesson] of (await call('GET', `${base}/lessons`)).entries()) {
+      const pBase = `${base}/lessons/${lesson.id}/parts`; const have = await call('GET', pBase);
+      const add = async (part) => { if (have.some((x) => x.title === part.title)) return null; return (await call('POST', pBase, { published: true, ...part })).id; };
+      await add({ kind: 'text', sequence: 1, title: `Read: ${lesson.title}`, content: `${lesson.content ?? ''}\n\nTake your time, then move on to the next part.`.trim() });
+      if (li === 0) await add({ kind: 'video', sequence: 2, title: `Watch: ${lesson.title}`, url: 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${spec.sub} ${lesson.title} for kids`) });
+      const fileId = li === 0 ? await add({ kind: 'file', sequence: 3, title: 'Worksheet (PDF)', content: 'Print or read this worksheet, then try the practice questions.' }) : null;
+      if (fileId) {
+        const pdf = Buffer.from(`%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj\n4 0 obj<</Length 60>>stream\nBT /F1 14 Tf 20 80 Td (${lesson.title.replace(/[()\\]/g, '')} worksheet) Tj ET\nendstream endobj\n5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\ntrailer<</Root 1 0 R/Size 6>>\n%%EOF\n`);
+        const res = await fetch(`${API}${pBase}/${fileId}/file?name=${encodeURIComponent('worksheet.pdf')}`, { method: 'POST', headers: { 'Content-Type': 'application/octet-stream', Authorization: `Bearer ${token}` }, body: pdf });
+        if (!res.ok) console.log(`  LMS part file: ${(await res.json().catch(() => ({}))).error ?? res.status}`);
+      }
+      if (li > 0) await add({ kind: 'link', sequence: 2, title: 'Practice more', url: 'https://www.khanacademy.org/' });
+    }
+  }
+
+  // Student activity in the Grade 5-A maths course: the first two pupils read, complete, submit and take quizzes at different paces.
+  const grade5 = find('Grade 5-A'); const mathId = out['Demo · Fractions and decimals'];
+  if (!grade5 || !mathId) return;
+  const accounts = await call('GET', '/student-accounts');
+  // only pupils whose login is ours (or who have none yet); other logins have passwords this script cannot know
+  const pupils = (await call('GET', '/students')).filter((s) => s.classId === grade5.id && s.status === 'active' && !accounts.some((a) => a.studentId === s.id && !a.email.endsWith('@demo.student'))).slice(0, 2);
+  const lessonRows = await call('GET', `/lms/courses/${mathId}/lessons`);
+  const assignmentRows = await call('GET', `/lms/courses/${mathId}/assignments`);
+  const quizRows = await call('GET', `/lms/courses/${mathId}/quizzes`);
+  const answerFor = (q, good) => q.type === 'multiple_choice' ? (good ? q.correctIndexes : [q.correctIndexes[0]]) : q.type === 'short_answer' ? (good ? 'Line up the decimal points, then add 0.30 and 0.45 to get 0.75.' : 'Add the numbers.') : q.type === 'true_false' ? (good ? q.correctIndex : 1 - q.correctIndex) : (good ? q.correctIndex : (q.correctIndex + 1) % q.choices.length);
+  for (const [i, pupil] of pupils.entries()) {
+    const session = await studentSession(pupil, accounts);
+    if (!session) { console.log(`  LMS: could not sign in as ${pupil.firstName} ${pupil.lastName}; skipped their activity`); continue; }
+    const good = i === 0;
+    for (const lesson of lessonRows.slice(0, good ? lessonRows.length : 2)) { await session('POST', `/lms/lessons/${lesson.id}/view`, {}); if (good || lesson === lessonRows[0]) await session('POST', `/lms/lessons/${lesson.id}/complete`, {}); }
+    const first = assignmentRows.find((a) => a.published); const second = assignmentRows.filter((a) => a.published)[1];
+    if (first) await session('POST', `/lms/assignments/${first.id}/submit`, { response: good ? '2/5 + 1/5 = 3/5. 6/8 simplifies to 3/4 by dividing top and bottom by 2.' : '3/5 and 6/8.' }).catch(() => {});
+    if (good && second) await session('POST', `/lms/assignments/${second.id}/submit`, { response: 'Problem 1: 1.5 + 2.25 = 3.75. Problem 2: 4.0 - 1.35 = 2.65.', resourceUrl: 'https://example.com/my-decimal-working' }).catch(() => {});
+    const mine = await session('GET', '/lms');
+    const course = mine.find((c) => c.id === mathId);
+    for (const q of quizRows.filter((x) => x.published)) {
+      const done = course?.quizzes.find((x) => x.id === q.id)?.attemptCount ?? 0;
+      if (done) continue;
+      const answers = Object.fromEntries(q.questions.map((question) => [question.id, answerFor(question, good)]));
+      await session('POST', `/lms/quizzes/${q.id}/attempts`, { answers }).catch((e) => console.log(`  LMS quiz: ${e.message}`));
+    }
+  }
+
+  // Teacher grading: grade the first pupil's submission and review their written quiz answer.
+  if (pupils[0] && assignmentRows[0]) {
+    const subs = await call('GET', `/lms/courses/${mathId}/assignments/${assignmentRows[0].id}/submissions`);
+    const row = subs.rows.find((r) => r.studentId === pupils[0].id);
+    if (row?.submittedAt && !row.gradedAt) await call('PUT', `/lms/courses/${mathId}/assignments/${assignmentRows[0].id}/submissions/${pupils[0].id}`, { score: 9, feedback: 'Correct steps and clear simplification. Remember to write the final answer on its own line.' });
+  }
+  const unit = quizRows.find((q) => q.title.startsWith('Unit test'));
+  if (unit) for (const attempt of await call('GET', `/lms/courses/${mathId}/quizzes/${unit.id}/attempts`)) {
+    if (attempt.reviewStatus !== 'pending_review') continue;
+    const good = attempt.studentId === pupils[0]?.id;
+    await call('PUT', `/lms/courses/${mathId}/quizzes/${unit.id}/attempts/${attempt.id}/review`, { questionScores: { ut4: good ? 4 : 1 }, feedback: good ? 'Excellent explanation.' : 'Show the steps: line up the decimal points first.' });
+  }
+  console.log(`LMS demo: ${Object.keys(out).length} courses with student activity.`);
+}
+
 async function seedOperations() {
   const students = (await call('GET', '/students')).filter((x) => x.status === 'active');
   const named = (first) => students.find((x) => x.firstName === first);

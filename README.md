@@ -6,6 +6,10 @@
 ## Mobile app
 One app serves many schools: the person signs in with a mobile number (or email) and password, the **global registry** (`global/`, its own small service and database) finds their school and role, and the app signs in at that school's own server with a short-lived signed ticket. See [global/README.md](global/README.md).
 
+**Learning Management (LMS):** admins and assigned teachers create class/subject courses, organize published or draft modules and lessons, attach protected resources, post course announcements, publish assignments with due dates, and create weighted single-choice, multiple-choice, true/false and written-response quizzes. Students access only courses they are actively enrolled in, mark lessons read or complete, submit text, links or files, take quizzes, review objective results and see written answers after teacher review. Teachers review submissions and quiz responses, leave feedback and track progress by course and student. Publishing learning materials and new due-dated work, and posting grades or feedback, sends push notifications to enrolled students and their linked parents who enabled push. Student/course reports support search and status filters with CSV export of the filtered rows. Admins manage LMS courses and enrollments here; user accounts and roles remain under the existing administration menus. LMS file bytes live in the private filesystem store selected by `LMS_STORAGE_DIR`; MySQL stores opaque keys and metadata, and JSON backups include referenced LMS files.
+
+The filesystem store must be persistent. For multiple API instances, point each instance at the same secured shared volume; this project does not currently include an S3-compatible storage adapter.
+
 `app/` is a React Native (Expo) app for parents, students and teachers that uses the same API. Its menu (labels, icons, order, roles, visibility) is stored in the database and edited under Settings, Mobile App Menu. See [app/README.md](app/README.md) to run it on a phone.
 
 ## Structure
@@ -32,12 +36,18 @@ client/src
 See **IMPLEMENTATION_GUIDE.md** for the six-week plan, process maps, roles, data checklist, training plan and go-live checklist. In the app, **Help & Support** has a **Setup & Go-Live Guide** (a checklist that ticks itself from your data, with a nudge on the admin dashboard until it is complete), **Class Readiness** (which classes have a class teacher, subjects with teachers, a timetable and fees) and a clickable **Process Map**. Every class can name a class teacher.
 
 ## Setup
-1. Create `server/.env` from `server/.env.example` (MySQL credentials and `JWT_SECRET`).
+1. Create `server/.env` from `server/.env.example` (MySQL credentials, a private `JWT_SECRET`, and `LMS_STORAGE_DIR` on persistent storage; the default is `server/uploads/lms`).
 2. `npm run install:all`
-3. `npm run db:migrate` (creates the database and tables, seeds the admin)
+3. `npm run db:migrate` (creates the database and tables, seeds the admin, and applies repeat-safe LMS storage/enrollment migrations)
 4. `npm run server` (API on :4000; it restarts when files in `server/src` change, and deliberately ignores `node_modules`, which otherwise made it restart in the middle of test runs) and `npm run client` (UI on :5173)
 
-First login: `admin@school.local` / `admin123` (seeded; change it).
+First login: `admin@school.local` / `admin123` (seeded; change it). For realistic demo records, run `npm run seed:demo --prefix server` while the API is running; it adds a Grade 5 fractions course with lessons, a written assignment due next week, an auto-graded test, an announcement, and student accounts where needed. Those demo student accounts use `student123` and require a password change at first sign-in. Remove the demo records with `npm run seed:demo:remove --prefix server`.
+
+Run the LMS end-to-end API workflow checks against a migrated, running server with `npm run test:lms --prefix server`. The suite signs in using `ADMIN_EMAIL` / `ADMIN_PASSWORD` (defaults shown above), creates temporary teacher/student accounts and course data, and removes them after completion.
+
+For a staging build, production environment requirements, database migration notes, persistent file storage, and preflight checks, see [docs/STAGING_DEPLOYMENT.md](docs/STAGING_DEPLOYMENT.md). Staging instructions do not deploy the application.
+
+For the Northstar LMS visual system and page-by-page role, responsive, accessibility, and state designs, see [docs/NORTHSTAR_LMS_DESIGN.md](docs/NORTHSTAR_LMS_DESIGN.md). The design marks proposed screens and interactions that are not backed by current product workflows.
 
 ## Adding a module
 Add `models/<name>.model.js` and register it in `models/index.js`, create `modules/<domain>/<name>.routes.js`
@@ -58,7 +68,7 @@ Inventory: categories → items (stock only changes through movements) → suppl
 
 Messaging: **Staff Messages** emails or texts all active staff (using the email/phone on their staff profile). Email (SMTP) and SMS (Twilio) from **Communication** (send to all parents, one class or one number; templates; history), **Fee Reminders** (overdue guardians, once per 24 h) and **Send SMS** on the absence-alert page. Set the `SMTP_*` / `TWILIO_*` / `DEFAULT_COUNTRY_CODE` values in `server/.env` (see `.env.example`). **Without them the system runs in log-only mode: messages are recorded in the history as "recorded only" and are NOT delivered.** Phone numbers need a country code, or set `DEFAULT_COUNTRY_CODE`.
 
-Student login: admins create a login per student under **Students → Student Accounts**. A `student` sees only their own record in a read-only portal (homework, fees, attendance, results, timetable, notices addressed to all or students); applying for leave and requesting certificates stay with parents. The login stops working when the student is made inactive and is deleted with the student.
+Student login: admins create a login per student under **Students → Student Accounts**. A `student` sees only their own record in the portal (homework, fees, attendance, results, timetable, notices addressed to all or students); they can complete LMS lessons, submit course assignments and take quizzes. Leave and certificate requests are also available through the portal. The login stops working when the student is made inactive and is deleted with the student.
 
 Roles: `parent` sees only the Parent Portal (their linked children's fees, attendance, results, timetable, notices); `admin` everything; `teacher` attendance, marks, library, read-only elsewhere; `accountant` fees, fee structure, finance reports.
 Assumed defaults to confirm with the school: grade scale and 40% pass mark (`modules/exams/grading.js`), library loan 14 days and fine 2/day (`modules/library/library.service.js`), 75% attendance flag (Reports).

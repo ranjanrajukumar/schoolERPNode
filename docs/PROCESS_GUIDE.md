@@ -182,6 +182,13 @@ Hand-offs: the student's class decides the fees billed, the subjects taken, the 
 - **Theory and practical marks:** a theory plus practical subject carries a practical share (30% of 100 = 70 + 30). The marks sheet then has two boxes, each checked against its own maximum; the total feeds results.
 - **Timetable:** class, day, period, subject, teacher, room. A room cannot serve two classes at once. Room bookings cannot clash with lessons. **Substitutions** list the periods of teachers on approved leave and only offer teachers who are free.
 - **Teaching tools:** syllabus and lesson plans, homework (with a tracker), study materials, online classes (joining link), academic calendar and holidays.
+- **Learning Management:** an admin or assigned teacher creates a course for a class-subject pair (active students start enrolled; the roster can be edited), groups sequenced lessons in modules, publishes/unpublishes content, and adds notes, video/resource links and protected attachments (PDF, common Office files, text, CSV, Markdown, images, MP4/MOV/M4V/WebM video; up to 25 MB). Teachers post announcements; publish written/file assignments with due dates; create weighted single-choice, multiple-choice, true/false and written-response quizzes; review submissions and written quiz answers; and return scores and feedback. Students see published work only for active enrollments, record lesson reads/completion, submit text/link/files, take quizzes, and review scored results and teacher feedback. Publishing a resource or due-dated assessment and grading work sends push notices to enrolled students and their linked parents with push enabled. The web course progress report filters by student and completion status and exports the filtered rows to CSV; course gradebooks summarize lessons, assignment scores and quiz results. Mobile supports course/module/lesson management and student quiz submissions; full result review and CSV reports are on the web. File bytes are outside MySQL under `LMS_STORAGE_DIR`; the database keeps an opaque key and metadata. JSON backups include the referenced LMS files. Keep the store persistent and include it in off-site backup plans. Admins manage LMS courses and enrollment rosters here; account and role management remain in the existing Users and Roles tools. Parents can review linked children's work but cannot record student progress or submit work. Course and assessment records are removed with their course.
+
+For multiple API instances, configure all instances to use the same secured shared file volume. An S3-compatible object storage adapter is not included yet.
+
+The full end-to-end LMS process is in [LMS_PROCESS.md](LMS_PROCESS.md).
+
+The LMS API workflow regression suite is `npm run test:lms --prefix server` (requires a migrated running API and seeded admin; it creates and cleans up temporary records).
 
 Verified by: `access.test.mjs` subject map, academics overview, theory and practical marks; `ui.test.mjs` subject map journey.
 
@@ -209,7 +216,9 @@ Verified by: `access.test.mjs` attendance details; `smoke.test.mjs` attendance v
 1. **Grade setup:** a grade scale from 0%; names up to 10 characters, no two starting at the same percentage, pass mark 0 to 100 (40% default).
 2. **Exam groups** (optional): weighted exams combined into one result (weight 1 to 1000); an exam can only join a group of its own class.
 3. **Create exam:** class, name, maximum marks, dates. The list shows upcoming, ongoing and completed from the dates.
+   Admins can create, edit and delete exams from the mobile app as well as the web app.
 4. **Enter marks** (`POST /exams/:id/marks`): every record needs a student of the exam class and a subject the class studies; a mark cannot exceed its maximum. A student is only expected to have marks in the subjects they take (core plus chosen elective). The sheet warns about unsaved changes.
+   The mobile marks sheet supports both single-total marks and split theory/practical marks; each part is checked against its own maximum.
 5. **Results** (`GET /exams/:id/results`): total, percentage, grade, rank (out of the subjects the student takes), result Pass, Fail or Incomplete.
 6. **Report card** (`GET /exams/:id/report-card/:studentId`): marks with theory and practical columns, total, percentage, grade, rank, result and attendance, with signature lines. Prints cleanly.
 7. **Merit list, holistic progress card, revaluation:** a revaluation request is raised once per subject while pending; an admin accepts (revised mark and note) or rejects (reason).
@@ -282,6 +291,7 @@ Books and categories (a category in use cannot be deleted) → library cards (nu
 - A reservation is only possible when no copy is free; a returned copy is held for the first reservation.
 - A student cannot borrow the same book twice at once; only active students borrow; a card limits books at a time and cannot be withdrawn while books are out; a book with copies on loan cannot be deleted.
 - A late return bills the fine to the student as a normal fee, once; earlier returns can be backfilled (`POST /library/issues/bill-fines`).
+- Staff can manage books and categories, create and update library cards, issue books to active students, record returns, and manage reservations from the mobile app. The server still enforces availability, membership limits, reservation order and fines.
 
 ### Transport
 
@@ -294,6 +304,8 @@ Hostels → rooms (beds, monthly fee) → allocation (bed number unique within a
 ### Inventory
 
 Categories → items (stock changes only through movements) → suppliers → stock in and out (never more than in stock; row-locked so simultaneous issues cannot overdraw) → purchase orders (each item once per order; **receive** adds every line to stock exactly once) → asset register with maintenance (an asset with history is marked disposed, not deleted) → stock reports (low stock, value at latest cost). **Inventory requests:** a teacher asks for items with a reason; an admin approves (optionally fewer, issued through the normal stock-out rules) or rejects with a reason; teachers see only their own.
+
+The mobile app supports teacher inventory requests and admin stock item/category/supplier management, stock movements, multi-line purchase orders, receipt/cancellation, asset registration and maintenance. Stock quantity remains controlled by movement records; approving a request and receiving an order use the same server stock rules as the web app.
 
 Verified by: `access.test.mjs` hostel, library cards; `smoke.test.mjs` inventory, inventory requests, library fines.
 
