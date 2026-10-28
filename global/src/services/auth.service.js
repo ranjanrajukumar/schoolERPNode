@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Client, Credential, Identity, MobileNumber, Role } from '../models/index.js';
+import { Client, Identity, Role } from '../models/index.js';
 import { privateKey } from '../config/keys.js';
 
 export const TICKET_SECONDS = 120;
@@ -36,15 +36,12 @@ export async function login(identifier, password) {
   const { kind, value } = classify(identifier);
   if (!value || typeof password !== 'string' || !password) return [];
   const where = { active: true };
-  if (kind === 'mobile') {
-    const phone = await MobileNumber.findOne({ where: { numberKey: value } });
-    if (!phone) { await bcrypt.compare(password, DUMMY_HASH); return []; }
-    where.mobileNumberId = phone.id;
-  } else where[kind] = value;
-  // the login, its password hash, its role and its (active) school, in one read
+  if (kind === 'mobile') where.mobile = value;
+  else where[kind] = value;
+  // the login (its password hash is on the same row), its role and its (active) school, in one read
   const rows = await Identity.findAll({
     where,
-    include: [{ model: Credential, required: true }, { model: Role, required: true }, { model: Client, required: true, where: { active: true } }],
+    include: [{ model: Role, required: true }, { model: Client, required: true, where: { active: true } }],
     order: [['id', 'ASC']],
     limit: 20,
   });
@@ -53,7 +50,7 @@ export async function login(identifier, password) {
   const accounts = [];
   for (const row of rows) {
     // eslint-disable-next-line no-await-in-loop
-    if (!(await bcrypt.compare(password, row.Credential.passwordHash))) continue;
+    if (!(await bcrypt.compare(password, row.passwordHash))) continue;
     const { Client: client, Role: role } = row;
     accounts.push({
       clientCode: client.code, clientName: client.name, city: client.city ?? null, logoUrl: client.logoUrl ?? null, apiUrl: client.apiUrl,

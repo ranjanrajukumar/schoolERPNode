@@ -8,7 +8,7 @@ phone ──► global registry: mobile / email / admission no + password ──
   └─────► that school's own server: POST /auth/sso { ticket } ──► the school's normal session (token) ──► the app
 ```
 
-What the registry stores: for each school its name, city, code, logo and API address; and for each login at a school its role, name, mobile number, email, admission number (for students) and **password hash** (see *The database* below). Students' marks, fees, attendance and everything else stay in each school's own database. Each school remains the source of truth for its logins: it reports them to the registry, and the registry follows.
+What the registry stores: for each school its name, city, code, logo and API address; and for each login at a school its role, name, mobile number, email, admission number (for students) and **password hash**, all on one row (see *The database* below). Students' marks, fees, attendance and everything else stay in each school's own database. Each school remains the source of truth for its logins: it reports them to the registry, and the registry follows.
 
 ## How a sign-in works
 
@@ -35,7 +35,7 @@ Where a login's mobile number comes from: a teacher's staff profile phone, a par
 
 ## The database
 
-Five tables, each holding one kind of fact once, joined by foreign keys (third normal form):
+Three tables. A login is one row on `identities`, which holds its own mobile number and password hash; schools and roles are small lookup tables:
 
 ```
 clients ─────────┐            roles
@@ -43,27 +43,21 @@ clients ─────────┐            roles
   name  api_url    │            │ 1
   api_key_hash …   │            │
                    ▼ many       ▼ many
-              identities ──────────────► mobile_numbers
-                id                many ─► 1   id  number_key (unique)  digits
+              identities
+                id
                 client_id  → clients.id   ON DELETE CASCADE
                 role_id    → roles.id     ON DELETE RESTRICT
-                mobile_number_id → mobile_numbers.id   ON DELETE SET NULL
                 local_user_id  (the login's id at that school)
+                mobile   (the number's last ten digits)
                 name  email  username  active
-                  │ 1
-                  ▼ 1
-              credentials
-                identity_id  → identities.id   ON DELETE CASCADE   (also its key)
-                password_hash  updated_at
+                password_hash
 ```
 
-- **`identities`** is one row per login at one school. The school, role and phone number are references, not copies of their text, so a school renamed or a role added is one change and a typo cannot invent a role. `(client_id, local_user_id)` is unique.
-- **`mobile_numbers`** holds each distinct phone once (matched on its last ten digits). A parent and a child who share a phone, or a person who works at two schools, point at the same row; signing in by phone is one indexed lookup. A number no login uses is removed.
-- **`credentials`** keeps the password hash apart from who the person is: only sign-in reads it, and listings and joins on `identities` never carry it.
-- **Deleting** follows the references: removing a school removes its logins and their passwords (nothing can be orphaned); a role that logins use cannot be removed; removing a phone number only clears the link.
-- Every non-key column depends on its own table's key and nothing else: no repeated school codes, role names or phone numbers, and no lists in a column.
+- **`identities`** is one row per login at one school. `mobile` is the number's last ten digits (indexed), which is what a sign-in by phone matches on, so `+91 98765 43210` and `09876543210` both find `9876543210`; the country code and leading zero are not kept. A parent and a child who share a phone, or a person who works at two schools, simply have the same `mobile` on their rows. `password_hash` is the bcrypt hash the school holds, never a password. `(client_id, local_user_id)` is unique.
+- **`clients`** and **`roles`** are references, so a school renamed or a role added is one change and a typo cannot invent a role.
+- **Deleting** follows the references: removing a school removes its logins, with their numbers and passwords (nothing can be orphaned); a role that logins use cannot be removed.
 
-Upgrading from the first version (one wide `identities` table with the school code, role, phone and password hash on each row) is automatic: at start-up the registry rebuilds the new tables from the old table in one transaction, checks that every row of a school that still exists arrived, and only then drops the old table. Rows whose school had already been removed are not carried over.
+Upgrading is automatic at start-up. An older registry that kept the phone number in a `mobile_numbers` table (or in a separate `mobile_key` column) and the password hash in a `credentials` table is flattened in place: each login's number and hash are copied onto its `identities` row, a login with no password (it could never sign in, and its school reports it again on the next sync) is dropped, and only then are the two extra tables removed. The very first version (one wide `identities` table with the school code and role as text) is moved into the current table in one transaction, after checking that every row of a school that still exists arrived. Rows whose school had already been removed are not carried over.
 
 ## Run it
 

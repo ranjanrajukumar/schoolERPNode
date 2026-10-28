@@ -1,4 +1,4 @@
-import { Client, Credential, Identity, MobileNumber, Role, sequelize } from '../models/index.js';
+import { Client, Identity, Role, sequelize } from '../models/index.js';
 import { badRequest } from '../utils/httpError.js';
 import { digitsOf, mobileKeyOf } from './auth.service.js';
 
@@ -23,18 +23,11 @@ function clean(raw, index) {
   const digits = digitsOf(raw.mobile).slice(-15) || null;
   const username = text(raw.username, 60);
   if (!email && !digits && !username) throw badRequest(`${at}: needs an email, a mobile number or a username to sign in with`);
-  return { localUserId, role: raw.role, name, email, digits, numberKey: digits ? mobileKeyOf(digits) : null, username, passwordHash: raw.passwordHash, active: raw.active !== false };
+  return { localUserId, role: raw.role, name, email, mobile: digits ? mobileKeyOf(digits) : null, username, passwordHash: raw.passwordHash, active: raw.active !== false };
 }
 
-/** The phone number's row, made when this number has not been seen before. Many logins share it. */
-async function mobileNumberId(numberKey, digits, transaction) {
-  if (!numberKey) return null;
-  const [row] = await MobileNumber.findOrCreate({ where: { numberKey }, defaults: { digits }, transaction });
-  return row.id;
-}
-
-// Two schools may report at the same moment, and a phone number can be shared by logins at both: the database then picks one of the two
-// transactions to retry. Retrying it is the correct answer, so a report is repeated a few times before it is given up on.
+// Two reports for the same school can arrive at the same moment: the database then picks one of the two transactions to retry (or refuses a
+// duplicate login). Retrying it is the correct answer, so a report is repeated a few times before it is given up on.
 const RETRYABLE = (err) => ['ER_LOCK_DEADLOCK', 'ER_LOCK_WAIT_TIMEOUT'].includes(err?.original?.code) || err?.name === 'SequelizeUniqueConstraintError';
 async function withRetry(fn, tries = 5) {
   for (let attempt = 1; ; attempt += 1) {
@@ -44,9 +37,6 @@ async function withRetry(fn, tries = 5) {
     }
   }
 }
-
-/** Phone numbers no login points to any more are not kept. */
-export const pruneMobileNumbers = (transaction) => sequelize.query('DELETE FROM mobile_numbers WHERE id NOT IN (SELECT mobile_number_id FROM identities WHERE mobile_number_id IS NOT NULL)', { transaction });
 
 /**
  * A school's server reports its logins. With `full`, the list is the school's complete set: any login not in it is switched off here,
@@ -58,24 +48,21 @@ export async function upsertIdentities(client, list, { full = false } = {}) {
   const rows = list.map(clean);
   if (new Set(rows.map((r) => r.localUserId)).size !== rows.length) throw badRequest('The same login is listed twice');
 
-  // phone numbers are locked in the same order by every report, so two reports sharing a number wait for each other instead of deadlocking
-  rows.sort((a, b) => String(a.numberKey ?? '~').localeCompare(String(b.numberKey ?? '~')) || a.localUserId - b.localUserId);
+  rows.sort((a, b) => a.localUserId - b.localUserId); // every report takes its rows in the same order
 
   const result = await withRetry(() => sequelize.transaction(async (transaction) => {
     const roles = new Map((await Role.findAll({ transaction })).map((r) => [r.code, r.id]));
     const existing = new Map((await Identity.findAll({ where: { clientId: client.id }, transaction })).map((r) => [r.localUserId, r]));
     let created = 0; let updated = 0;
     for (const row of rows) {
-      // eslint-disable-next-line no-await-in-loop
-      const phoneId = await mobileNumberId(row.numberKey, row.digits, transaction);
-      const fields = { roleId: roles.get(row.role), mobileNumberId: phoneId, name: row.name, email: row.email, username: row.username, active: row.active, updatedAt: new Date() };
+      const fields = { roleId: roles.get(row.role), mobile: row.mobile, name: row.name, email: row.email, username: row.username, passwordHash: row.passwordHash, active: row.active, updatedAt: new Date() };
       const have = existing.get(row.localUserId);
-      let identityId;
-      if (have) { await have.update(fields, { transaction }); identityId = have.id; updated += 1; } else {
-        identityId = (await Identity.create({ clientId: client.id, localUserId: row.localUserId, ...fields }, { transaction })).id;
+      // eslint-disable-next-line no-await-in-loop
+      if (have) { await have.update(fields, { transaction }); updated += 1; } else {
+        // eslint-disable-next-line no-await-in-loop
+        await Identity.create({ clientId: client.id, localUserId: row.localUserId, ...fields }, { transaction });
         created += 1;
       }
-      await Credential.upsert({ identityId, passwordHash: row.passwordHash, updatedAt: new Date() }, { transaction });
     }
     let deactivated = 0;
     if (full) {
@@ -86,8 +73,6 @@ export async function upsertIdentities(client, list, { full = false } = {}) {
     }
     return { created, updated, deactivated };
   }));
-  // housekeeping after the report is safely saved: a failure here must not undo or fail it
-  await pruneMobileNumbers().catch(() => {});
   await Client.update({ lastSyncAt: new Date() }, { where: { id: client.id } }); // the registry's admin page shows this
   return result;
 }

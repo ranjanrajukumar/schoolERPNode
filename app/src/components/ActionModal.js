@@ -9,6 +9,39 @@ import { Banner, Button, Chips, Field, Muted } from '../ui';
  * `action` = { label, fields: [{ key, label, keyboard, multiline, required, options, optionsPath, default }], method, path, body(values), confirm, done(result) }
  * Fields of type options (a fixed list) or optionsPath (a list read from the API) render as choices.
  */
+// One choice from a list. A short list is a row of chips. A long one (all classes, all subjects) shows nothing until you type: the
+// suggestions are the choices that match, and picking one closes them and shows it as "Selected".
+const SUGGESTIONS = 8;
+function ChoicePicker({ options, value, onChange }) {
+  const [query, setQuery] = useState('');
+  if (options.length <= 6) return <Chips options={options.length > 1 ? options : [...options, { value: '__', label: '—' }]} value={value} onChange={onChange} />;
+  const needle = query.trim().toLowerCase();
+  const matches = needle ? options.filter((o) => o.value !== '' && String(o.label).toLowerCase().includes(needle)) : [];
+  const chosen = options.find((o) => o.value === value && o.value !== '');
+  return (
+    <View style={{ marginBottom: space.md }}>
+      {chosen ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+          <View style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 18, backgroundColor: color.header }}><Text style={{ color: '#fff', fontWeight: '700' }}>{chosen.label}</Text></View>
+          <Pressable onPress={() => onChange('')}><Text style={{ color: color.muted }}>Clear</Text></Pressable>
+        </View>
+      ) : null}
+      <Field value={query} onChangeText={setQuery} placeholder={chosen ? 'Type to choose another…' : 'Type to search…'} autoCapitalize="none" style={{ marginBottom: 4 }} />
+      {needle ? (
+        <View style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: color.line, borderRadius: 10, overflow: 'hidden' }}>
+          {matches.slice(0, SUGGESTIONS).map((o, i) => (
+            <Pressable key={o.value} onPress={() => { onChange(o.value); setQuery(''); }} style={{ paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: i ? 1 : 0, borderTopColor: color.line }}>
+              <Text style={{ color: color.ink }}>{o.label}</Text>
+            </Pressable>
+          ))}
+          {matches.length === 0 ? <Text style={{ padding: 12, color: color.muted }}>Nothing matches “{query}”.</Text> : null}
+          {matches.length > SUGGESTIONS ? <Text style={{ padding: 10, color: color.muted, fontSize: 12 }}>{matches.length - SUGGESTIONS} more: keep typing to narrow it down.</Text> : null}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 export default function ActionModal({ visible, action, row, child = null, onClose, onDone }) {
   const [values, setValues] = useState({});
   const [options, setOptions] = useState({});
@@ -84,7 +117,7 @@ export default function ActionModal({ visible, action, row, child = null, onClos
               ) : choices ? (
                 <View key={f.key} style={{ marginBottom: space.sm }}>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', marginBottom: 4 }}>{f.label}</Text>
-                  <Chips options={choices.length > 1 ? choices : [...choices, { value: '__', label: '—' }]} value={values[f.key]} onChange={(v) => setValues((x) => ({ ...x, [f.key]: v }))} />
+                  <ChoicePicker options={choices} value={values[f.key]} onChange={(v) => setValues((x) => ({ ...x, [f.key]: v === '__' ? '' : v }))} />
                 </View>
               ) : (
                 <Field

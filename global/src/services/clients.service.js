@@ -2,7 +2,6 @@ import crypto from 'node:crypto';
 import { Op } from 'sequelize';
 import { Client, Identity } from '../models/index.js';
 import { badRequest, conflict, notFound } from '../utils/httpError.js';
-import { pruneMobileNumbers } from './provision.service.js';
 
 const CODE = /^[a-z0-9][a-z0-9-]{1,29}$/;
 
@@ -138,6 +137,5 @@ export async function update(code, body, { verify = false } = {}) {
 export async function remove(code) {
   const row = await Client.findOne({ where: { code: String(code).toLowerCase() } });
   if (!row) throw notFound('No school has that code');
-  await row.destroy(); // its logins and their passwords go with it (foreign keys)
-  await pruneMobileNumbers();
+  await row.destroy(); // its logins, with their phone numbers and passwords, go with it (foreign key)
 }
