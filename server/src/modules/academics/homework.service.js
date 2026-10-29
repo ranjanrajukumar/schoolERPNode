@@ -1,10 +1,20 @@
-import { Homework, HomeworkSubmission, SchoolClass, Student, Subject, sequelize } from '../../models/index.js';
+import {
+  Homework,
+  HomeworkSubmission,
+  SchoolClass,
+  Student,
+  Subject,
+  sequelize,
+} from '../../models/index.js';
 import { SUBMISSION_STATUSES } from '../../models/homeworkSubmission.model.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { today } from '../../utils/money.js';
 
 const FIELDS = ['classId', 'subjectId', 'title', 'description', 'assignedOn', 'dueDate', 'maxMarks'];
-const pick = (body) => Object.fromEntries(FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]));
+const pick = (body) =>
+  Object.fromEntries(
+    FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]),
+  );
 
 function shape(h, counts) {
   return {
@@ -24,19 +34,27 @@ function shape(h, counts) {
   };
 }
 
-const include = [{ model: SchoolClass, attributes: ['name', 'section'] }, { model: Subject, attributes: ['name'] }];
+const include = [
+  { model: SchoolClass, attributes: ['name', 'section'] },
+  { model: Subject, attributes: ['name'] },
+];
 
 export async function listHomework({ classId, subjectId } = {}) {
   const rows = await Homework.findAll({
     where: { ...(classId && { classId }), ...(subjectId && { subjectId }) },
     include: [...include, { model: HomeworkSubmission, attributes: ['status'] }],
-    order: [['dueDate', 'DESC'], ['id', 'DESC']],
+    order: [
+      ['dueDate', 'DESC'],
+      ['id', 'DESC'],
+    ],
     limit: 300,
   });
-  return rows.map((h) => shape(h, {
-    submitted: h.HomeworkSubmissions.filter((s) => ['submitted', 'late'].includes(s.status)).length,
-    total: h.HomeworkSubmissions.length,
-  }));
+  return rows.map((h) =>
+    shape(h, {
+      submitted: h.HomeworkSubmissions.filter((s) => ['submitted', 'late'].includes(s.status)).length,
+      total: h.HomeworkSubmissions.length,
+    }),
+  );
 }
 
 export async function createHomework(body, user) {
@@ -55,10 +73,12 @@ export async function updateHomework(id, body) {
   if (!homework) throw notFound('Homework not found');
   const data = pick(body);
   const dueDate = data.dueDate ?? homework.dueDate;
-  if (dueDate < (data.assignedOn ?? homework.assignedOn)) throw badRequest('The due date cannot be before the assigned date');
+  if (dueDate < (data.assignedOn ?? homework.assignedOn))
+    throw badRequest('The due date cannot be before the assigned date');
   if (data.maxMarks) {
     const worst = await HomeworkSubmission.max('marks', { where: { homeworkId: id } });
-    if (worst !== null && worst > data.maxMarks) throw conflict(`A student already has ${worst} marks, which is above ${data.maxMarks}`);
+    if (worst !== null && worst > data.maxMarks)
+      throw conflict(`A student already has ${worst} marks, which is above ${data.maxMarks}`);
   }
   await homework.update(data);
 }
@@ -67,7 +87,8 @@ export async function updateHomework(id, body) {
 export async function deleteHomework(id, user) {
   const homework = await Homework.findByPk(id);
   if (!homework) throw notFound('Homework not found');
-  if (user.role !== 'admin' && homework.createdBy !== user.id) throw conflict('You can only delete homework you set');
+  if (user.role !== 'admin' && homework.createdBy !== user.id)
+    throw conflict('You can only delete homework you set');
   await homework.destroy();
 }
 
@@ -76,7 +97,10 @@ export async function getSubmissions(id) {
   const homework = await Homework.findByPk(id, { include });
   if (!homework) throw notFound('Homework not found');
   const [students, subs] = await Promise.all([
-    Student.findAll({ where: { classId: homework.classId, status: 'active' }, order: [['firstName', 'ASC']] }),
+    Student.findAll({
+      where: { classId: homework.classId, status: 'active' },
+      order: [['firstName', 'ASC']],
+    }),
     HomeworkSubmission.findAll({ where: { homeworkId: id } }),
   ]);
   const byStudent = new Map(subs.map((s) => [s.studentId, s]));
@@ -102,14 +126,22 @@ export async function saveSubmissions(id, records = []) {
   if (!homework) throw notFound('Homework not found');
 
   const clean = records.map((r) => {
-    if (!SUBMISSION_STATUSES.includes(r.status)) throw badRequest(`Status must be one of ${SUBMISSION_STATUSES.join(', ')}`);
+    if (!SUBMISSION_STATUSES.includes(r.status))
+      throw badRequest(`Status must be one of ${SUBMISSION_STATUSES.join(', ')}`);
     const blank = r.marks === '' || r.marks === null || r.marks === undefined;
     if (!blank) {
       const marks = Number(r.marks);
       if (Number.isNaN(marks) || marks < 0) throw badRequest('Marks must be zero or more');
-      if (homework.maxMarks && marks > homework.maxMarks) throw badRequest(`Marks cannot be above ${homework.maxMarks}`);
+      if (homework.maxMarks && marks > homework.maxMarks)
+        throw badRequest(`Marks cannot be above ${homework.maxMarks}`);
     }
-    return { homeworkId: id, studentId: r.studentId, status: r.status, marks: blank ? null : Number(r.marks), remarks: r.remarks || null };
+    return {
+      homeworkId: id,
+      studentId: r.studentId,
+      status: r.status,
+      marks: blank ? null : Number(r.marks),
+      remarks: r.remarks || null,
+    };
   });
 
   await sequelize.transaction(async (transaction) => {
@@ -130,7 +162,11 @@ export async function homeworkForStudent(student) {
   return rows.map((h) => ({
     ...shape(h),
     submission: h.HomeworkSubmissions[0]
-      ? { status: h.HomeworkSubmissions[0].status, marks: h.HomeworkSubmissions[0].marks, remarks: h.HomeworkSubmissions[0].remarks }
+      ? {
+          status: h.HomeworkSubmissions[0].status,
+          marks: h.HomeworkSubmissions[0].marks,
+          remarks: h.HomeworkSubmissions[0].remarks,
+        }
       : { status: 'pending', marks: null, remarks: null },
   }));
 }

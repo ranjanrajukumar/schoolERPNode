@@ -19,10 +19,17 @@ export default function ChangePassword() {
     if (form.newPassword !== form.confirm) return setError('The two new passwords do not match.');
     setBusy(true);
     try {
-      await api('/auth/change-password', { method: 'POST', body: { currentPassword: form.currentPassword, newPassword: form.newPassword } });
+      await api('/auth/change-password', {
+        method: 'POST',
+        body: { currentPassword: form.currentPassword, newPassword: form.newPassword },
+      });
       passwordChanged();
       nav('/', { replace: true });
-    } catch (err) { setError(err.message); } finally { setBusy(false); }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -30,14 +37,66 @@ export default function ChangePassword() {
       <form className="login-form" onSubmit={submit} style={{ margin: '0 auto' }}>
         <SchoolBrand className="brand login-brand" />
         <h1>Choose a new password</h1>
-        <p className="hint">{user?.mustChangePassword ? 'You are signed in with a temporary password. Choose your own to continue.' : 'Enter your current password, then a new one.'}</p>
-        <label>Current password<input type="password" autoComplete="current-password" value={form.currentPassword} onChange={set('currentPassword')} required /></label>
-        <label>New password (at least 8 characters)<input type="password" autoComplete="new-password" value={form.newPassword} onChange={set('newPassword')} required minLength={8} /></label>
-        <label>New password again<input type="password" autoComplete="new-password" value={form.confirm} onChange={set('confirm')} required minLength={8} /></label>
-        {error && <p className="error" role="alert">{error}</p>}
-        <button type="submit" className="big" disabled={busy}>{busy ? 'Saving…' : 'Save new password'}</button>
-        {!user?.mustChangePassword && <button type="button" className="ghost" onClick={() => nav(-1)}>Back</button>}
-        <button type="button" className="ghost" onClick={() => { logout(); nav('/login'); }}>Sign out</button>
+        <p className="hint">
+          {user?.mustChangePassword
+            ? 'You are signed in with a temporary password. Choose your own to continue.'
+            : 'Enter your current password, then a new one.'}
+        </p>
+        <label>
+          Current password
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={form.currentPassword}
+            onChange={set('currentPassword')}
+            required
+          />
+        </label>
+        <label>
+          New password (at least 8 characters)
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={form.newPassword}
+            onChange={set('newPassword')}
+            required
+            minLength={8}
+          />
+        </label>
+        <label>
+          New password again
+          <input
+            type="password"
+            autoComplete="new-password"
+            value={form.confirm}
+            onChange={set('confirm')}
+            required
+            minLength={8}
+          />
+        </label>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+        <button type="submit" className="big" disabled={busy}>
+          {busy ? 'Saving…' : 'Save new password'}
+        </button>
+        {!user?.mustChangePassword && (
+          <button type="button" className="ghost" onClick={() => nav(-1)}>
+            Back
+          </button>
+        )}
+        <button
+          type="button"
+          className="ghost"
+          onClick={() => {
+            logout();
+            nav('/login');
+          }}
+        >
+          Sign out
+        </button>
       </form>
     </div>
   );

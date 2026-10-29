@@ -353,7 +353,7 @@ export default function AppRoutes() {
           <Route path="hostel-fees" element={<HostelFees />} />
           <Route path="hostel-visitors" element={<VisitorLog />} />
           <Route path="hostel-reports" element={<HostelReports />} />
-          <Route path="audit"element={<AuditLog />} />
+          <Route path="audit" element={<AuditLog />} />
           <Route path="planned/:moduleSlug/:itemSlug" element={<Planned />} />
         </Route>
       </Route>

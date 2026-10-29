@@ -7,23 +7,35 @@ const average = (r) => Math.round((RATINGS.reduce((sum, k) => sum + r[k], 0) / R
 
 const shape = (r) => {
   const { Staff: s, ...rest } = r.toJSON();
-  return { ...rest, staffName: s ? `${s.firstName} ${s.lastName}` : null, staffNo: s?.staffNo ?? null, overall: average(r) };
+  return {
+    ...rest,
+    staffName: s ? `${s.firstName} ${s.lastName}` : null,
+    staffNo: s?.staffNo ?? null,
+    overall: average(r),
+  };
 };
 
 export async function listReviews({ staffId } = {}) {
   const rows = await PerformanceReview.findAll({
-    where: staffId ? { staffId } : {}, include: [{ model: Staff, attributes: ['firstName', 'lastName', 'staffNo'] }],
-    order: [['reviewDate', 'DESC'], ['id', 'DESC']],
+    where: staffId ? { staffId } : {},
+    include: [{ model: Staff, attributes: ['firstName', 'lastName', 'staffNo'] }],
+    order: [
+      ['reviewDate', 'DESC'],
+      ['id', 'DESC'],
+    ],
   });
   return rows.map(shape);
 }
 
 function clean(body) {
-  const data = Object.fromEntries(FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]));
+  const data = Object.fromEntries(
+    FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]),
+  );
   for (const k of RATINGS) {
     if (data[k] !== undefined) {
       data[k] = Number(data[k]);
-      if (!Number.isInteger(data[k]) || data[k] < 1 || data[k] > 5) throw badRequest('Ratings must be whole numbers from 1 to 5');
+      if (!Number.isInteger(data[k]) || data[k] < 1 || data[k] > 5)
+        throw badRequest('Ratings must be whole numbers from 1 to 5');
     }
   }
   return data;

@@ -10,12 +10,20 @@ if (missing.length) throw new Error(`Missing settings: ${missing.join(', ')} (se
 await migrate();
 
 const port = Number(process.env.PORT || 4100);
-const server = app.listen(port, () => console.log(`Global registry running on port ${port}: http://localhost:${port}/api`));
+const server = app.listen(port, () =>
+  console.log(`Global registry running on port ${port}: http://localhost:${port}/api`),
+);
 server.on('error', (err) => {
   if (err.code !== 'EADDRINUSE') throw err;
-  console.error(`Port ${port} is already in use: the registry is probably already running. To restart it, stop the old copy first.`);
+  console.error(
+    `Port ${port} is already in use: the registry is probably already running. To restart it, stop the old copy first.`,
+  );
   process.exit(1);
 });
-const shutdown = () => server.close(async () => { await sequelize.close(); process.exit(0); });
+const shutdown = () =>
+  server.close(async () => {
+    await sequelize.close();
+    process.exit(0);
+  });
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);

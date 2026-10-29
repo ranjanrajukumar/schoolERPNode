@@ -55,7 +55,7 @@ export function MenuProvider({ children }) {
 }
 
 /** What a tile or page opens: a route in the navigator, with its parameters. Unknown keys (a page this app version lacks) return null. */
-export function targetOf(audience, item) {
+function targetOf(audience, item) {
   if (item.key === PASSWORD_TILE.key) return { route: PASSWORD_TILE.route };
   if (audience === 'staff') {
     const quick = STAFF_QUICK.find((q) => q.key === item.key);

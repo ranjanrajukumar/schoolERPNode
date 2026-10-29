@@ -1,6 +1,15 @@
 import { Op } from 'sequelize';
 import {
-  Asset, AssetMaintenance, InventoryCategory, InventoryItem, InventoryRequest, PurchaseOrder, PurchaseOrderLine, StockMovement, Supplier, sequelize,
+  Asset,
+  AssetMaintenance,
+  InventoryCategory,
+  InventoryItem,
+  InventoryRequest,
+  PurchaseOrder,
+  PurchaseOrderLine,
+  StockMovement,
+  Supplier,
+  sequelize,
 } from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { daysFromNow, fromCents, toCents, today } from '../../utils/money.js';
@@ -11,14 +20,20 @@ const positiveInt = (value) => Number.isInteger(Number(value)) && Number(value) 
 /* ---------- Categories, items, suppliers ---------- */
 
 export async function listCategories() {
-  const rows = await InventoryCategory.findAll({ include: [{ model: InventoryItem, attributes: ['id'] }], order: [['name', 'ASC']] });
+  const rows = await InventoryCategory.findAll({
+    include: [{ model: InventoryItem, attributes: ['id'] }],
+    order: [['name', 'ASC']],
+  });
   return rows.map((c) => ({ id: c.id, name: c.name, itemCount: c.InventoryItems.length }));
 }
 
 export async function deleteCategory(id) {
   const category = await InventoryCategory.findByPk(id);
   if (!category) throw notFound('Category not found');
-  if (await InventoryItem.count({ where: { categoryId: id } }) || await Asset.count({ where: { categoryId: id } })) {
+  if (
+    (await InventoryItem.count({ where: { categoryId: id } })) ||
+    (await Asset.count({ where: { categoryId: id } }))
+  ) {
     throw conflict('Items or assets still use this category');
   }
   await category.destroy();
@@ -31,7 +46,10 @@ export async function listItems({ categoryId, low } = {}) {
     order: [['name', 'ASC']],
   });
   const items = rows.map((i) => ({
-    ...i.toJSON(), InventoryCategory: undefined, categoryName: i.InventoryCategory?.name ?? null, lowStock: i.quantity <= i.reorderLevel,
+    ...i.toJSON(),
+    InventoryCategory: undefined,
+    categoryName: i.InventoryCategory?.name ?? null,
+    lowStock: i.quantity <= i.reorderLevel,
   }));
   return low ? items.filter((i) => i.lowStock) : items;
 }
@@ -40,8 +58,11 @@ export async function listItems({ categoryId, low } = {}) {
 export async function deleteItem(id) {
   const item = await InventoryItem.findByPk(id);
   if (!item) throw notFound('Item not found');
-  if (await StockMovement.count({ where: { itemId: id } }) || await PurchaseOrderLine.count({ where: { itemId: id } })
-    || await InventoryRequest.count({ where: { itemId: id } })) {
+  if (
+    (await StockMovement.count({ where: { itemId: id } })) ||
+    (await PurchaseOrderLine.count({ where: { itemId: id } })) ||
+    (await InventoryRequest.count({ where: { itemId: id } }))
+  ) {
     throw conflict('This item has stock or order history and cannot be deleted');
   }
   await item.destroy();
@@ -50,7 +71,8 @@ export async function deleteItem(id) {
 export async function deleteSupplier(id) {
   const supplier = await Supplier.findByPk(id);
   if (!supplier) throw notFound('Supplier not found');
-  if (await PurchaseOrder.count({ where: { supplierId: id } })) throw conflict('This supplier has purchase orders and cannot be deleted');
+  if (await PurchaseOrder.count({ where: { supplierId: id } }))
+    throw conflict('This supplier has purchase orders and cannot be deleted');
   await supplier.destroy();
 }
 
@@ -64,21 +86,35 @@ export async function recordMovement(data, createdByName, outerTransaction) {
   const { itemId, type, quantity, unitCost, supplierId, orderId, party, note, date } = data;
   if (!['in', 'out'].includes(type)) throw badRequest('Type must be in or out');
   if (!positiveInt(quantity)) throw badRequest('Quantity must be a whole number greater than zero');
-  if (unitCost !== undefined && unitCost !== null && unitCost !== '' && !(Number(unitCost) >= 0)) throw badRequest('Unit cost is invalid');
+  if (unitCost !== undefined && unitCost !== null && unitCost !== '' && !(Number(unitCost) >= 0))
+    throw badRequest('Unit cost is invalid');
 
   const run = async (transaction) => {
     const item = await InventoryItem.findByPk(itemId, { transaction, lock: transaction.LOCK.UPDATE });
     if (!item) throw notFound('Item not found');
-    if (supplierId && !(await Supplier.findByPk(supplierId, { transaction }))) throw notFound('Supplier not found');
+    if (supplierId && !(await Supplier.findByPk(supplierId, { transaction })))
+      throw notFound('Supplier not found');
 
     const delta = type === 'in' ? Number(quantity) : -Number(quantity);
-    if (item.quantity + delta < 0) throw conflict(`Only ${item.quantity} ${item.unit} of ${item.name} in stock`);
+    if (item.quantity + delta < 0)
+      throw conflict(`Only ${item.quantity} ${item.unit} of ${item.name} in stock`);
 
     await item.update({ quantity: item.quantity + delta }, { transaction });
-    return StockMovement.create({
-      itemId, type, quantity: Number(quantity), unitCost: unitCost === '' ? null : unitCost ?? null, supplierId: supplierId || null,
-      orderId: orderId || null, party: party || null, note: note || null, date: date || today(), createdByName,
-    }, { transaction });
+    return StockMovement.create(
+      {
+        itemId,
+        type,
+        quantity: Number(quantity),
+        unitCost: unitCost === '' ? null : (unitCost ?? null),
+        supplierId: supplierId || null,
+        orderId: orderId || null,
+        party: party || null,
+        note: note || null,
+        date: date || today(),
+        createdByName,
+      },
+      { transaction },
+    );
   };
   return outerTransaction ? run(outerTransaction) : sequelize.transaction(run);
 }
@@ -86,14 +122,27 @@ export async function recordMovement(data, createdByName, outerTransaction) {
 export async function listMovements({ type, itemId } = {}) {
   const rows = await StockMovement.findAll({
     where: { ...(type && { type }), ...(itemId && { itemId }) },
-    include: [{ model: InventoryItem, attributes: ['name', 'unit'] }, { model: Supplier, attributes: ['name'] }],
+    include: [
+      { model: InventoryItem, attributes: ['name', 'unit'] },
+      { model: Supplier, attributes: ['name'] },
+    ],
     order: [['id', 'DESC']],
     limit: MOVEMENT_LIMIT,
   });
   return rows.map((m) => ({
-    id: m.id, type: m.type, quantity: m.quantity, unitCost: m.unitCost, party: m.party, note: m.note, date: m.date,
-    orderId: m.orderId, createdByName: m.createdByName,
-    itemId: m.itemId, itemName: m.InventoryItem.name, unit: m.InventoryItem.unit, supplierName: m.Supplier?.name ?? null,
+    id: m.id,
+    type: m.type,
+    quantity: m.quantity,
+    unitCost: m.unitCost,
+    party: m.party,
+    note: m.note,
+    date: m.date,
+    orderId: m.orderId,
+    createdByName: m.createdByName,
+    itemId: m.itemId,
+    itemName: m.InventoryItem.name,
+    unit: m.InventoryItem.unit,
+    supplierName: m.Supplier?.name ?? null,
   }));
 }
 
@@ -106,19 +155,35 @@ const orderInclude = [
 
 function shapeOrder(o) {
   const lines = o.PurchaseOrderLines.map((l) => ({
-    id: l.id, itemId: l.itemId, itemName: l.InventoryItem.name, unit: l.InventoryItem.unit, quantity: l.quantity, unitCost: l.unitCost,
+    id: l.id,
+    itemId: l.itemId,
+    itemName: l.InventoryItem.name,
+    unit: l.InventoryItem.unit,
+    quantity: l.quantity,
+    unitCost: l.unitCost,
     lineTotal: fromCents(l.quantity * toCents(l.unitCost)),
   }));
   return {
-    id: o.id, supplierId: o.supplierId, supplierName: o.Supplier.name, orderDate: o.orderDate, expectedDate: o.expectedDate,
-    status: o.status, receivedOn: o.receivedOn, note: o.note, createdByName: o.createdByName,
+    id: o.id,
+    supplierId: o.supplierId,
+    supplierName: o.Supplier.name,
+    orderDate: o.orderDate,
+    expectedDate: o.expectedDate,
+    status: o.status,
+    receivedOn: o.receivedOn,
+    note: o.note,
+    createdByName: o.createdByName,
     total: fromCents(o.PurchaseOrderLines.reduce((sum, l) => sum + l.quantity * toCents(l.unitCost), 0)),
     lines,
   };
 }
 
 export async function listOrders({ status } = {}) {
-  const rows = await PurchaseOrder.findAll({ where: status ? { status } : {}, include: orderInclude, order: [['id', 'DESC']] });
+  const rows = await PurchaseOrder.findAll({
+    where: status ? { status } : {},
+    include: orderInclude,
+    order: [['id', 'DESC']],
+  });
   return rows.map(shapeOrder);
 }
 
@@ -126,17 +191,33 @@ export async function createOrder({ supplierId, orderDate, expectedDate, note, l
   if (!supplierId || !(await Supplier.findByPk(supplierId))) throw notFound('Supplier not found');
   if (!lines.length) throw badRequest('Add at least one item to the order');
   const itemIds = lines.map((l) => Number(l.itemId));
-  if (new Set(itemIds).size !== itemIds.length) throw badRequest('Each item can appear only once in an order');
-  if (lines.some((l) => !positiveInt(l.quantity) || !(Number(l.unitCost ?? 0) >= 0))) throw badRequest('Every line needs a whole quantity above zero and a valid cost');
-  if ((await InventoryItem.count({ where: { id: itemIds } })) !== itemIds.length) throw notFound('One of the items does not exist');
+  if (new Set(itemIds).size !== itemIds.length)
+    throw badRequest('Each item can appear only once in an order');
+  if (lines.some((l) => !positiveInt(l.quantity) || !(Number(l.unitCost ?? 0) >= 0)))
+    throw badRequest('Every line needs a whole quantity above zero and a valid cost');
+  if ((await InventoryItem.count({ where: { id: itemIds } })) !== itemIds.length)
+    throw notFound('One of the items does not exist');
 
   return sequelize.transaction(async (transaction) => {
-    const order = await PurchaseOrder.create({
-      supplierId, orderDate: orderDate || today(), expectedDate: expectedDate || null, note: note || null, createdByName,
-    }, { transaction });
-    await PurchaseOrderLine.bulkCreate(lines.map((l) => ({
-      orderId: order.id, itemId: l.itemId, quantity: Number(l.quantity), unitCost: l.unitCost || 0,
-    })), { transaction });
+    const order = await PurchaseOrder.create(
+      {
+        supplierId,
+        orderDate: orderDate || today(),
+        expectedDate: expectedDate || null,
+        note: note || null,
+        createdByName,
+      },
+      { transaction },
+    );
+    await PurchaseOrderLine.bulkCreate(
+      lines.map((l) => ({
+        orderId: order.id,
+        itemId: l.itemId,
+        quantity: Number(l.quantity),
+        unitCost: l.unitCost || 0,
+      })),
+      { transaction },
+    );
     return order.id;
   });
 }
@@ -149,10 +230,19 @@ export async function receiveOrder(id, createdByName) {
     if (order.status !== 'ordered') throw conflict(`This order is already ${order.status}`);
     const lines = await PurchaseOrderLine.findAll({ where: { orderId: id }, transaction });
     for (const l of lines) {
-      await recordMovement({
-        itemId: l.itemId, type: 'in', quantity: l.quantity, unitCost: l.unitCost, supplierId: order.supplierId, orderId: order.id,
-        note: `Purchase order #${order.id}`,
-      }, createdByName, transaction);
+      await recordMovement(
+        {
+          itemId: l.itemId,
+          type: 'in',
+          quantity: l.quantity,
+          unitCost: l.unitCost,
+          supplierId: order.supplierId,
+          orderId: order.id,
+          note: `Purchase order #${order.id}`,
+        },
+        createdByName,
+        transaction,
+      );
     }
     await order.update({ status: 'received', receivedOn: today() }, { transaction });
   });
@@ -173,10 +263,14 @@ export async function summary() {
   const [items, lastCosts, month] = await Promise.all([
     listItems(),
     StockMovement.findAll({
-      where: { type: 'in', unitCost: { [Op.ne]: null } }, attributes: ['itemId', 'unitCost'], order: [['id', 'ASC']],
+      where: { type: 'in', unitCost: { [Op.ne]: null } },
+      attributes: ['itemId', 'unitCost'],
+      order: [['id', 'ASC']],
     }),
     StockMovement.findAll({
-      where: { date: { [Op.gte]: `${today().slice(0, 7)}-01` } }, attributes: ['type', 'quantity'], raw: true,
+      where: { date: { [Op.gte]: `${today().slice(0, 7)}-01` } },
+      attributes: ['type', 'quantity'],
+      raw: true,
     }),
   ]);
   const cost = new Map(lastCosts.map((m) => [m.itemId, toCents(m.unitCost)])); // later rows overwrite earlier ones
@@ -201,15 +295,27 @@ export async function listAssets({ status } = {}) {
     include: [{ model: InventoryCategory, attributes: ['name'] }],
     order: [['assetTag', 'ASC']],
   });
-  return rows.map((a) => ({ ...a.toJSON(), InventoryCategory: undefined, categoryName: a.InventoryCategory?.name ?? null }));
+  return rows.map((a) => ({
+    ...a.toJSON(),
+    InventoryCategory: undefined,
+    categoryName: a.InventoryCategory?.name ?? null,
+  }));
 }
 
 export async function listAssetMaintenance() {
   const rows = await AssetMaintenance.findAll({
     include: [{ model: Asset, attributes: ['assetTag', 'name'] }],
-    order: [['serviceDate', 'DESC'], ['id', 'DESC']],
+    order: [
+      ['serviceDate', 'DESC'],
+      ['id', 'DESC'],
+    ],
   });
-  return rows.map((m) => ({ ...m.toJSON(), Asset: undefined, assetTag: m.Asset.assetTag, assetName: m.Asset.name }));
+  return rows.map((m) => ({
+    ...m.toJSON(),
+    Asset: undefined,
+    assetTag: m.Asset.assetTag,
+    assetName: m.Asset.name,
+  }));
 }
 
 export async function deleteAsset(id) {
@@ -228,13 +334,18 @@ export async function assetSummary() {
     AssetMaintenance.findAll({
       where: { nextDue: { [Op.ne]: null } },
       include: [{ model: Asset, attributes: ['assetTag', 'name', 'status'] }],
-      order: [['serviceDate', 'DESC'], ['id', 'DESC']],
+      order: [
+        ['serviceDate', 'DESC'],
+        ['id', 'DESC'],
+      ],
     }),
   ]);
   const live = assets.filter((a) => a.status !== 'disposed');
   const horizon = daysFromNow(30);
   const latest = new Map();
-  services.forEach((m) => { if (!latest.has(m.assetId)) latest.set(m.assetId, m); });
+  services.forEach((m) => {
+    if (!latest.has(m.assetId)) latest.set(m.assetId, m);
+  });
   return {
     total: assets.length,
     inUse: assets.filter((a) => a.status === 'in_use').length,

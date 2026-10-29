@@ -1,6 +1,16 @@
 import { Op } from 'sequelize';
 import { photoIds } from '../../utils/photoFlags.js';
-import { Admission, DocumentRequest, FeeStructure, Staff, Student, SchoolClass, StudentAccount, User, sequelize } from '../../models/index.js';
+import {
+  Admission,
+  DocumentRequest,
+  FeeStructure,
+  Staff,
+  Student,
+  SchoolClass,
+  StudentAccount,
+  User,
+  sequelize,
+} from '../../models/index.js';
 import { billStudents } from '../finance/fees.service.js';
 import { badRequest, conflict } from '../../utils/httpError.js';
 import { nextNumber } from '../../utils/numbering.js';
@@ -11,14 +21,31 @@ import { loadExtras, saveExtras } from '../admissions/recordExtras.js';
 import { removeStoredFiles, storedNames } from '../files/files.service.js';
 import { pruneElectives } from './subjectMap.service.js';
 
-export const STUDENT_FIELDS = [
-  'admissionNo', 'firstName', 'lastName', 'dob', 'gender',
-  'guardianName', 'guardianPhone', 'classId', 'status', 'registrationStatus', ...DETAIL_KEYS,
+const STUDENT_FIELDS = [
+  'admissionNo',
+  'firstName',
+  'lastName',
+  'dob',
+  'gender',
+  'guardianName',
+  'guardianPhone',
+  'classId',
+  'status',
+  'registrationStatus',
+  ...DETAIL_KEYS,
 ];
 
 const MAX_PAGE_SIZE = 100;
 
-const include = [{ model: SchoolClass, attributes: ['name', 'section'], include: [{ model: Staff, as: 'ClassTeacher', attributes: ['firstName', 'lastName', 'phone'], required: false }] }];
+const include = [
+  {
+    model: SchoolClass,
+    attributes: ['name', 'section'],
+    include: [
+      { model: Staff, as: 'ClassTeacher', attributes: ['firstName', 'lastName', 'phone'], required: false },
+    ],
+  },
+];
 
 /** Flattens the joined class onto the student as a "Class-Section" label. */
 function shape(student) {
@@ -26,9 +53,13 @@ function shape(student) {
   const day = (v) => (v instanceof Date ? v.toISOString() : String(v ?? '')).slice(0, 10);
   const registrationDate = day(rest.admissionDate) || day(rest.createdAt);
   return {
-    ...rest, className: cls ? `${cls.name}-${cls.section}` : null,
-    classTeacherName: cls?.ClassTeacher ? `${cls.ClassTeacher.firstName} ${cls.ClassTeacher.lastName}` : null, classTeacherPhone: cls?.ClassTeacher?.phone ?? null,
-    studentId: `STU-${registrationDate.slice(0, 4) || new Date().getFullYear()}-${String(rest.id).padStart(4, '0')}`, registrationId: `REG-${registrationDate.slice(0, 4) || new Date().getFullYear()}-${String(rest.id).padStart(4, '0')}`, registrationDate,
+    ...rest,
+    className: cls ? `${cls.name}-${cls.section}` : null,
+    classTeacherName: cls?.ClassTeacher ? `${cls.ClassTeacher.firstName} ${cls.ClassTeacher.lastName}` : null,
+    classTeacherPhone: cls?.ClassTeacher?.phone ?? null,
+    studentId: `STU-${registrationDate.slice(0, 4) || new Date().getFullYear()}-${String(rest.id).padStart(4, '0')}`,
+    registrationId: `REG-${registrationDate.slice(0, 4) || new Date().getFullYear()}-${String(rest.id).padStart(4, '0')}`,
+    registrationDate,
   };
 }
 
@@ -66,7 +97,16 @@ function pick(body) {
  * Without `page` the full list is returned as an array (used by dropdowns in other modules);
  * with `page` the result is { rows, total, page, pageSize }.
  */
-export async function listStudents({ q, classId, status, registrationStatus, grade, section, page, pageSize } = {}) {
+export async function listStudents({
+  q,
+  classId,
+  status,
+  registrationStatus,
+  grade,
+  section,
+  page,
+  pageSize,
+} = {}) {
   const where = {};
   if (grade) where['$SchoolClass.name$'] = grade;
   if (section) where['$SchoolClass.section$'] = section;
@@ -83,7 +123,9 @@ export async function listStudents({ q, classId, status, registrationStatus, gra
       { fatherPhone: { [Op.like]: like } },
       { motherPhone: { [Op.like]: like } },
       { rollNo: { [Op.like]: like } },
-      { guardianName: { [Op.like]: like } }, { fatherName: { [Op.like]: like } }, { motherName: { [Op.like]: like } },
+      { guardianName: { [Op.like]: like } },
+      { fatherName: { [Op.like]: like } },
+      { motherName: { [Op.like]: like } },
       ...(/^stu-?\d{4}-?(\d+)$/i.test(q.trim()) ? [{ id: Number(/(\d+)$/.exec(q.trim())[1]) }] : []),
       ...(/^reg-?\d{4}-?(\d+)$/i.test(q.trim()) ? [{ id: Number(/(\d+)$/.exec(q.trim())[1]) }] : []),
     ];
@@ -91,17 +133,32 @@ export async function listStudents({ q, classId, status, registrationStatus, gra
 
   if (!page) {
     const all = await Student.findAll({ where, include, order: [['id', 'DESC']] });
-    const withPhoto = await photoIds('student', all.map((s) => s.id));
+    const withPhoto = await photoIds(
+      'student',
+      all.map((s) => s.id),
+    );
     return all.map((s) => ({ ...shape(s), hasPhoto: withPhoto.has(s.id) }));
   }
 
   const size = Math.min(Math.max(Number(pageSize) || 10, 1), MAX_PAGE_SIZE);
   const current = Math.max(Number(page) || 1, 1);
   const { rows, count } = await Student.findAndCountAll({
-    where, include, order: [['id', 'DESC']], limit: size, offset: (current - 1) * size,
+    where,
+    include,
+    order: [['id', 'DESC']],
+    limit: size,
+    offset: (current - 1) * size,
   });
-  const withPhoto = await photoIds('student', rows.map((s) => s.id));
-  return { rows: rows.map((s) => ({ ...shape(s), hasPhoto: withPhoto.has(s.id) })), total: count, page: current, pageSize: size };
+  const withPhoto = await photoIds(
+    'student',
+    rows.map((s) => s.id),
+  );
+  return {
+    rows: rows.map((s) => ({ ...shape(s), hasPhoto: withPhoto.has(s.id) })),
+    total: count,
+    page: current,
+    pageSize: size,
+  };
 }
 
 export async function getStudent(id) {
@@ -110,14 +167,22 @@ export async function getStudent(id) {
 }
 
 /** Next admission number from the school's formula (default ADM-2026-0007); numbers already taken are skipped. */
-export async function nextAdmissionNo(transaction) {
-  return nextNumber({ model: Student, field: 'admissionNo', formula: await getSetting('numbering.admission'), transaction });
+async function nextAdmissionNo(transaction) {
+  return nextNumber({
+    model: Student,
+    field: 'admissionNo',
+    formula: await getSetting('numbering.admission'),
+    transaction,
+  });
 }
 
 /** A student with the same name and date of birth is almost always a double entry. */
-export async function findDuplicate({ firstName, lastName, dob }) {
+async function findDuplicate({ firstName, lastName, dob }) {
   if (!dob || !firstName || !lastName) return null;
-  return Student.findOne({ where: { firstName: String(firstName).trim(), lastName: String(lastName).trim(), dob }, attributes: ['id', 'admissionNo'] });
+  return Student.findOne({
+    where: { firstName: String(firstName).trim(), lastName: String(lastName).trim(), dob },
+    attributes: ['id', 'admissionNo'],
+  });
 }
 
 /**
@@ -127,7 +192,10 @@ export async function findDuplicate({ firstName, lastName, dob }) {
 export async function createStudent(body, { allowDuplicate = false, billFees = false } = {}) {
   if (!allowDuplicate) {
     const twin = await findDuplicate(body);
-    if (twin) throw conflict(`A student with the same name and date of birth already exists (${twin.admissionNo}). Save again to register them anyway.`);
+    if (twin)
+      throw conflict(
+        `A student with the same name and date of birth already exists (${twin.admissionNo}). Save again to register them anyway.`,
+      );
   }
   return sequelize.transaction(async (transaction) => {
     const extras = extrasOf(body);
@@ -158,14 +226,20 @@ export async function updateStudent(id, body) {
 }
 
 export async function deleteStudent(id) {
-  if (await DocumentRequest.count({ where: { studentId: id } })) throw conflict('This student has certificate requests on record. Mark the student inactive instead of deleting.');
+  if (await DocumentRequest.count({ where: { studentId: id } }))
+    throw conflict(
+      'This student has certificate requests on record. Mark the student inactive instead of deleting.',
+    );
   const stored = await storedNames(id);
   const login = await StudentAccount.findOne({ where: { studentId: id } });
   const deleted = (await Student.destroy({ where: { id } })) > 0;
   if (deleted) {
     await removeStoredFiles(stored);
     // an applicant who was enrolled as this student goes back to holding an offer, so nothing points at a student that is gone
-    await Admission.update({ status: 'approved', studentId: null, enrolledOn: null }, { where: { studentId: id, status: 'enrolled' } });
+    await Admission.update(
+      { status: 'approved', studentId: null, enrolledOn: null },
+      { where: { studentId: id, status: 'enrolled' } },
+    );
   }
   if (login) await User.destroy({ where: { id: login.userId } });
   return deleted;
@@ -173,16 +247,24 @@ export async function deleteStudent(id) {
 
 /** Tiles for the Registrations page: how many registrations are complete and how many still need review. */
 export async function registrationSummary() {
-  const [total, complete] = await Promise.all([Student.count(), Student.count({ where: { registrationStatus: 'complete' } })]);
+  const [total, complete] = await Promise.all([
+    Student.count(),
+    Student.count({ where: { registrationStatus: 'complete' } }),
+  ]);
   return { total, complete, pending: total - complete };
 }
 
 /** Tiles and tabs for the Students page. Pending enrollment = applicants who have an offer but are not yet students. */
 export async function studentSummary() {
-  const month = new Date(); month.setDate(1); month.setHours(0, 0, 0, 0);
+  const month = new Date();
+  month.setDate(1);
+  month.setHours(0, 0, 0, 0);
   const [total, active, addedThisMonth, pendingEnrollment, classes] = await Promise.all([
-    Student.count(), Student.count({ where: { status: 'active' } }), Student.count({ where: { createdAt: { [Op.gte]: month } } }),
-    Admission.count({ where: { status: 'approved' } }), SchoolClass.count(),
+    Student.count(),
+    Student.count({ where: { status: 'active' } }),
+    Student.count({ where: { createdAt: { [Op.gte]: month } } }),
+    Admission.count({ where: { status: 'approved' } }),
+    SchoolClass.count(),
   ]);
   return { total, active, inactive: total - active, addedThisMonth, pendingEnrollment, classes };
 }

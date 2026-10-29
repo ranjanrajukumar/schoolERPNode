@@ -8,7 +8,7 @@ const HIDDEN = new Set([
 const MONEY = /(amount|fee|balance|paid|basic|allowances|deductions|net|total|price|cost|income|salary|fine|deposit|refunded|refundable|value)$/i;
 const DATETIME = /(createdAt|checkIn|checkOut|decidedOn|sentAt|updatedAt|punch)/i;
 
-export const humanize = (key) => String(key).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
+const humanize = (key) => String(key).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
 
 export const dateTime = (v) => (v ? new Date(v).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }) : '');
 
@@ -39,7 +39,7 @@ export function autoRow(r) {
   return { title: String(title), sub: sub || undefined };
 }
 
-export const TONE_OF = {
+const TONE_OF = {
   active: 'green', paid: 'green', approved: 'green', issued: 'green', present: 'green', pass: 'green', resolved: 'green', received: 'green', completed: 'green', live: 'green',
   pending: 'amber', partial: 'amber', requested: 'amber', open: 'amber', late: 'amber', waitlisted: 'amber', in_progress: 'amber', applied: 'amber', draft: 'amber', ordered: 'amber',
   rejected: 'red', overdue: 'red', absent: 'red', fail: 'red', inactive: 'red', closed: 'grey', cancelled: 'grey', disposed: 'grey',

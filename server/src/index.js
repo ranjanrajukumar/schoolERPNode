@@ -10,19 +10,24 @@ assertEnvironment();
 
 await migrateDatabase();
 
-const server = app.listen(env.port(), () => console.log(`API running on port ${env.port()}: http://localhost:${env.port()}/api`));
+const server = app.listen(env.port(), () =>
+  console.log(`API running on port ${env.port()}: http://localhost:${env.port()}/api`),
+);
 server.on('error', (err) => {
   if (err.code !== 'EADDRINUSE') throw err;
-  console.error(`Port ${env.port()} is already in use: the API is probably already running (open http://localhost:5173). To restart it, stop the old copy first.`);
+  console.error(
+    `Port ${env.port()} is already in use: the API is probably already running (open http://localhost:5173). To restart it, stop the old copy first.`,
+  );
   process.exit(1);
 });
 startAbsenceAlertTimer();
 startAutoBackupTimer();
 startGlobalSync();
 
-const shutdown = () => server.close(async () => {
-  await sequelize.close();
-  process.exit(0);
-});
+const shutdown = () =>
+  server.close(async () => {
+    await sequelize.close();
+    process.exit(0);
+  });
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);

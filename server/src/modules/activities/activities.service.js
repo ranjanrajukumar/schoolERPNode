@@ -5,13 +5,31 @@ import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { toCents } from '../../utils/money.js';
 import { billStudents } from '../finance/fees.service.js';
 
-export const KIND_LABEL = {
-  event: 'Event', celebration: 'Celebration', competition: 'Competition', sport: 'Sport', field_trip: 'Field trip', club: 'Club',
+const KIND_LABEL = {
+  event: 'Event',
+  celebration: 'Celebration',
+  competition: 'Competition',
+  sport: 'Sport',
+  field_trip: 'Field trip',
+  club: 'Club',
 };
 
-const FIELDS = ['kind', 'title', 'description', 'venue', 'startDate', 'endDate', 'classId', 'capacity', 'fee', 'requiresConsent', 'organizer'];
+const FIELDS = [
+  'kind',
+  'title',
+  'description',
+  'venue',
+  'startDate',
+  'endDate',
+  'classId',
+  'capacity',
+  'fee',
+  'requiresConsent',
+  'organizer',
+];
 const blankToNull = (v) => (v === '' ? null : v);
-const pick = (body) => Object.fromEntries(FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, blankToNull(body[f])]));
+const pick = (body) =>
+  Object.fromEntries(FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, blankToNull(body[f])]));
 
 /** Registration is open only while an activity is planned or open. */
 const ACCEPTING = ['planned', 'open'];
@@ -62,7 +80,10 @@ export async function listActivities({ kind, status, classId, from, to } = {}) {
       ...(to && { startDate: { [Op.lte]: to } }),
     },
     include: [SchoolClass, { model: ActivityParticipant, attributes: ['status', 'consent'] }],
-    order: [['startDate', 'DESC'], ['id', 'DESC']],
+    order: [
+      ['startDate', 'DESC'],
+      ['id', 'DESC'],
+    ],
     limit: 300,
   });
   return rows.map((a) => shape(a, countsOf(a.ActivityParticipants)));
@@ -70,13 +91,15 @@ export async function listActivities({ kind, status, classId, from, to } = {}) {
 
 function validate(data, { partial = false } = {}) {
   if (!partial || data.kind !== undefined) {
-    if (!ACTIVITY_KINDS.includes(data.kind)) throw badRequest(`Kind must be one of ${ACTIVITY_KINDS.join(', ')}`);
+    if (!ACTIVITY_KINDS.includes(data.kind))
+      throw badRequest(`Kind must be one of ${ACTIVITY_KINDS.join(', ')}`);
   }
   if (!partial || data.title !== undefined) {
     if (!String(data.title ?? '').trim()) throw badRequest('Title is required');
   }
   if (!partial && !data.startDate) throw badRequest('Start date is required');
-  if (data.fee !== undefined && data.fee !== null && (Number.isNaN(Number(data.fee)) || Number(data.fee) < 0)) throw badRequest('Fee cannot be negative');
+  if (data.fee !== undefined && data.fee !== null && (Number.isNaN(Number(data.fee)) || Number(data.fee) < 0))
+    throw badRequest('Fee cannot be negative');
 }
 
 export async function createActivity(body, userId) {
@@ -102,11 +125,15 @@ export async function updateActivity(id, body) {
 
   if (data.capacity !== undefined && data.capacity !== null) {
     const taken = await ActivityParticipant.count({ where: { activityId: id } });
-    if (Number(data.capacity) < taken) throw conflict(`${taken} students are already registered, so capacity cannot go below that`);
+    if (Number(data.capacity) < taken)
+      throw conflict(`${taken} students are already registered, so capacity cannot go below that`);
   }
   // Switching consent on after students are registered would leave them without a consent state.
-  if (data.requiresConsent !== undefined && Boolean(data.requiresConsent) !== activity.requiresConsent
-      && await ActivityParticipant.count({ where: { activityId: id } })) {
+  if (
+    data.requiresConsent !== undefined &&
+    Boolean(data.requiresConsent) !== activity.requiresConsent &&
+    (await ActivityParticipant.count({ where: { activityId: id } }))
+  ) {
     throw conflict('Consent cannot be switched after students are registered');
   }
   await activity.update(data);
@@ -116,7 +143,8 @@ export async function setStatus(id, status) {
   if (!ACTIVITY_STATUSES.includes(status)) throw badRequest('Status is invalid');
   const activity = await Activity.findByPk(id);
   if (!activity) throw notFound('Activity not found');
-  if (!TRANSITIONS[activity.status].includes(status)) throw conflict(`Cannot move from ${activity.status} to ${status}`);
+  if (!TRANSITIONS[activity.status].includes(status))
+    throw conflict(`Cannot move from ${activity.status} to ${status}`);
   await activity.update({ status });
 }
 
@@ -125,7 +153,9 @@ export async function deleteActivity(id) {
   const activity = await Activity.findByPk(id);
   if (!activity) throw notFound('Activity not found');
   if (await ActivityParticipant.count({ where: { activityId: id, status: { [Op.ne]: 'registered' } } })) {
-    throw conflict('Attendance has been recorded for this activity, so it cannot be deleted. Cancel it instead.');
+    throw conflict(
+      'Attendance has been recorded for this activity, so it cannot be deleted. Cancel it instead.',
+    );
   }
   await activity.destroy();
 }
@@ -143,14 +173,22 @@ export async function getParticipants(id) {
   if (!activity) throw notFound('Activity not found');
   const rows = await ActivityParticipant.findAll({
     where: { activityId: id },
-    include: [{ model: Student, attributes: ['firstName', 'lastName', 'admissionNo', 'classId'], include: [SchoolClass] }],
+    include: [
+      {
+        model: Student,
+        attributes: ['firstName', 'lastName', 'admissionNo', 'classId'],
+        include: [SchoolClass],
+      },
+    ],
     order: [[Student, 'firstName', 'ASC']],
   });
   const participants = rows.map((p) => ({
     studentId: p.studentId,
     name: `${p.Student.firstName} ${p.Student.lastName}`,
     admissionNo: p.Student.admissionNo,
-    className: p.Student.SchoolClass ? `${p.Student.SchoolClass.name}-${p.Student.SchoolClass.section}` : null,
+    className: p.Student.SchoolClass
+      ? `${p.Student.SchoolClass.name}-${p.Student.SchoolClass.section}`
+      : null,
     status: p.status,
     consent: p.consent,
     result: p.result,
@@ -167,7 +205,8 @@ export async function register(id, { studentIds, classId }) {
   return sequelize.transaction(async (transaction) => {
     const activity = await Activity.findByPk(id, { transaction, lock: transaction.LOCK.UPDATE });
     if (!activity) throw notFound('Activity not found');
-    if (!ACCEPTING.includes(activity.status)) throw conflict(`Registration is closed for a ${activity.status} activity`);
+    if (!ACCEPTING.includes(activity.status))
+      throw conflict(`Registration is closed for a ${activity.status} activity`);
 
     const where = { status: 'active' };
     if (Array.isArray(studentIds) && studentIds.length) where.id = studentIds;
@@ -181,15 +220,30 @@ export async function register(id, { studentIds, classId }) {
       throw badRequest('This activity is only for its own class');
     }
 
-    const existing = new Set((await ActivityParticipant.findAll({ where: { activityId: id }, attributes: ['studentId'], transaction })).map((p) => p.studentId));
+    const existing = new Set(
+      (
+        await ActivityParticipant.findAll({
+          where: { activityId: id },
+          attributes: ['studentId'],
+          transaction,
+        })
+      ).map((p) => p.studentId),
+    );
     const fresh = students.filter((s) => !existing.has(s.id));
     if (activity.capacity && existing.size + fresh.length > activity.capacity) {
-      throw conflict(`Only ${Math.max(activity.capacity - existing.size, 0)} place(s) left (capacity ${activity.capacity})`);
+      throw conflict(
+        `Only ${Math.max(activity.capacity - existing.size, 0)} place(s) left (capacity ${activity.capacity})`,
+      );
     }
 
-    await ActivityParticipant.bulkCreate(fresh.map((s) => ({
-      activityId: id, studentId: s.id, consent: activity.requiresConsent ? 'pending' : 'not_required',
-    })), { transaction });
+    await ActivityParticipant.bulkCreate(
+      fresh.map((s) => ({
+        activityId: id,
+        studentId: s.id,
+        consent: activity.requiresConsent ? 'pending' : 'not_required',
+      })),
+      { transaction },
+    );
     return { registered: fresh.length, skipped: students.length - fresh.length };
   });
 }
@@ -204,18 +258,25 @@ export async function withdraw(id, studentId) {
 /** Marks who turned up. A trip that needs consent cannot take a child whose parent has not agreed. */
 export async function markAttendance(id, records = []) {
   if (!Array.isArray(records) || !records.length) throw badRequest('records must be a non-empty list');
-  if (records.some((r) => !['attended', 'absent', 'registered'].includes(r.status))) throw badRequest('Status must be attended, absent or registered');
+  if (records.some((r) => !['attended', 'absent', 'registered'].includes(r.status)))
+    throw badRequest('Status must be attended, absent or registered');
 
   await sequelize.transaction(async (transaction) => {
     const activity = await loadActivity(id, transaction);
-    if (!['open', 'completed'].includes(activity.status)) throw conflict('Attendance can be recorded once the activity is open');
-    const rows = await ActivityParticipant.findAll({ where: { activityId: id, studentId: records.map((r) => r.studentId) }, transaction });
+    if (!['open', 'completed'].includes(activity.status))
+      throw conflict('Attendance can be recorded once the activity is open');
+    const rows = await ActivityParticipant.findAll({
+      where: { activityId: id, studentId: records.map((r) => r.studentId) },
+      transaction,
+    });
     const byStudent = new Map(rows.map((p) => [p.studentId, p]));
     for (const r of records) {
       const p = byStudent.get(Number(r.studentId));
       if (!p) throw badRequest('Every student must be registered for this activity');
       if (r.status === 'attended' && activity.requiresConsent && p.consent !== 'given') {
-        throw conflict(`${p.studentId}: consent has not been given, so this child cannot be marked as attended`);
+        throw conflict(
+          `${p.studentId}: consent has not been given, so this child cannot be marked as attended`,
+        );
       }
       await p.update({ status: r.status }, { transaction });
     }
@@ -234,12 +295,14 @@ export async function setResult(id, studentId, { result, remarks }) {
 
 /** Consent comes from the parent (portal) or from staff holding the signed form. */
 export async function setConsent(id, studentId, consent) {
-  if (!['given', 'declined', 'pending'].includes(consent)) throw badRequest('Consent must be given, declined or pending');
+  if (!['given', 'declined', 'pending'].includes(consent))
+    throw badRequest('Consent must be given, declined or pending');
   const p = await ActivityParticipant.findOne({ where: { activityId: id, studentId }, include: [Activity] });
   if (!p) throw notFound('That student is not registered');
   if (!p.Activity.requiresConsent) throw conflict('This activity does not need consent');
   if (p.status === 'attended' && consent !== 'given') throw conflict('This student has already attended');
-  if (['completed', 'cancelled'].includes(p.Activity.status)) throw conflict(`The activity is ${p.Activity.status}`);
+  if (['completed', 'cancelled'].includes(p.Activity.status))
+    throw conflict(`The activity is ${p.Activity.status}`);
   await p.update({ consent });
 }
 
@@ -257,9 +320,13 @@ export async function billParticipants(id) {
     where: { activityId: id, status: { [Op.ne]: 'absent' }, consent: { [Op.in]: ['not_required', 'given'] } },
   });
   const title = `Activity: ${activity.title}`.slice(0, 120);
-  return sequelize.transaction((transaction) => billStudents(
-    going.map((p) => p.studentId), { title, amount: activity.fee, dueDate: activity.startDate }, transaction,
-  ));
+  return sequelize.transaction((transaction) =>
+    billStudents(
+      going.map((p) => p.studentId),
+      { title, amount: activity.fee, dueDate: activity.startDate },
+      transaction,
+    ),
+  );
 }
 
 /* ---------- Views for students, calendar and reports ---------- */
@@ -296,7 +363,12 @@ export async function summary({ from, to } = {}) {
       ...(from && { endDate: { [Op.gte]: from } }),
       ...(to && { startDate: { [Op.lte]: to } }),
     },
-    include: [{ model: ActivityParticipant, include: [{ model: Student, attributes: ['firstName', 'lastName', 'admissionNo'] }] }],
+    include: [
+      {
+        model: ActivityParticipant,
+        include: [{ model: Student, attributes: ['firstName', 'lastName', 'admissionNo'] }],
+      },
+    ],
     order: [['startDate', 'DESC']],
   });
 
@@ -305,22 +377,50 @@ export async function summary({ from, to } = {}) {
   const achievements = [];
   const perActivity = activities.map((a) => {
     const attended = a.ActivityParticipants.filter((p) => p.status === 'attended').length;
-    const k = byKind[a.kind] ?? { kind: a.kind, label: KIND_LABEL[a.kind], activities: 0, participants: 0, attended: 0 };
-    k.activities += 1; k.participants += a.ActivityParticipants.length; k.attended += attended;
+    const k = byKind[a.kind] ?? {
+      kind: a.kind,
+      label: KIND_LABEL[a.kind],
+      activities: 0,
+      participants: 0,
+      attended: 0,
+    };
+    k.activities += 1;
+    k.participants += a.ActivityParticipants.length;
+    k.attended += attended;
     byKind[a.kind] = k;
 
     for (const p of a.ActivityParticipants) {
       if (p.status === 'attended') {
-        const s = students.get(p.studentId) ?? { studentId: p.studentId, name: `${p.Student.firstName} ${p.Student.lastName}`, admissionNo: p.Student.admissionNo, count: 0 };
+        const s = students.get(p.studentId) ?? {
+          studentId: p.studentId,
+          name: `${p.Student.firstName} ${p.Student.lastName}`,
+          admissionNo: p.Student.admissionNo,
+          count: 0,
+        };
         s.count += 1;
         students.set(p.studentId, s);
       }
-      if (p.result) achievements.push({ studentName: `${p.Student.firstName} ${p.Student.lastName}`, admissionNo: p.Student.admissionNo, activity: a.title, kindLabel: KIND_LABEL[a.kind], date: a.startDate, result: p.result });
+      if (p.result)
+        achievements.push({
+          studentName: `${p.Student.firstName} ${p.Student.lastName}`,
+          admissionNo: p.Student.admissionNo,
+          activity: a.title,
+          kindLabel: KIND_LABEL[a.kind],
+          date: a.startDate,
+          result: p.result,
+        });
     }
     return {
-      id: a.id, title: a.title, kindLabel: KIND_LABEL[a.kind], startDate: a.startDate, status: a.status,
-      registered: a.ActivityParticipants.length, attended,
-      turnoutPercent: a.ActivityParticipants.length ? Math.round((attended / a.ActivityParticipants.length) * 1000) / 10 : null,
+      id: a.id,
+      title: a.title,
+      kindLabel: KIND_LABEL[a.kind],
+      startDate: a.startDate,
+      status: a.status,
+      registered: a.ActivityParticipants.length,
+      attended,
+      turnoutPercent: a.ActivityParticipants.length
+        ? Math.round((attended / a.ActivityParticipants.length) * 1000) / 10
+        : null,
     };
   });
 

@@ -16,14 +16,24 @@ const CHUNK = 4000; // the registry takes up to 5000 at a time; a school with fe
 const SYNC_EVERY_MS = 15 * 60 * 1000;
 const state = { lastSync: null, lastError: null, lastResult: null, publicKey: null };
 
-export function globalConfig() {
-  const url = String(process.env.GLOBAL_URL ?? '').trim().replace(/[/]+$/, '');
-  const code = String(process.env.GLOBAL_CLIENT_CODE ?? '').trim().toLowerCase();
+function globalConfig() {
+  const url = String(process.env.GLOBAL_URL ?? '')
+    .trim()
+    .replace(/[/]+$/, '');
+  const code = String(process.env.GLOBAL_CLIENT_CODE ?? '')
+    .trim()
+    .toLowerCase();
   const key = String(process.env.GLOBAL_CLIENT_KEY ?? '').trim();
   return { enabled: Boolean(url && code && key), url, code, key };
 }
 
-export const globalStatus = () => ({ ...globalConfig(), key: undefined, lastSync: state.lastSync, lastError: state.lastError, lastResult: state.lastResult });
+export const globalStatus = () => ({
+  ...globalConfig(),
+  key: undefined,
+  lastSync: state.lastSync,
+  lastError: state.lastError,
+  lastResult: state.lastResult,
+});
 
 /* ---------- accepting the registry's ticket ---------- */
 
@@ -49,16 +59,22 @@ export async function ssoLogin(ticket) {
   if (!cfg.enabled) throw unauthorized('Sign-in through the global registry is not set up at this school');
   let claims;
   try {
-    try { claims = verifyWith(String(ticket ?? ''), await signingKey()); } catch (err) {
-      if (err.name === 'JsonWebTokenError' && !process.env.GLOBAL_PUBLIC_KEY) claims = verifyWith(String(ticket ?? ''), await signingKey({ refresh: true })); // the registry may have changed its key
+    try {
+      claims = verifyWith(String(ticket ?? ''), await signingKey());
+    } catch (err) {
+      if (err.name === 'JsonWebTokenError' && !process.env.GLOBAL_PUBLIC_KEY)
+        claims = verifyWith(String(ticket ?? ''), await signingKey({ refresh: true })); // the registry may have changed its key
       else throw err;
     }
-  } catch { throw unauthorized('That sign-in has expired or is not valid. Please sign in again.'); }
+  } catch {
+    throw unauthorized('That sign-in has expired or is not valid. Please sign in again.');
+  }
   if (claims.cc !== cfg.code) throw unauthorized('That sign-in is for another school');
 
   const now = Date.now();
   for (const [id, until] of usedTickets) if (until <= now) usedTickets.delete(id);
-  if (!claims.jti || usedTickets.has(claims.jti)) throw unauthorized('That sign-in was already used. Please sign in again.');
+  if (!claims.jti || usedTickets.has(claims.jti))
+    throw unauthorized('That sign-in was already used. Please sign in again.');
   usedTickets.set(claims.jti, claims.exp * 1000);
 
   const user = await User.findByPk(claims.uid);
@@ -76,11 +92,19 @@ async function identitiesFor(where = {}) {
   if (!users.length) return [];
   const ids = users.map((u) => u.id);
   const [staff, parents, accounts] = await Promise.all([
-    Staff.findAll({ where: { id: users.map((u) => u.staffId).filter(Boolean) }, attributes: ['id', 'phone'] }),
+    Staff.findAll({
+      where: { id: users.map((u) => u.staffId).filter(Boolean) },
+      attributes: ['id', 'phone'],
+    }),
     Parent.findAll({ where: { userId: ids }, attributes: ['userId', 'phone'] }),
     StudentAccount.findAll({ where: { userId: ids }, attributes: ['userId', 'studentId'] }),
   ]);
-  const students = accounts.length ? await Student.findAll({ where: { id: accounts.map((a) => a.studentId) }, attributes: ['id', 'admissionNo', 'phone', 'guardianPhone'] }) : [];
+  const students = accounts.length
+    ? await Student.findAll({
+        where: { id: accounts.map((a) => a.studentId) },
+        attributes: ['id', 'admissionNo', 'phone', 'guardianPhone'],
+      })
+    : [];
   const staffPhone = new Map(staff.map((s) => [s.id, s.phone]));
   const parentPhone = new Map(parents.map((p) => [p.userId, p.phone]));
   const studentOf = new Map(students.map((s) => [s.id, s]));
@@ -88,10 +112,23 @@ async function identitiesFor(where = {}) {
 
   return users.map((u) => {
     const student = studentByUser.get(u.id);
-    const mobile = u.role === 'student' ? (digits(student?.phone) ? student.phone : student?.guardianPhone) : u.role === 'parent' ? parentPhone.get(u.id) : staffPhone.get(u.staffId);
+    const mobile =
+      u.role === 'student'
+        ? digits(student?.phone)
+          ? student.phone
+          : student?.guardianPhone
+        : u.role === 'parent'
+          ? parentPhone.get(u.id)
+          : staffPhone.get(u.staffId);
     return {
-      localUserId: u.id, role: u.role, name: u.name, email: u.email, mobile: digits(mobile) || null, username: u.role === 'student' ? student?.admissionNo ?? null : null,
-      passwordHash: u.passwordHash, active: true,
+      localUserId: u.id,
+      role: u.role,
+      name: u.name,
+      email: u.email,
+      mobile: digits(mobile) || null,
+      username: u.role === 'student' ? (student?.admissionNo ?? null) : null,
+      passwordHash: u.passwordHash,
+      active: true,
     };
   });
 }
@@ -122,7 +159,9 @@ export async function pushAll() {
       const r = await post('/identities', { identities: all.slice(i, i + CHUNK), full: all.length <= CHUNK });
       for (const k of Object.keys(total)) total[k] += r[k] ?? 0;
     }
-    state.lastSync = new Date().toISOString(); state.lastError = null; state.lastResult = { logins: all.length, ...total };
+    state.lastSync = new Date().toISOString();
+    state.lastError = null;
+    state.lastResult = { logins: all.length, ...total };
     return state.lastResult;
   } catch (err) {
     state.lastError = err.message;
@@ -132,24 +171,38 @@ export async function pushAll() {
 
 const pending = new Map();
 /** One login changed (created, renamed, new password): tell the registry a moment later, once, whatever else changes meanwhile. */
-export function queuePush(userId) {
+function queuePush(userId) {
   if (!globalConfig().enabled) return;
   clearTimeout(pending.get(userId));
-  pending.set(userId, setTimeout(async () => {
-    pending.delete(userId);
-    try {
-      const [identity] = await identitiesFor({ id: userId });
-      if (identity) await post('/identities', { identities: [identity] });
-      else await post(`/identities/${userId}`, undefined, 'DELETE');
-    } catch (err) { state.lastError = err.message; console.error('Global sync of one login failed:', err.message); }
-  }, 1500));
+  pending.set(
+    userId,
+    setTimeout(async () => {
+      pending.delete(userId);
+      try {
+        const [identity] = await identitiesFor({ id: userId });
+        if (identity) await post('/identities', { identities: [identity] });
+        else await post(`/identities/${userId}`, undefined, 'DELETE');
+      } catch (err) {
+        state.lastError = err.message;
+        console.error('Global sync of one login failed:', err.message);
+      }
+    }, 1500),
+  );
 }
 
 /** Starts reporting: a first full push shortly after start-up, a full push every 15 minutes, and a push whenever a login is saved. */
 export function startGlobalSync() {
   if (!globalConfig().enabled) return;
   User.addHook('afterSave', (user) => queuePush(user.id));
-  const run = () => pushAll().then((r) => { if (r.logins !== undefined) console.log(`Global registry: ${r.logins} logins reported (${r.created} new, ${r.updated} updated, ${r.deactivated} switched off)`); }).catch((err) => console.error('Global sync failed:', err.message));
+  const run = () =>
+    pushAll()
+      .then((r) => {
+        if (r.logins !== undefined)
+          console.log(
+            `Global registry: ${r.logins} logins reported (${r.created} new, ${r.updated} updated, ${r.deactivated} switched off)`,
+          );
+      })
+      .catch((err) => console.error('Global sync failed:', err.message));
   setTimeout(run, 10_000).unref();
   setInterval(run, SYNC_EVERY_MS).unref();
 }

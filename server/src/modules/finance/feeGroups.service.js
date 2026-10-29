@@ -3,9 +3,17 @@ import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { billStudents } from './fees.service.js';
 
 export async function listGroups() {
-  const rows = await FeeGroup.findAll({ include: [FeeGroupItem], order: [['name', 'ASC'], [FeeGroupItem, 'id', 'ASC']] });
+  const rows = await FeeGroup.findAll({
+    include: [FeeGroupItem],
+    order: [
+      ['name', 'ASC'],
+      [FeeGroupItem, 'id', 'ASC'],
+    ],
+  });
   return rows.map((g) => ({
-    id: g.id, name: g.name, description: g.description,
+    id: g.id,
+    name: g.name,
+    description: g.description,
     items: g.FeeGroupItems.map((i) => ({ id: i.id, title: i.title, amount: i.amount, dueDate: i.dueDate })),
     total: g.FeeGroupItems.reduce((sum, i) => sum + Math.round(Number(i.amount) * 100), 0) / 100,
   }));
@@ -31,7 +39,8 @@ export async function addItem(groupId, { title, amount, dueDate }) {
   if (!(await FeeGroup.findByPk(groupId))) throw notFound('Fee group not found');
   if (!String(title ?? '').trim()) throw badRequest('Item title is required');
   if (!(Number(amount) > 0)) throw badRequest('Amount must be above zero');
-  if (await FeeGroupItem.findOne({ where: { groupId, title: title.trim() } })) throw conflict('This group already has an item with that title');
+  if (await FeeGroupItem.findOne({ where: { groupId, title: title.trim() } }))
+    throw conflict('This group already has an item with that title');
   return (await FeeGroupItem.create({ groupId, title: title.trim(), amount, dueDate: dueDate || null })).id;
 }
 
@@ -54,18 +63,27 @@ export async function applyGroup(groupId, { classId, bill }) {
   const result = { structureAdded: 0, structureSkipped: 0, billed: 0, alreadyBilled: 0, students: 0 };
   await sequelize.transaction(async (transaction) => {
     const ids = bill
-      ? (await Student.findAll({ where: { classId, status: 'active' }, attributes: ['id'], transaction })).map((s) => s.id)
+      ? (
+          await Student.findAll({ where: { classId, status: 'active' }, attributes: ['id'], transaction })
+        ).map((s) => s.id)
       : [];
     result.students = ids.length;
     for (const item of group.FeeGroupItems) {
       const exists = await FeeStructure.findOne({ where: { classId, title: item.title }, transaction });
       if (exists) result.structureSkipped += 1;
       else {
-        await FeeStructure.create({ classId, title: item.title, amount: item.amount, dueDate: item.dueDate }, { transaction });
+        await FeeStructure.create(
+          { classId, title: item.title, amount: item.amount, dueDate: item.dueDate },
+          { transaction },
+        );
         result.structureAdded += 1;
       }
       if (ids.length) {
-        const r = await billStudents(ids, { title: item.title, amount: item.amount, dueDate: item.dueDate }, transaction);
+        const r = await billStudents(
+          ids,
+          { title: item.title, amount: item.amount, dueDate: item.dueDate },
+          transaction,
+        );
         result.billed += r.created;
         result.alreadyBilled += r.skipped;
       }

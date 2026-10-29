@@ -24,19 +24,31 @@ export async function restoreLmsFile(key, buffer) {
   const destination = objectPath(key);
   await fs.mkdir(storageDir(), { recursive: true });
   const temporary = `${destination}.${crypto.randomBytes(8).toString('hex')}.tmp`;
-  try { await fs.writeFile(temporary, buffer, { flag: 'wx', mode: 0o600 }); await fs.rename(temporary, destination); }
-  catch (error) { await fs.rm(temporary, { force: true }); throw error; }
+  try {
+    await fs.writeFile(temporary, buffer, { flag: 'wx', mode: 0o600 });
+    await fs.rename(temporary, destination);
+  } catch (error) {
+    await fs.rm(temporary, { force: true });
+    throw error;
+  }
 }
 
 export async function getLmsFile(key) {
-  try { return await fs.readFile(objectPath(key)); }
-  catch (error) { if (error.code === 'ENOENT') throw notFound('LMS file is missing from storage'); throw error; }
+  try {
+    return await fs.readFile(objectPath(key));
+  } catch (error) {
+    if (error.code === 'ENOENT') throw notFound('LMS file is missing from storage');
+    throw error;
+  }
 }
 
 export async function removeLmsFile(key) {
   if (!key) return;
-  try { await fs.rm(objectPath(key), { force: true }); }
-  catch (error) { if (error.status !== 404) throw error; }
+  try {
+    await fs.rm(objectPath(key), { force: true });
+  } catch (error) {
+    if (error.status !== 404) throw error;
+  }
 }
 
 /** One-time, repeat-safe migration from the old base64 columns to the configured file store. */
@@ -46,8 +58,13 @@ export async function migrateLegacyLmsFiles(models) {
     for (const row of await Model.findAll({ where: { attachmentData: { [Op.not]: null } } })) {
       if (!row.attachmentData) continue;
       if (row.attachmentKey) {
-        try { await getLmsFile(row.attachmentKey); await row.update({ attachmentData: null }); continue; }
-        catch (error) { if (error.status !== 404) throw error; }
+        try {
+          await getLmsFile(row.attachmentKey);
+          await row.update({ attachmentData: null });
+          continue;
+        } catch (error) {
+          if (error.status !== 404) throw error;
+        }
       }
       const key = await putLmsFile(Buffer.from(row.attachmentData, 'base64'));
       await row.update({ attachmentKey: key, attachmentData: null });
@@ -56,4 +73,3 @@ export async function migrateLegacyLmsFiles(models) {
   }
   return moved;
 }
-

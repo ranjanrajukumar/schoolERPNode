@@ -21,26 +21,47 @@ const escapeLike = (term) => term.replace(/[\\%_]/g, (c) => `\\${c}`);
  *  - With nothing typed it returns the newest records, so the dropdown is never empty.
  * Response: [{ id, label, sub }], never more than 25 rows, so a school with thousands of students sends a few bytes.
  */
-export function typeahead({ model, fields, label, sub = () => null, filters = [], include = [], order = [['id', 'DESC']], where = {} }) {
+export function typeahead({
+  model,
+  fields,
+  label,
+  sub = () => null,
+  filters = [],
+  include = [],
+  order = [['id', 'DESC']],
+  where = {},
+}) {
   return asyncHandler(async (req, res) => {
     const limit = Math.min(Math.max(Number(req.query.limit) || DEFAULT_LIMIT, 1), MAX_LIMIT);
     const clauses = { ...where };
     for (const key of filters) if (req.query[key]) clauses[key] = String(req.query[key]);
 
-    const excluded = String(req.query.exclude ?? '').split(',').map(Number).filter((n) => Number.isInteger(n) && n > 0).slice(0, 2000);
+    const excluded = String(req.query.exclude ?? '')
+      .split(',')
+      .map(Number)
+      .filter((n) => Number.isInteger(n) && n > 0)
+      .slice(0, 2000);
     if (excluded.length) clauses.id = { [Op.notIn]: excluded };
 
     let conditions = [];
     if (req.query.id) {
       clauses.id = Number(req.query.id) || 0; // one known record: exclusion does not apply
     } else {
-      const terms = String(req.query.q ?? '').trim().split(/\s+/).filter(Boolean).slice(0, MAX_TERMS);
-      conditions = terms.map((term) => ({ [Op.or]: fields.map((f) => ({ [f]: { [Op.like]: `%${escapeLike(term)}%` } })) }));
+      const terms = String(req.query.q ?? '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, MAX_TERMS);
+      conditions = terms.map((term) => ({
+        [Op.or]: fields.map((f) => ({ [f]: { [Op.like]: `%${escapeLike(term)}%` } })),
+      }));
     }
 
     const rows = await model.findAll({
       where: conditions.length ? { ...clauses, [Op.and]: conditions } : clauses,
-      include, order, limit,
+      include,
+      order,
+      limit,
     });
     res.json(rows.map((r) => ({ id: r.id, label: label(r), sub: sub(r) })));
   });

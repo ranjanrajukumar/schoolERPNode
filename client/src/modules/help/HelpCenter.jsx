@@ -10,20 +10,39 @@ export default function HelpCenter() {
     <>
       <h1>Help center</h1>
       <p>
-        <Link className="btn" to="/user-guide">User guide</Link>
-        <Link className="btn" to="/support">Submit a support request</Link>
-        <Link className="btn" to="/system-updates">What&apos;s new</Link>
+        <Link className="btn" to="/user-guide">
+          User guide
+        </Link>
+        <Link className="btn" to="/support">
+          Submit a support request
+        </Link>
+        <Link className="btn" to="/system-updates">
+          What&apos;s new
+        </Link>
       </p>
       <div className="card form">
-        <label>Search the questions<input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="e.g. password, backup, marks" /></label>
+        <label>
+          Search the questions
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. password, backup, marks"
+          />
+        </label>
       </div>
       {shown.map((f) => (
         <details className="card" key={f.q}>
-          <summary><b>{f.q}</b></summary>
+          <summary>
+            <b>{f.q}</b>
+          </summary>
           <p>{f.a}</p>
         </details>
       ))}
-      {!shown.length && <p className="hint">Nothing matches. <Link to="/support">Ask the administrator</Link>.</p>}
+      {!shown.length && (
+        <p className="hint">
+          Nothing matches. <Link to="/support">Ask the administrator</Link>.
+        </p>
+      )}
     </>
   );
 }

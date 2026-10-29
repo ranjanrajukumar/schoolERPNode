@@ -7,7 +7,9 @@ const MAX_DETAILS = 2000;
 const redact = (value) => {
   if (Array.isArray(value)) return value.map(redact);
   if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, /password|token|secret/i.test(k) ? '[redacted]' : redact(v)]));
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, /password|token|secret/i.test(k) ? '[redacted]' : redact(v)]),
+    );
   }
   return value;
 };
@@ -29,7 +31,10 @@ export function auditTrail(req, res, next) {
 
   res.on('finish', () => {
     if (res.statusCode >= 400) return;
-    const details = req.body && Object.keys(req.body).length ? JSON.stringify(redact(req.body)).slice(0, MAX_DETAILS) : null;
+    const details =
+      req.body && Object.keys(req.body).length
+        ? JSON.stringify(redact(req.body)).slice(0, MAX_DETAILS)
+        : null;
     AuditLog.create({
       userId: req.user?.id,
       userName: req.user?.name,

@@ -1,5 +1,12 @@
 import { Op } from 'sequelize';
-import { Attendance, AttendanceCorrection, SchoolClass, Student, StudentLeave, sequelize } from '../../models/index.js';
+import {
+  Attendance,
+  AttendanceCorrection,
+  SchoolClass,
+  Student,
+  StudentLeave,
+  sequelize,
+} from '../../models/index.js';
 import { badRequest } from '../../utils/httpError.js';
 import { today } from '../../utils/money.js';
 
@@ -20,7 +27,15 @@ export async function getRoster(date, classId) {
   const [students, onLeave] = await Promise.all([
     Student.findAll({
       where: { status: 'active', ...(classId && { classId }) },
-      include: [{ model: Attendance, required: false, where: { date }, attributes: ['status', 'arrivalTime', 'note', 'savedAt'] }, { model: SchoolClass, attributes: ['name', 'section'], required: false }],
+      include: [
+        {
+          model: Attendance,
+          required: false,
+          where: { date },
+          attributes: ['status', 'arrivalTime', 'note', 'savedAt'],
+        },
+        { model: SchoolClass, attributes: ['name', 'section'], required: false },
+      ],
       order: [['firstName', 'ASC']],
     }),
     studentsOnLeave(date),
@@ -47,34 +62,58 @@ export async function getRoster(date, classId) {
  */
 export async function saveRecords(date, records, { reason, user }) {
   if (!Array.isArray(records) || !records.length) throw badRequest('records must be a non-empty list');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date).getTime())) throw badRequest('date must be YYYY-MM-DD');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date).getTime()))
+    throw badRequest('date must be YYYY-MM-DD');
   if (date > today()) throw badRequest('Attendance cannot be marked for a future date');
-  if (records.some((r) => !['present', 'absent', 'late'].includes(r.status))) throw badRequest('Status must be present, absent or late');
+  if (records.some((r) => !['present', 'absent', 'late'].includes(r.status)))
+    throw badRequest('Status must be present, absent or late');
   for (const r of records) {
-    if (r.arrivalTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(r.arrivalTime)) throw badRequest('Arrival time must look like 08:15');
+    if (r.arrivalTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(r.arrivalTime))
+      throw badRequest('Arrival time must look like 08:15');
     if (r.note && String(r.note).length > 120) throw badRequest('A note must be 120 characters or fewer');
   }
   const known = await Student.count({ where: { id: records.map((r) => r.studentId) } });
-  if (known !== new Set(records.map((r) => Number(r.studentId))).size) throw badRequest('Every record needs an existing student');
+  if (known !== new Set(records.map((r) => Number(r.studentId))).size)
+    throw badRequest('Every record needs an existing student');
   const existing = await Attendance.findAll({ where: { date, studentId: records.map((r) => r.studentId) } });
   const before = new Map(existing.map((a) => [a.studentId, a.status]));
   const changes = records.filter((r) => before.has(r.studentId) && before.get(r.studentId) !== r.status);
 
   if (changes.length && date < today() && !String(reason ?? '').trim()) {
-    throw badRequest(`A reason is required to change past attendance (${changes.length} mark(s) would change)`);
+    throw badRequest(
+      `A reason is required to change past attendance (${changes.length} mark(s) would change)`,
+    );
   }
 
   await sequelize.transaction(async (transaction) => {
     const savedAt = new Date();
     for (const { studentId, status, arrivalTime, note } of records) {
       // a student who was absent has no arrival time
-      await Attendance.upsert({ studentId, date, status, arrivalTime: status === 'absent' ? null : arrivalTime || null, note: String(note ?? '').trim() || null, savedAt }, { transaction });
+      await Attendance.upsert(
+        {
+          studentId,
+          date,
+          status,
+          arrivalTime: status === 'absent' ? null : arrivalTime || null,
+          note: String(note ?? '').trim() || null,
+          savedAt,
+        },
+        { transaction },
+      );
     }
     for (const c of changes) {
-      await AttendanceCorrection.create({
-        studentId: c.studentId, date, oldStatus: before.get(c.studentId), newStatus: c.status,
-        reason: reason?.trim() || null, correctedBy: user.id, correctedByName: user.name,
-      }, { transaction });
+      await AttendanceCorrection.create(
+        {
+          studentId: c.studentId,
+          date,
+          oldStatus: before.get(c.studentId),
+          newStatus: c.status,
+          reason: reason?.trim() || null,
+          correctedBy: user.id,
+          correctedByName: user.name,
+        },
+        { transaction },
+      );
     }
   });
   return { saved: records.length, corrected: changes.length };

@@ -26,17 +26,28 @@ async function vapid() {
       await Setting.create({ key: KEY, value: JSON.stringify(keys), updatedByName: 'system' });
     }
   }
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT || 'mailto:admin@school.local', keys.publicKey, keys.privateKey);
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:admin@school.local',
+    keys.publicKey,
+    keys.privateKey,
+  );
   return keys;
 }
 
 export const publicKey = async () => (await vapid()).publicKey;
 
 export async function subscribe(user, { endpoint, keys: k }, userAgent) {
-  if (!/^https:\/\//.test(String(endpoint ?? '')) || String(endpoint).length > 500) throw badRequest('Invalid subscription');
+  if (!/^https:\/\//.test(String(endpoint ?? '')) || String(endpoint).length > 500)
+    throw badRequest('Invalid subscription');
   if (!k?.p256dh || !k?.auth) throw badRequest('Invalid subscription');
   // One endpoint belongs to one person: a shared computer signing in as someone else takes the endpoint over.
-  await PushSubscription.upsert({ userId: user.id, endpoint, p256dh: k.p256dh, auth: k.auth, userAgent: String(userAgent ?? '').slice(0, 200) || null });
+  await PushSubscription.upsert({
+    userId: user.id,
+    endpoint,
+    p256dh: k.p256dh,
+    auth: k.auth,
+    userAgent: String(userAgent ?? '').slice(0, 200) || null,
+  });
 }
 
 export async function unsubscribe(user, endpoint) {
@@ -53,11 +64,22 @@ export async function notifyUsers(userIds, { title, body, url }) {
     await vapid();
     const subs = await PushSubscription.findAll({ where: { userId: ids } });
     const payload = JSON.stringify({ title, body, url: url || '/' });
-    await Promise.all(subs.map(async (s) => {
-      try { await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 86400, timeout: 10000 }); }
-      catch (err) { if ([404, 410].includes(err.statusCode)) await s.destroy(); }
-    }));
-  } catch (err) { console.error('Notification failed:', err.message); }
+    await Promise.all(
+      subs.map(async (s) => {
+        try {
+          await webpush.sendNotification(
+            { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+            payload,
+            { TTL: 86400, timeout: 10000 },
+          );
+        } catch (err) {
+          if ([404, 410].includes(err.statusCode)) await s.destroy();
+        }
+      }),
+    );
+  } catch (err) {
+    console.error('Notification failed:', err.message);
+  }
 }
 
 const AUDIENCES = {
@@ -82,7 +104,8 @@ export async function sendPush({ audience, title, body, url }) {
   if (!heading || !text) throw badRequest('A title and a message are required');
   if (heading.length > MAX_TITLE) throw badRequest(`The title is limited to ${MAX_TITLE} characters`);
   if (text.length > MAX_BODY) throw badRequest(`The message is limited to ${MAX_BODY} characters`);
-  if (url && !String(url).startsWith('/')) throw badRequest('The link must be a page of this site, starting with /');
+  if (url && !String(url).startsWith('/'))
+    throw badRequest('The link must be a page of this site, starting with /');
   await vapid();
 
   const users = await User.findAll({ where: AUDIENCES[audience], attributes: ['id'] });
@@ -91,14 +114,23 @@ export async function sendPush({ audience, title, body, url }) {
 
   const result = { devices: subs.length, delivered: 0, failed: 0, removed: 0 };
   for (let i = 0; i < subs.length; i += BATCH) {
-    await Promise.all(subs.slice(i, i + BATCH).map(async (s) => {
-      try {
-        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 86400, timeout: 10000 });
-        result.delivered += 1;
-      } catch (err) {
-        if ([404, 410].includes(err.statusCode)) { await s.destroy(); result.removed += 1; } else result.failed += 1;
-      }
-    }));
+    await Promise.all(
+      subs.slice(i, i + BATCH).map(async (s) => {
+        try {
+          await webpush.sendNotification(
+            { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+            payload,
+            { TTL: 86400, timeout: 10000 },
+          );
+          result.delivered += 1;
+        } catch (err) {
+          if ([404, 410].includes(err.statusCode)) {
+            await s.destroy();
+            result.removed += 1;
+          } else result.failed += 1;
+        }
+      }),
+    );
   }
   return result;
 }

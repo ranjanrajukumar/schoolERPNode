@@ -6,10 +6,21 @@ export function usePhotoSet(entity, ids) {
   const [set, setSet] = useState(() => new Set());
   const key = [...new Set(ids.filter(Boolean))].sort((a, b) => a - b).join(',');
   useEffect(() => {
-    if (!key) { setSet(new Set()); return undefined; }
+    if (!key) {
+      setSet(new Set());
+      return undefined;
+    }
     let cancelled = false;
-    api(`/photos/has/${entity}?ids=${key}`).then((found) => { if (!cancelled) setSet(new Set(found)); }).catch(() => { if (!cancelled) setSet(new Set()); });
-    return () => { cancelled = true; };
+    api(`/photos/has/${entity}?ids=${key}`)
+      .then((found) => {
+        if (!cancelled) setSet(new Set(found));
+      })
+      .catch(() => {
+        if (!cancelled) setSet(new Set());
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [entity, key]);
   return set;
 }

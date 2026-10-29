@@ -9,14 +9,30 @@ import { sniff } from '../files/files.service.js';
  * defaults.json is generated from the app's registry (npm run gen:menu in app/) and seeds the table.
  */
 const DEFAULTS = JSON.parse(fs.readFileSync(new URL('./defaults.json', import.meta.url), 'utf8'));
-export const ROLES = ['admin', 'teacher', 'accountant', 'parent', 'student'];
+const ROLES = ['admin', 'teacher', 'accountant', 'parent', 'student'];
 export const MAX_ICON_BYTES = 60 * 1024;
 const ICON_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
-export const audienceOf = (role) => (['parent', 'student'].includes(role) ? 'family' : 'staff');
-const splitRoles = (text) => (text ? text.split(',').map((r) => r.trim()).filter(Boolean) : null);
+const audienceOf = (role) => (['parent', 'student'].includes(role) ? 'family' : 'staff');
+const splitRoles = (text) =>
+  text
+    ? text
+        .split(',')
+        .map((r) => r.trim())
+        .filter(Boolean)
+    : null;
 
-const seedRow = (d) => ({ audience: d.audience, key: d.key, parentKey: d.parentKey ?? null, kind: d.kind, label: d.label, icon: d.icon, roles: d.roles?.length ? d.roles.join(',') : null, position: d.position, active: true });
+const seedRow = (d) => ({
+  audience: d.audience,
+  key: d.key,
+  parentKey: d.parentKey ?? null,
+  kind: d.kind,
+  label: d.label,
+  icon: d.icon,
+  roles: d.roles?.length ? d.roles.join(',') : null,
+  position: d.position,
+  active: true,
+});
 
 /**
  * Adds any default item the table does not have yet, and removes rows for pages the app no longer has (a page cannot be invented from the
@@ -35,7 +51,13 @@ export async function ensureAppMenu() {
 
 /** The menu one person sees: active items, in order, whose roles (own, else the parent's) include theirs. */
 export async function menuFor(role) {
-  const rows = await AppMenuItem.findAll({ where: { audience: audienceOf(role), active: true }, order: [['position', 'ASC'], ['id', 'ASC']] });
+  const rows = await AppMenuItem.findAll({
+    where: { audience: audienceOf(role), active: true },
+    order: [
+      ['position', 'ASC'],
+      ['id', 'ASC'],
+    ],
+  });
   const byKey = new Map(rows.map((r) => [r.key, r]));
   const allowed = (r) => {
     const parent = r.parentKey ? byKey.get(r.parentKey) : null;
@@ -45,20 +67,40 @@ export async function menuFor(role) {
     return !roles || roles.includes(role);
   };
   return rows.filter(allowed).map((r) => ({
-    key: r.key, parentKey: r.parentKey, kind: r.kind, label: r.label, icon: r.icon, position: r.position,
+    key: r.key,
+    parentKey: r.parentKey,
+    kind: r.kind,
+    label: r.label,
+    icon: r.icon,
+    position: r.position,
     iconData: r.iconImage ? `data:${r.iconMime};base64,${r.iconImage}` : null,
   }));
 }
 
 const shapeAdmin = (r) => ({
-  id: r.id, audience: r.audience, key: r.key, parentKey: r.parentKey, kind: r.kind, label: r.label, icon: r.icon,
-  roles: splitRoles(r.roles), position: r.position, active: r.active, hasImage: Boolean(r.iconImage),
+  id: r.id,
+  audience: r.audience,
+  key: r.key,
+  parentKey: r.parentKey,
+  kind: r.kind,
+  label: r.label,
+  icon: r.icon,
+  roles: splitRoles(r.roles),
+  position: r.position,
+  active: r.active,
+  hasImage: Boolean(r.iconImage),
   iconData: r.iconImage ? `data:${r.iconMime};base64,${r.iconImage}` : null,
 });
 
 export async function listForAdmin(audience) {
   if (!['staff', 'family'].includes(audience)) throw badRequest('audience must be staff or family');
-  const rows = await AppMenuItem.findAll({ where: { audience }, order: [['position', 'ASC'], ['id', 'ASC']] });
+  const rows = await AppMenuItem.findAll({
+    where: { audience },
+    order: [
+      ['position', 'ASC'],
+      ['id', 'ASC'],
+    ],
+  });
   return rows.map(shapeAdmin);
 }
 
@@ -73,21 +115,29 @@ export async function updateItem(id, body) {
   }
   if (body.icon !== undefined) {
     const icon = String(body.icon).trim();
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(icon) || icon.length > 60) throw badRequest('An icon name looks like "wallet-outline"');
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(icon) || icon.length > 60)
+      throw badRequest('An icon name looks like "wallet-outline"');
     changes.icon = icon;
   }
   if (body.position !== undefined) {
     const position = Number(body.position);
-    if (!Number.isInteger(position) || position < 0 || position > 100000) throw badRequest('Position must be a whole number');
+    if (!Number.isInteger(position) || position < 0 || position > 100000)
+      throw badRequest('Position must be a whole number');
     changes.position = position;
   }
   if (body.active !== undefined) changes.active = Boolean(body.active);
   if (body.roles !== undefined) {
     if (body.roles === null || (Array.isArray(body.roles) && !body.roles.length)) changes.roles = null;
     else {
-      if (!Array.isArray(body.roles) || body.roles.some((r) => !ROLES.includes(r))) throw badRequest(`Roles must come from: ${ROLES.join(', ')}`);
+      if (!Array.isArray(body.roles) || body.roles.some((r) => !ROLES.includes(r)))
+        throw badRequest(`Roles must come from: ${ROLES.join(', ')}`);
       const family = row.audience === 'family';
-      if (body.roles.some((r) => ['parent', 'student'].includes(r) !== family)) throw badRequest(family ? 'The family menu is for parents and students' : 'The staff menu is for admins, teachers and accountants');
+      if (body.roles.some((r) => ['parent', 'student'].includes(r) !== family))
+        throw badRequest(
+          family
+            ? 'The family menu is for parents and students'
+            : 'The staff menu is for admins, teachers and accountants',
+        );
       changes.roles = [...new Set(body.roles)].join(',');
     }
   }
@@ -123,7 +173,13 @@ export async function resetMenu(audience) {
   for (const d of defaults) {
     const row = await AppMenuItem.findOne({ where: { audience, key: d.key } });
     const seed = { ...seedRow(d), iconImage: null, iconMime: null };
-    if (row) { await row.update(seed); restored += 1; } else { await AppMenuItem.create(seed); restored += 1; }
+    if (row) {
+      await row.update(seed);
+      restored += 1;
+    } else {
+      await AppMenuItem.create(seed);
+      restored += 1;
+    }
   }
   return { restored };
 }

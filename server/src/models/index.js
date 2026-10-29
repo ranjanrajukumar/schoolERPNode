@@ -413,7 +413,7 @@ LmsLesson.hasMany(LmsLessonPart, { foreignKey: 'lessonId', onDelete: 'CASCADE' }
 LmsLessonPart.belongsTo(LmsLesson, { foreignKey: 'lessonId' });
 LmsCourse.hasMany(LmsLessonPart, { foreignKey: 'courseId', onDelete: 'CASCADE' });
 LmsLessonPart.belongsTo(LmsCourse, { foreignKey: 'courseId' });
-LmsLesson.hasMany(LmsProgress,{ foreignKey: 'lessonId', onDelete: 'CASCADE' });
+LmsLesson.hasMany(LmsProgress, { foreignKey: 'lessonId', onDelete: 'CASCADE' });
 LmsProgress.belongsTo(LmsLesson, { foreignKey: 'lessonId' });
 Student.hasMany(LmsProgress, { foreignKey: 'studentId', onDelete: 'CASCADE' });
 LmsProgress.belongsTo(Student, { foreignKey: 'studentId' });

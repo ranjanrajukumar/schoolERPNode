@@ -37,7 +37,10 @@ export async function listRequests(user, { status } = {}) {
 
 /** What a requester may ask for: item names, units and stock, but not costs or suppliers. */
 export async function requestCatalog() {
-  const items = await InventoryItem.findAll({ attributes: ['id', 'name', 'unit', 'quantity'], order: [['name', 'ASC']] });
+  const items = await InventoryItem.findAll({
+    attributes: ['id', 'name', 'unit', 'quantity'],
+    order: [['name', 'ASC']],
+  });
   return items.map((i) => ({ id: i.id, name: i.name, unit: i.unit, inStock: i.quantity }));
 }
 
@@ -46,7 +49,11 @@ export async function createRequest({ itemId, quantity, reason }, user) {
   if (!String(reason ?? '').trim()) throw badRequest('Say what the items are needed for');
   if (!(await InventoryItem.findByPk(itemId))) throw notFound('Item not found');
   const request = await InventoryRequest.create({
-    itemId, quantity: Number(quantity), reason: reason.trim(), requestedBy: user.id, requestedByName: user.name,
+    itemId,
+    quantity: Number(quantity),
+    reason: reason.trim(),
+    requestedBy: user.id,
+    requestedByName: user.name,
   });
   return request.id;
 }
@@ -54,8 +61,12 @@ export async function createRequest({ itemId, quantity, reason }, user) {
 /** Only the requester (or an admin) can withdraw, and only while it is undecided. */
 export async function cancelRequest(id, user) {
   const request = await InventoryRequest.findByPk(id);
-  if (!request || (user.role !== 'admin' && request.requestedBy !== user.id)) throw notFound('Request not found');
-  const [count] = await InventoryRequest.update({ status: 'cancelled' }, { where: { id, status: 'pending' } });
+  if (!request || (user.role !== 'admin' && request.requestedBy !== user.id))
+    throw notFound('Request not found');
+  const [count] = await InventoryRequest.update(
+    { status: 'cancelled' },
+    { where: { id, status: 'pending' } },
+  );
   if (!count) throw conflict(`This request is already ${request.status}`);
 }
 
@@ -69,21 +80,33 @@ export async function approveRequest(id, { quantity } = {}, admin) {
     const request = await InventoryRequest.findByPk(id, { transaction, lock: transaction.LOCK.UPDATE });
     if (!request) throw notFound('Request not found');
     if (request.status !== 'pending') throw conflict(`This request is already ${request.status}`);
-    const approved = quantity === undefined || quantity === '' || quantity === null ? request.quantity : Number(quantity);
+    const approved =
+      quantity === undefined || quantity === '' || quantity === null ? request.quantity : Number(quantity);
     if (!positiveInt(approved) || approved > request.quantity) {
       throw badRequest(`Approved quantity must be between 1 and ${request.quantity}`);
     }
 
-    const movement = await recordMovement({
-      itemId: request.itemId,
-      type: 'out',
-      quantity: approved,
-      party: request.requestedByName,
-      note: `Request #${request.id}: ${request.reason}`.slice(0, 255),
-    }, admin.name, transaction);
-    await request.update({
-      status: 'approved', approvedQuantity: approved, decidedByName: admin.name, decidedOn: today(), movementId: movement.id,
-    }, { transaction });
+    const movement = await recordMovement(
+      {
+        itemId: request.itemId,
+        type: 'out',
+        quantity: approved,
+        party: request.requestedByName,
+        note: `Request #${request.id}: ${request.reason}`.slice(0, 255),
+      },
+      admin.name,
+      transaction,
+    );
+    await request.update(
+      {
+        status: 'approved',
+        approvedQuantity: approved,
+        decidedByName: admin.name,
+        decidedOn: today(),
+        movementId: movement.id,
+      },
+      { transaction },
+    );
   });
 }
 

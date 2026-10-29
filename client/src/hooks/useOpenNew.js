@@ -5,6 +5,9 @@ import { useSearchParams } from 'react-router-dom';
 export function useOpenNew(open, allowed = true) {
   const [params, setParams] = useSearchParams();
   useEffect(() => {
-    if (params.get('new') && allowed) { open(); setParams({}, { replace: true }); }
+    if (params.get('new') && allowed) {
+      open();
+      setParams({}, { replace: true });
+    }
   }, [params, allowed]); // eslint-disable-line react-hooks/exhaustive-deps
 }

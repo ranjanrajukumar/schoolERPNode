@@ -1,6 +1,13 @@
 import { Op } from 'sequelize';
 import {
-  Student, StudentTransport, TransportAttendance, TransportRoute, TransportStop, Vehicle, VehicleMaintenance, sequelize,
+  Student,
+  StudentTransport,
+  TransportAttendance,
+  TransportRoute,
+  TransportStop,
+  Vehicle,
+  VehicleMaintenance,
+  sequelize,
 } from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { daysFromNow, today } from '../../utils/money.js';
@@ -35,7 +42,11 @@ export async function listVehicles() {
 
 export async function listRoutes() {
   const routes = await TransportRoute.findAll({
-    include: [{ model: Vehicle, attributes: ['regNo'] }, { model: TransportStop, attributes: ['id'] }, { model: StudentTransport, attributes: ['id'] }],
+    include: [
+      { model: Vehicle, attributes: ['regNo'] },
+      { model: TransportStop, attributes: ['id'] },
+      { model: StudentTransport, attributes: ['id'] },
+    ],
     order: [['name', 'ASC']],
   });
   return routes.map((r) => ({
@@ -53,7 +64,10 @@ export async function listStops(routeId) {
   const stops = await TransportStop.findAll({
     where: routeId ? { routeId } : {},
     include: [{ model: TransportRoute, attributes: ['name'] }],
-    order: [['routeId', 'ASC'], ['sequence', 'ASC']],
+    order: [
+      ['routeId', 'ASC'],
+      ['sequence', 'ASC'],
+    ],
   });
   return stops.map((s) => ({ ...s.toJSON(), TransportRoute: undefined, routeName: s.TransportRoute.name }));
 }
@@ -62,14 +76,16 @@ export async function listStops(routeId) {
 export async function deleteStop(id) {
   const stop = await TransportStop.findByPk(id);
   if (!stop) throw notFound('Stop not found');
-  if (await StudentTransport.count({ where: { stopId: id } })) throw conflict('Students are assigned to this stop');
+  if (await StudentTransport.count({ where: { stopId: id } }))
+    throw conflict('Students are assigned to this stop');
   await stop.destroy();
 }
 
 export async function deleteRoute(id) {
   const route = await TransportRoute.findByPk(id);
   if (!route) throw notFound('Route not found');
-  if (await StudentTransport.count({ where: { routeId: id } })) throw conflict('Students are assigned to this route');
+  if (await StudentTransport.count({ where: { routeId: id } }))
+    throw conflict('Students are assigned to this route');
   await route.destroy();
 }
 
@@ -81,7 +97,10 @@ export async function listAssignments({ routeId } = {}) {
       { model: TransportRoute, attributes: ['name', 'monthlyFee'] },
       { model: TransportStop, attributes: ['name', 'pickupTime'] },
     ],
-    order: [['routeId', 'ASC'], ['stopId', 'ASC']],
+    order: [
+      ['routeId', 'ASC'],
+      ['stopId', 'ASC'],
+    ],
   });
   return rows.map((a) => ({
     studentId: a.studentId,
@@ -114,7 +133,12 @@ function ridingDetails(body) {
   };
   const phone = clean(body.authorizedPickupPhone, 20, 'Pickup person phone');
   if (phone && !/^[0-9+\-\s()]{7,20}$/.test(phone)) throw badRequest('Pickup person phone is invalid');
-  return { tripType, authorizedPickupName: clean(body.authorizedPickupName, 100, 'Pickup person name'), authorizedPickupPhone: phone, remarks: clean(body.remarks, 255, 'Remarks') };
+  return {
+    tripType,
+    authorizedPickupName: clean(body.authorizedPickupName, 100, 'Pickup person name'),
+    authorizedPickupPhone: phone,
+    remarks: clean(body.remarks, 255, 'Remarks'),
+  };
 }
 
 /**
@@ -138,17 +162,21 @@ export async function assignStudent(body) {
 
     if (route.vehicleId) {
       const vehicle = await Vehicle.findByPk(route.vehicleId, { transaction, lock: transaction.LOCK.UPDATE });
-      if (await seatsTaken(vehicle.id, { exceptStudentId: student.id }, transaction) >= vehicle.capacity) {
+      if ((await seatsTaken(vehicle.id, { exceptStudentId: student.id }, transaction)) >= vehicle.capacity) {
         throw conflict(`Vehicle ${vehicle.regNo} is full (${vehicle.capacity} seats)`);
       }
     }
 
-    await StudentTransport.upsert({ studentId, routeId, stopId, startDate: startDate || null, ...details }, { transaction });
+    await StudentTransport.upsert(
+      { studentId, routeId, stopId, startDate: startDate || null, ...details },
+      { transaction },
+    );
   });
 }
 
 export async function unassignStudent(studentId) {
-  if (!(await StudentTransport.destroy({ where: { studentId } }))) throw notFound('Student is not on transport');
+  if (!(await StudentTransport.destroy({ where: { studentId } })))
+    throw notFound('Student is not on transport');
 }
 
 /**
@@ -170,7 +198,11 @@ export async function generateTransportFees({ month, dueDate }) {
         transaction,
       });
       if (!riders.length) continue;
-      const result = await billStudents(riders.map((r) => r.studentId), { title, amount: route.monthlyFee, dueDate }, transaction);
+      const result = await billStudents(
+        riders.map((r) => r.studentId),
+        { title, amount: route.monthlyFee, dueDate },
+        transaction,
+      );
       created += result.created;
       skipped += result.skipped;
     }
@@ -187,7 +219,9 @@ export async function getRoster(routeId, date, trip) {
       { model: TransportStop, attributes: ['name', 'sequence'] },
     ],
   });
-  const marks = await TransportAttendance.findAll({ where: { date, trip, studentId: riders.map((r) => r.studentId) } });
+  const marks = await TransportAttendance.findAll({
+    where: { date, trip, studentId: riders.map((r) => r.studentId) },
+  });
   const byStudent = new Map(marks.map((m) => [m.studentId, m.status]));
   return riders
     .sort((a, b) => a.TransportStop.sequence - b.TransportStop.sequence)
@@ -201,8 +235,10 @@ export async function getRoster(routeId, date, trip) {
 }
 
 export async function saveAttendance({ date, trip, records = [] }) {
-  if (!date || !['morning', 'evening'].includes(trip)) throw badRequest('date and trip (morning|evening) are required');
-  if (records.some((r) => !['boarded', 'absent'].includes(r.status))) throw badRequest('Status must be boarded or absent');
+  if (!date || !['morning', 'evening'].includes(trip))
+    throw badRequest('date and trip (morning|evening) are required');
+  if (records.some((r) => !['boarded', 'absent'].includes(r.status)))
+    throw badRequest('Status must be boarded or absent');
   await sequelize.transaction(async (transaction) => {
     for (const { studentId, status } of records) {
       await TransportAttendance.upsert({ studentId, date, trip, status }, { transaction });
@@ -213,7 +249,10 @@ export async function saveAttendance({ date, trip, records = [] }) {
 export async function listMaintenance() {
   const rows = await VehicleMaintenance.findAll({
     include: [{ model: Vehicle, attributes: ['regNo'] }],
-    order: [['serviceDate', 'DESC'], ['id', 'DESC']],
+    order: [
+      ['serviceDate', 'DESC'],
+      ['id', 'DESC'],
+    ],
   });
   return rows.map((m) => ({ ...m.toJSON(), Vehicle: undefined, vehicleRegNo: m.Vehicle.regNo }));
 }
@@ -227,21 +266,30 @@ export async function summary() {
     VehicleMaintenance.sum('cost'),
     StudentTransport.count(),
     VehicleMaintenance.findAll({
-      where: { nextDue: { [Op.lte]: soon } }, include: [{ model: Vehicle, attributes: ['regNo'] }], order: [['nextDue', 'ASC']],
+      where: { nextDue: { [Op.lte]: soon } },
+      include: [{ model: Vehicle, attributes: ['regNo'] }],
+      order: [['nextDue', 'ASC']],
     }),
   ]);
 
   return {
     riders: ridersTotal,
     vehicles: vehicles.map((v) => ({
-      id: v.id, regNo: v.regNo, capacity: v.capacity, seatsTaken: v.seatsTaken, status: v.status,
+      id: v.id,
+      regNo: v.regNo,
+      capacity: v.capacity,
+      seatsTaken: v.seatsTaken,
+      status: v.status,
       insuranceExpiry: v.insuranceExpiry,
       insuranceExpiring: Boolean(v.insuranceExpiry && v.insuranceExpiry <= soon),
     })),
     routes,
     maintenanceCost: maintenance || 0,
     maintenanceDue: dueSoon.map((m) => ({
-      vehicleRegNo: m.Vehicle.regNo, description: m.description, nextDue: m.nextDue, overdue: m.nextDue < today(),
+      vehicleRegNo: m.Vehicle.regNo,
+      description: m.description,
+      nextDue: m.nextDue,
+      overdue: m.nextDue < today(),
     })),
   };
 }

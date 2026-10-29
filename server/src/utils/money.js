@@ -8,7 +8,12 @@ const two = (n) => String(n).padStart(2, '0');
  * A date as YYYY-MM-DD in the server's own time zone (set TZ for the school's zone when the host is elsewhere).
  * toISOString().slice(0, 10) gives the UTC day, which is yesterday for the first hours of the morning anywhere ahead of UTC.
  */
-export const localDate = (d = new Date()) => `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`;
+export const localDate = (d = new Date()) =>
+  `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`;
 export const today = () => localDate();
 /** The day `n` days from today (negative for the past). */
-export const daysFromNow = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return localDate(d); };
+export const daysFromNow = (n) => {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return localDate(d);
+};

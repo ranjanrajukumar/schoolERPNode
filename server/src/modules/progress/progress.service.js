@@ -1,18 +1,33 @@
-import { CoScholasticArea, CoScholasticGrade, Exam, ExamGroup, SchoolClass, Student, sequelize } from '../../models/index.js';
+import {
+  CoScholasticArea,
+  CoScholasticGrade,
+  Exam,
+  ExamGroup,
+  SchoolClass,
+  Student,
+  sequelize,
+} from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { getReportCard } from '../exams/exams.service.js';
 import { getGroupResults } from '../exams/examExtras.service.js';
 
-export const GRADES = ['A', 'B', 'C', 'D', 'E'];
+const GRADES = ['A', 'B', 'C', 'D', 'E'];
 const className = (c) => (c ? `${c.name}-${c.section}` : null);
 
 /* ---------- Co-scholastic areas ---------- */
 
-export const listAreas = () => CoScholasticArea.findAll({ order: [['category', 'ASC'], ['name', 'ASC']] });
+export const listAreas = () =>
+  CoScholasticArea.findAll({
+    order: [
+      ['category', 'ASC'],
+      ['name', 'ASC'],
+    ],
+  });
 
 export async function createArea({ name, category }) {
   if (!name?.trim()) throw badRequest('Area name is required');
-  if (await CoScholasticArea.findOne({ where: { name: name.trim() } })) throw conflict('That area already exists');
+  if (await CoScholasticArea.findOne({ where: { name: name.trim() } }))
+    throw conflict('That area already exists');
   return (await CoScholasticArea.create({ name: name.trim(), category: category?.trim() || 'Skills' })).id;
 }
 
@@ -33,7 +48,11 @@ export async function getGrades(groupId) {
   const group = await loadGroup(groupId);
   const [areas, students, grades] = await Promise.all([
     listAreas(),
-    Student.findAll({ where: { classId: group.classId, status: 'active' }, attributes: ['id', 'admissionNo', 'firstName', 'lastName'], order: [['firstName', 'ASC']] }),
+    Student.findAll({
+      where: { classId: group.classId, status: 'active' },
+      attributes: ['id', 'admissionNo', 'firstName', 'lastName'],
+      order: [['firstName', 'ASC']],
+    }),
     CoScholasticGrade.findAll({ where: { examGroupId: groupId } }),
   ]);
   const byStudent = new Map();
@@ -44,7 +63,12 @@ export async function getGrades(groupId) {
   return {
     group: { id: group.id, name: group.name, className: className(group.SchoolClass) },
     areas: areas.map((a) => ({ id: a.id, name: a.name, category: a.category })),
-    students: students.map((s) => ({ studentId: s.id, admissionNo: s.admissionNo, name: `${s.firstName} ${s.lastName}`, grades: byStudent.get(s.id) ?? {} })),
+    students: students.map((s) => ({
+      studentId: s.id,
+      admissionNo: s.admissionNo,
+      name: `${s.firstName} ${s.lastName}`,
+      grades: byStudent.get(s.id) ?? {},
+    })),
   };
 }
 
@@ -58,7 +82,8 @@ export async function saveGrades(groupId, records = []) {
   const memberIds = new Set(members.map((s) => s.id));
   const areaIds = new Set(areas.map((a) => a.id));
   for (const r of records) {
-    if (!memberIds.has(Number(r.studentId))) throw badRequest('Every student must belong to the group\'s class');
+    if (!memberIds.has(Number(r.studentId)))
+      throw badRequest("Every student must belong to the group's class");
     if (!areaIds.has(Number(r.areaId))) throw badRequest('Unknown co-scholastic area');
     if (r.grade && !GRADES.includes(r.grade)) throw badRequest(`Grade must be one of ${GRADES.join(', ')}`);
     if (r.remark && String(r.remark).length > 200) throw badRequest('A remark can be at most 200 characters');
@@ -67,7 +92,11 @@ export async function saveGrades(groupId, records = []) {
     for (const r of records) {
       const key = { studentId: r.studentId, areaId: r.areaId, examGroupId: group.id };
       if (!r.grade) await CoScholasticGrade.destroy({ where: key, transaction });
-      else await CoScholasticGrade.upsert({ ...key, grade: r.grade, remark: r.remark?.trim() || null }, { transaction });
+      else
+        await CoScholasticGrade.upsert(
+          { ...key, grade: r.grade, remark: r.remark?.trim() || null },
+          { transaction },
+        );
     }
   });
   return records.length;
@@ -83,7 +112,7 @@ export async function getProgressCard(groupId, studentId) {
   const group = await loadGroup(groupId);
   const student = await Student.findByPk(studentId, { include: [SchoolClass] });
   if (!student) throw notFound('Student not found');
-  if (student.classId !== group.classId) throw badRequest('This student is not in the group\'s class');
+  if (student.classId !== group.classId) throw badRequest("This student is not in the group's class");
 
   const exams = await Exam.findAll({ where: { examGroupId: groupId }, order: [['id', 'ASC']] });
   const [combined, cards, grades, areas] = await Promise.all([
@@ -95,11 +124,13 @@ export async function getProgressCard(groupId, studentId) {
 
   // subject -> { exam id -> marks }, keeping the order subjects first appear in
   const subjects = new Map();
-  cards.forEach((card) => card.subjects.forEach((s) => {
-    const row = subjects.get(s.subjectId) ?? { subjectId: s.subjectId, subject: s.subject, marks: {} };
-    row.marks[card.exam.id] = { marks: s.marks, maxMarks: s.maxMarks, grade: s.grade, passed: s.passed };
-    subjects.set(s.subjectId, row);
-  }));
+  cards.forEach((card) =>
+    card.subjects.forEach((s) => {
+      const row = subjects.get(s.subjectId) ?? { subjectId: s.subjectId, subject: s.subject, marks: {} };
+      row.marks[card.exam.id] = { marks: s.marks, maxMarks: s.maxMarks, grade: s.grade, passed: s.passed };
+      subjects.set(s.subjectId, row);
+    }),
+  );
 
   const gradeOf = new Map(grades.map((g) => [g.areaId, g]));
   return {
@@ -116,6 +147,11 @@ export async function getProgressCard(groupId, studentId) {
     overall: combined?.rows.find((r) => r.studentId === Number(studentId)) ?? null,
     classSize: combined?.rows.length ?? 0,
     attendance: cards[0]?.attendance ?? null,
-    coScholastic: areas.map((a) => ({ area: a.name, category: a.category, grade: gradeOf.get(a.id)?.grade ?? null, remark: gradeOf.get(a.id)?.remark ?? null })),
+    coScholastic: areas.map((a) => ({
+      area: a.name,
+      category: a.category,
+      grade: gradeOf.get(a.id)?.grade ?? null,
+      remark: gradeOf.get(a.id)?.remark ?? null,
+    })),
   };
 }

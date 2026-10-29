@@ -9,7 +9,7 @@ import { autoFields } from '../../registry/format';
  * A summary page: tiles, lists, and (for an `auto` page) every readable field of the record.
  * cfg = { title, path | path(child), tiles(data, role), lists: [{ title, rows(data), row(item) }], auto }.
  */
-export function StatsBody({ cfg, child, role, reloadRef }) {
+function StatsBody({ cfg, child, role, reloadRef }) {
   const path = typeof cfg.path === 'function' ? cfg.path(child) : cfg.path;
   const { data, error, loading, reload } = useLoad(() => (path ? api(path) : Promise.resolve(null)), [path]);
   if (reloadRef) reloadRef.current = reload;
@@ -58,4 +58,3 @@ export function StatsScreen({ cfg, role, child = null, back = true }) {
   );
 }
 
-export const Spacer = () => <View style={{ height: 8 }} />;

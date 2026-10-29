@@ -18,7 +18,10 @@ test('formula pattern needs a SEQ and only known tokens', () => {
 
 test('nextNumber skips numbers already taken', async () => {
   const taken = new Set(['A-1', 'A-2']);
-  const model = { max: async () => 0, findOne: async ({ where }) => (taken.has(where.code) ? { id: 1 } : null) };
+  const model = {
+    max: async () => 0,
+    findOne: async ({ where }) => (taken.has(where.code) ? { id: 1 } : null),
+  };
   assert.equal(await nextNumber({ model, field: 'code', formula: 'A-{SEQ}' }), 'A-3');
 });
 

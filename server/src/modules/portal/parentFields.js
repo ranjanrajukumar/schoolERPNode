@@ -12,7 +12,11 @@ export const PARENT_DETAILS = [
 export const PARENT_KEYS = PARENT_DETAILS.map((f) => f.key);
 
 const snake = (key) => key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
-export const PARENT_COLUMNS = PARENT_DETAILS.map((f) => ({ table: 'parents', column: snake(f.key), definition: `VARCHAR(${f.max}) NULL` }));
+export const PARENT_COLUMNS = PARENT_DETAILS.map((f) => ({
+  table: 'parents',
+  column: snake(f.key),
+  definition: `VARCHAR(${f.max}) NULL`,
+}));
 
 const blank = (v) => v === undefined || v === null || v === '';
 
@@ -20,11 +24,15 @@ const blank = (v) => v === undefined || v === null || v === '';
 export function parentProblems(body) {
   const errors = [];
   for (const f of PARENT_DETAILS) {
-    if (!blank(body[f.key]) && String(body[f.key]).length > f.max) errors.push(`${f.label} must be ${f.max} characters or fewer`);
+    if (!blank(body[f.key]) && String(body[f.key]).length > f.max)
+      errors.push(`${f.label} must be ${f.max} characters or fewer`);
   }
   if (!blank(body.phone) && !/^[0-9+\-\s()]{7,20}$/.test(body.phone)) errors.push('Phone is invalid');
-  if (!blank(body.alternatePhone) && !/^[0-9+\-\s()]{7,20}$/.test(body.alternatePhone)) errors.push('Alternate phone is invalid');
-  if (!blank(body.pincode) && !/^[A-Za-z0-9][A-Za-z0-9 -]{2,11}$/.test(body.pincode)) errors.push('PIN / postal code is invalid');
-  if (!blank(body.nationalId) && !/^[A-Za-z0-9-]{4,20}$/.test(body.nationalId)) errors.push('Aadhaar / national ID must be 4 to 20 letters, digits or dashes');
+  if (!blank(body.alternatePhone) && !/^[0-9+\-\s()]{7,20}$/.test(body.alternatePhone))
+    errors.push('Alternate phone is invalid');
+  if (!blank(body.pincode) && !/^[A-Za-z0-9][A-Za-z0-9 -]{2,11}$/.test(body.pincode))
+    errors.push('PIN / postal code is invalid');
+  if (!blank(body.nationalId) && !/^[A-Za-z0-9-]{4,20}$/.test(body.nationalId))
+    errors.push('Aadhaar / national ID must be 4 to 20 letters, digits or dashes');
   return errors;
 }

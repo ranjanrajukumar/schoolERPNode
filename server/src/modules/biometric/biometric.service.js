@@ -38,7 +38,10 @@ export async function recordPunches(device, input) {
     return { enrollId, at };
   });
 
-  const students = await Student.findAll({ where: { admissionNo: [...new Set(punches.map((p) => p.enrollId))], status: 'active' }, attributes: ['id', 'admissionNo'] });
+  const students = await Student.findAll({
+    where: { admissionNo: [...new Set(punches.map((p) => p.enrollId))], status: 'active' },
+    attributes: ['id', 'admissionNo'],
+  });
   const byAdmission = new Map(students.map((s) => [s.admissionNo, s.id]));
 
   let stored = 0;
@@ -46,33 +49,56 @@ export async function recordPunches(device, input) {
   await sequelize.transaction(async (transaction) => {
     for (const { enrollId, at } of punches.sort((a, b) => a.at - b.at)) {
       const studentId = byAdmission.get(enrollId) ?? null;
-      const [, created] = await BiometricPunch.findOrCreate({ where: { deviceId: device.id, enrollId, punchedAt: at }, defaults: { studentId }, transaction });
+      const [, created] = await BiometricPunch.findOrCreate({
+        where: { deviceId: device.id, enrollId, punchedAt: at },
+        defaults: { studentId },
+        transaction,
+      });
       if (!created) continue; // a device that resends a punch changes nothing
       stored += 1;
       if (!studentId) continue;
       const date = localDate(at);
       const existing = await Attendance.findOne({ where: { studentId, date }, transaction });
-      const mark = { status: 'present', arrivalTime: localTime(at), note: `Biometric · ${device.name}`, savedAt: new Date() };
+      const mark = {
+        status: 'present',
+        arrivalTime: localTime(at),
+        note: `Biometric · ${device.name}`,
+        savedAt: new Date(),
+      };
       if (!existing) {
         await Attendance.create({ studentId, date, ...mark }, { transaction });
         marked += 1;
       } else if (existing.status === 'absent') {
         await existing.update({ ...mark, outTime: null }, { transaction });
         marked += 1;
-      } else if (existing.arrivalTime && minutes(localTime(at)) - minutes(existing.arrivalTime) >= MIN_STAY_MINUTES && localTime(at) > (existing.outTime ?? '')) {
+      } else if (
+        existing.arrivalTime &&
+        minutes(localTime(at)) - minutes(existing.arrivalTime) >= MIN_STAY_MINUTES &&
+        localTime(at) > (existing.outTime ?? '')
+      ) {
         await existing.update({ outTime: localTime(at) }, { transaction }); // a later punch the same day: going home
       }
     }
     await device.update({ lastSeenAt: new Date() }, { transaction });
   });
-  return { received: list.length, stored, marked, unmatched: punches.filter((p) => !byAdmission.has(p.enrollId)).length };
+  return {
+    received: list.length,
+    stored,
+    marked,
+    unmatched: punches.filter((p) => !byAdmission.has(p.enrollId)).length,
+  };
 }
 
 export async function listDevices({ withKeys = false } = {}) {
   const since = new Date();
   since.setHours(0, 0, 0, 0);
   const devices = await BiometricDevice.findAll({ order: [['name', 'ASC']] });
-  const counts = await BiometricPunch.findAll({ where: { punchedAt: { [Op.gte]: since } }, attributes: ['deviceId', [sequelize.fn('COUNT', '*'), 'n']], group: ['deviceId'], raw: true });
+  const counts = await BiometricPunch.findAll({
+    where: { punchedAt: { [Op.gte]: since } },
+    attributes: ['deviceId', [sequelize.fn('COUNT', '*'), 'n']],
+    group: ['deviceId'],
+    raw: true,
+  });
   const today = new Map(counts.map((c) => [c.deviceId, Number(c.n)]));
   return devices.map((d) => ({
     id: d.id,
@@ -81,7 +107,8 @@ export async function listDevices({ withKeys = false } = {}) {
     location: d.location,
     status: d.status,
     lastSeenAt: d.lastSeenAt,
-    online: Boolean(d.lastSeenAt) && Date.now() - new Date(d.lastSeenAt).getTime() < ONLINE_MINUTES * 60 * 1000,
+    online:
+      Boolean(d.lastSeenAt) && Date.now() - new Date(d.lastSeenAt).getTime() < ONLINE_MINUTES * 60 * 1000,
     punchesToday: today.get(d.id) ?? 0,
     ...(withKeys && { apiKey: d.apiKey }),
   }));
@@ -89,15 +116,25 @@ export async function listDevices({ withKeys = false } = {}) {
 
 export async function createDevice({ name, serialNo, location }) {
   if (!name?.trim() || !serialNo?.trim()) throw badRequest('Name and serial number are required');
-  const row = await BiometricDevice.create({ name: name.trim(), serialNo: serialNo.trim(), location: location?.trim() || null, apiKey: newKey() });
+  const row = await BiometricDevice.create({
+    name: name.trim(),
+    serialNo: serialNo.trim(),
+    location: location?.trim() || null,
+    apiKey: newKey(),
+  });
   return { id: row.id, apiKey: row.apiKey };
 }
 
 export async function updateDevice(id, { name, location, status }) {
   const device = await BiometricDevice.findByPk(id);
   if (!device) throw notFound('Device not found');
-  if (status && !['active', 'inactive'].includes(status)) throw badRequest('Status must be active or inactive');
-  await device.update({ ...(name?.trim() && { name: name.trim() }), ...(location !== undefined && { location: location?.trim() || null }), ...(status && { status }) });
+  if (status && !['active', 'inactive'].includes(status))
+    throw badRequest('Status must be active or inactive');
+  await device.update({
+    ...(name?.trim() && { name: name.trim() }),
+    ...(location !== undefined && { location: location?.trim() || null }),
+    ...(status && { status }),
+  });
 }
 
 export async function rotateKey(id) {
@@ -119,7 +156,10 @@ export async function listPunches(date) {
   to.setDate(to.getDate() + 1);
   const rows = await BiometricPunch.findAll({
     where: { punchedAt: { [Op.gte]: from, [Op.lt]: to } },
-    include: [{ model: BiometricDevice, attributes: ['name'] }, { model: Student, attributes: ['firstName', 'lastName'], required: false }],
+    include: [
+      { model: BiometricDevice, attributes: ['name'] },
+      { model: Student, attributes: ['firstName', 'lastName'], required: false },
+    ],
     order: [['punchedAt', 'DESC']],
     limit: 1000,
   });

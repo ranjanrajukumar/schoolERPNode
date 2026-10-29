@@ -10,10 +10,33 @@ import { escalate, list, meta, respond, submit } from './feedback.service.js';
 const router = Router();
 
 router.get('/categories', (_req, res) => res.json(FEEDBACK_CATEGORIES));
-router.get('/meta', asyncHandler(async (_req, res) => res.json(await meta())));
-router.get('/', asyncHandler(async (req, res) => res.json(await list(req.user, req.query))));
-router.post('/', asyncHandler(async (req, res) => res.status(201).json(await submit(req.body, { id: req.user.id, name: req.user.name, role: 'staff' }))));
-router.put('/:id', asyncHandler(async (req, res) => { await respond(req.params.id, req.body, req.user); res.json({ ok: true }); }));
-router.post('/:id/escalate', asyncHandler(async (req, res) => { await escalate(req.params.id, req.body, req.user); res.json({ ok: true }); }));
+router.get(
+  '/meta',
+  asyncHandler(async (_req, res) => res.json(await meta())),
+);
+router.get(
+  '/',
+  asyncHandler(async (req, res) => res.json(await list(req.user, req.query))),
+);
+router.post(
+  '/',
+  asyncHandler(async (req, res) =>
+    res.status(201).json(await submit(req.body, { id: req.user.id, name: req.user.name, role: 'staff' })),
+  ),
+);
+router.put(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    await respond(req.params.id, req.body, req.user);
+    res.json({ ok: true });
+  }),
+);
+router.post(
+  '/:id/escalate',
+  asyncHandler(async (req, res) => {
+    await escalate(req.params.id, req.body, req.user);
+    res.json({ ok: true });
+  }),
+);
 
 export default router;

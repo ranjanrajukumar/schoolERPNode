@@ -11,7 +11,9 @@ export default function CertificatePage() {
 
   useEffect(() => {
     const path = studentId ? `/portal/children/${studentId}/documents/${id}/print` : `/documents/${id}/print`;
-    api(path).then(setData).catch((e) => setError(e.message));
+    api(path)
+      .then(setData)
+      .catch((e) => setError(e.message));
   }, [id, studentId]);
 
   if (error) return <p className="error">{error}</p>;

@@ -6,9 +6,14 @@
 const TIMEOUT_MS = 10000;
 const cfg = () => process.env;
 
-export const smtpConfigured = () => Boolean(cfg().SMTP_HOST);
-export const smsProvider = () => (cfg().SMS_PROVIDER === 'twilio' && cfg().TWILIO_SID && cfg().TWILIO_TOKEN
-  && (cfg().TWILIO_FROM || cfg().TWILIO_MESSAGING_SERVICE_SID) ? 'twilio' : 'log');
+const smtpConfigured = () => Boolean(cfg().SMTP_HOST);
+const smsProvider = () =>
+  cfg().SMS_PROVIDER === 'twilio' &&
+  cfg().TWILIO_SID &&
+  cfg().TWILIO_TOKEN &&
+  (cfg().TWILIO_FROM || cfg().TWILIO_MESSAGING_SERVICE_SID)
+    ? 'twilio'
+    : 'log';
 
 /** What is live right now. Never includes secrets. */
 export const providerStatus = () => ({
@@ -54,13 +59,22 @@ async function smtp() {
   return transporter;
 }
 
-const fail = (provider, err) => ({ status: 'failed', provider, error: String(err?.message ?? err).slice(0, 300) });
+const fail = (provider, err) => ({
+  status: 'failed',
+  provider,
+  error: String(err?.message ?? err).slice(0, 300),
+});
 
 async function sendEmail({ to, subject, body }) {
   if (!smtpConfigured()) return { status: 'logged', provider: 'log' };
   try {
-    await (await smtp()).sendMail({
-      from: cfg().SMTP_FROM || cfg().SMTP_USER, to, subject: subject || '(no subject)', text: body,
+    await (
+      await smtp()
+    ).sendMail({
+      from: cfg().SMTP_FROM || cfg().SMTP_USER,
+      to,
+      subject: subject || '(no subject)',
+      text: body,
     });
     return { status: 'sent', provider: 'smtp' };
   } catch (err) {
@@ -72,7 +86,8 @@ async function sendSms({ to, body }) {
   if (smsProvider() === 'log') return { status: 'logged', provider: 'log' };
   try {
     const params = new URLSearchParams({ To: to, Body: body });
-    if (cfg().TWILIO_MESSAGING_SERVICE_SID) params.set('MessagingServiceSid', cfg().TWILIO_MESSAGING_SERVICE_SID);
+    if (cfg().TWILIO_MESSAGING_SERVICE_SID)
+      params.set('MessagingServiceSid', cfg().TWILIO_MESSAGING_SERVICE_SID);
     else params.set('From', cfg().TWILIO_FROM);
     const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${cfg().TWILIO_SID}/Messages.json`, {
       method: 'POST',

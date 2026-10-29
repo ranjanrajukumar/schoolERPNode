@@ -1,17 +1,26 @@
 import { useSchoolBrand } from '../hooks/useSchoolBrand.js';
 
 /** The school's logo, or its first letter when none has been uploaded. Used beside the name in the sidebar, top bar and login page. */
-export function SchoolMark() {
+function SchoolMark() {
   const { name, logoUrl } = useSchoolBrand();
-  return logoUrl
-    ? <img className="brand-mark brand-logo" src={logoUrl} alt={`${name} logo`} />
-    : <span className="brand-mark" aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>;
+  return logoUrl ? (
+    <img className="brand-mark brand-logo" src={logoUrl} alt={`${name} logo`} />
+  ) : (
+    <span className="brand-mark" aria-hidden="true">
+      {name.slice(0, 1).toUpperCase()}
+    </span>
+  );
 }
 
 /** Logo and school name as one block: <SchoolBrand /> replaces the old fixed "School ERP" heading. */
 export default function SchoolBrand({ className = 'brand' }) {
   const { name } = useSchoolBrand();
-  return <div className={className}><SchoolMark /><h2>{name}</h2></div>;
+  return (
+    <div className={className}>
+      <SchoolMark />
+      <h2>{name}</h2>
+    </div>
+  );
 }
 
 const contactLine = (b) => [b.phone, b.email, b.website].filter(Boolean).join('  ·  ');
@@ -32,7 +41,9 @@ export function AppFooter() {
         {b.address && <span>{b.address}</span>}
         {contactLine(b) && <span>{contactLine(b)}</span>}
       </div>
-      <small>© {new Date().getFullYear()} {b.name}</small>
+      <small>
+        © {new Date().getFullYear()} {b.name}
+      </small>
     </footer>
   );
 }
@@ -51,7 +62,10 @@ export function PrintLetterhead() {
           {contactLine(b) && <p>{contactLine(b)}</p>}
         </div>
       </header>
-      <div className="print-footer">{b.name}{b.address ? ` · ${b.address}` : ''}</div>
+      <div className="print-footer">
+        {b.name}
+        {b.address ? ` · ${b.address}` : ''}
+      </div>
     </>
   );
 }

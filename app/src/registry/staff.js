@@ -341,25 +341,3 @@ export const STAFF_MODULES = [
     ],
   },
 ];
-
-/** The staff home page: what needs attention today. */
-export const STAFF_DASHBOARD = {
-  title: 'Today',
-  sub: 'What needs attention.',
-  path: '/dashboard',
-  tiles: (d, role) => (role === 'accountant'
-    ? [{ label: 'Fees due', value: money(d.feesDue), tone: 'amber' }, { label: 'Overdue', value: d.overdueFees, tone: d.overdueFees ? 'red' : 'green' }, { label: 'Collected this month', value: money(d.collectedThisMonth), tone: 'green' }]
-    : [
-      { label: 'Students', value: d.students }, { label: 'Staff', value: d.staff },
-      { label: 'Present today', value: d.attendanceToday?.present, tone: 'green' }, { label: 'Absent today', value: d.attendanceToday?.absent, tone: 'red' },
-      ...(role === 'admin' ? [
-        { label: 'Fees due', value: money(d.feesDue), tone: 'amber' }, { label: 'Collected this month', value: money(d.collectedThisMonth), tone: 'green' },
-        { label: 'Applications waiting', value: d.pendingAdmissions, tone: 'amber' }, { label: 'Leave to decide', value: (d.attention?.studentLeaves ?? 0) + (d.attention?.staffLeaves ?? 0), tone: 'amber' },
-      ] : []),
-    ]),
-  lists: [
-    { title: 'Classes without attendance today', rows: (d) => d.unmarkedClasses ?? [], row: (c) => ({ title: c }), empty: 'Every class has been marked.' },
-    { title: 'Upcoming events', rows: (d) => d.upcomingEvents ?? [], row: (e) => ({ title: e.title, sub: niceDate(e.startDate) }), empty: 'No events soon.' },
-    { title: 'Notices', rows: (d) => d.notices ?? [], row: (n) => ({ title: n.title, sub: n.body?.slice(0, 60) }), empty: 'No notices.' },
-  ],
-};

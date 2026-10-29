@@ -18,7 +18,9 @@ const bump = (key) => {
 
 const blockedFor = (key, max) => {
   const entry = failures.get(key);
-  return entry && entry.resetAt > Date.now() && entry.count >= max ? Math.ceil((entry.resetAt - Date.now()) / 1000) : 0;
+  return entry && entry.resetAt > Date.now() && entry.count >= max
+    ? Math.ceil((entry.resetAt - Date.now()) / 1000)
+    : 0;
 };
 
 const keys = (req) => {
@@ -31,7 +33,9 @@ export function checkLoginAllowed(req, res, next) {
   const wait = Math.max(blockedFor(k.account, MAX_PER_ACCOUNT), blockedFor(k.address, MAX_PER_ADDRESS));
   if (!wait) return next();
   res.set('Retry-After', String(wait));
-  return res.status(429).json({ error: `Too many failed attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` });
+  return res
+    .status(429)
+    .json({ error: `Too many failed attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` });
 }
 
 export function recordLoginFailure(req) {

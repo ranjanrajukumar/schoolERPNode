@@ -27,7 +27,6 @@ export class ApiError extends Error {
 }
 
 export const getServerUrl = () => baseUrl;
-export const getAuthToken = () => token;
 
 /** Sends a small file as raw bytes to an authenticated upload endpoint. */
 export async function uploadBinary(path, bytes, contentType = 'application/octet-stream') {

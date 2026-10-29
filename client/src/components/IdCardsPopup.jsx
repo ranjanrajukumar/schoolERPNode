@@ -16,10 +16,17 @@ export default function IdCardsPopup({ studentId, staffId, classId: startClass =
   const { design, logoUrl } = useIdCardDesign();
 
   useEffect(() => {
-    if (!studentId && !staffId && !classId) { setData(null); return; }
+    if (!studentId && !staffId && !classId) {
+      setData(null);
+      return;
+    }
     setError('');
-    const path = staffId ? `/documents/staff-id-cards?staffId=${staffId}` : `/documents/id-cards?${studentId ? `studentId=${studentId}` : `classId=${classId}`}`;
-    api(path).then(setData).catch((e) => setError(e.message));
+    const path = staffId
+      ? `/documents/staff-id-cards?staffId=${staffId}`
+      : `/documents/id-cards?${studentId ? `studentId=${studentId}` : `classId=${classId}`}`;
+    api(path)
+      .then(setData)
+      .catch((e) => setError(e.message));
   }, [studentId, staffId, classId]);
 
   const single = Boolean(studentId || staffId);
@@ -29,13 +36,23 @@ export default function IdCardsPopup({ studentId, staffId, classId: startClass =
         {!single && (
           <select value={classId} onChange={(e) => setClassId(e.target.value)} aria-label="Class">
             <option value="">Choose a class…</option>
-            {classes.map((c) => <option key={c.id} value={c.id}>{c.name}-{c.section}</option>)}
+            {classes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}-{c.section}
+              </option>
+            ))}
           </select>
         )}
-        {data?.cards.length > 0 && <button type="button" onClick={() => window.print()}>Print {data.cards.length === 1 ? 'card' : `${data.cards.length} cards`}</button>}
+        {data?.cards.length > 0 && (
+          <button type="button" onClick={() => window.print()}>
+            Print {data.cards.length === 1 ? 'card' : `${data.cards.length} cards`}
+          </button>
+        )}
       </div>
       {error && <p className="error">{error}</p>}
-      {data && !data.cards.length && <p className="hint">No active {kind === 'staff' ? 'staff' : 'students'} to print.</p>}
+      {data && !data.cards.length && (
+        <p className="hint">No active {kind === 'staff' ? 'staff' : 'students'} to print.</p>
+      )}
       {!single && !classId && <p className="hint">Choose a class to see its ID cards.</p>}
       <IdCardSheet data={data} kind={kind} design={design} logoUrl={logoUrl} />
     </div>

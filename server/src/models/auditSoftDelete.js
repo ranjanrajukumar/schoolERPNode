@@ -46,9 +46,13 @@ const fkError = (message) => {
 /** The attribute-name sets that must be unique in a table: unique indexes and a key that is typed in (not auto-numbered). */
 function uniqueSets(Model) {
   if (Model.__uniqueSets) return Model.__uniqueSets;
-  const attrOf = (name) => Object.values(Model.rawAttributes).find((a) => a.fieldName === name || a.field === name)?.fieldName;
+  const attrOf = (name) =>
+    Object.values(Model.rawAttributes).find((a) => a.fieldName === name || a.field === name)?.fieldName;
   const sets = [];
-  const add = (fields) => { const attrs = (fields ?? []).map((f) => attrOf(typeof f === 'string' ? f : f.name ?? f.attribute)); if (attrs.length && attrs.every(Boolean)) sets.push(attrs); };
+  const add = (fields) => {
+    const attrs = (fields ?? []).map((f) => attrOf(typeof f === 'string' ? f : (f.name ?? f.attribute)));
+    if (attrs.length && attrs.every(Boolean)) sets.push(attrs);
+  };
   for (const key of Object.values(Model.uniqueKeys ?? {})) add(key.fields);
   for (const index of Model.options.indexes ?? []) if (index.unique) add(index.fields);
   const pk = Model.primaryKeyAttributes ?? [];
@@ -65,8 +69,20 @@ async function purgeDeletedHolding(Model, values, transaction) {
   if (!softDeletes(Model)) return;
   for (const attrs of uniqueSets(Model)) {
     const where = {};
-    if (!attrs.every((a) => { const v = values[a]; if (v === undefined || v === null) return false; where[a] = v; return true; })) continue;
-    try { await Model.unscoped().destroy({ where: { ...where, delstatus: true }, force: true, transaction }); } catch { /* still referenced by something: the create will report the duplicate */ }
+    if (
+      !attrs.every((a) => {
+        const v = values[a];
+        if (v === undefined || v === null) return false;
+        where[a] = v;
+        return true;
+      })
+    )
+      continue;
+    try {
+      await Model.unscoped().destroy({ where: { ...where, delstatus: true }, force: true, transaction });
+    } catch {
+      /* still referenced by something: the create will report the duplicate */
+    }
   }
 }
 
@@ -79,7 +95,11 @@ async function purgeDeletedHolding(Model, values, transaction) {
 async function purgeChildren(Model, options) {
   const pk = Model.primaryKeyAttributes.length === 1 ? Model.primaryKeyAttributes[0] : null;
   if (!pk || options.truncate) return;
-  const parents = await Model.unscoped().findAll({ where: options.where ?? {}, attributes: [pk], transaction: options.transaction });
+  const parents = await Model.unscoped().findAll({
+    where: options.where ?? {},
+    attributes: [pk],
+    transaction: options.transaction,
+  });
   const ids = parents.map((r) => r.get(pk));
   if (!ids.length) return;
   for (const assoc of Object.values(Model.associations)) {
@@ -90,8 +110,10 @@ async function purgeChildren(Model, options) {
     const target = assoc.target.unscoped();
     const { transaction } = options;
     if (rule === 'CASCADE') await target.destroy({ where: child, force: true, transaction });
-    else if (rule === 'SET NULL') await target.update({ [assoc.foreignKey]: null }, { where: child, transaction, hooks: false });
-    else if (softDeletes(assoc.target)) await target.destroy({ where: { ...child, delstatus: true }, force: true, transaction });
+    else if (rule === 'SET NULL')
+      await target.update({ [assoc.foreignKey]: null }, { where: child, transaction, hooks: false });
+    else if (softDeletes(assoc.target))
+      await target.destroy({ where: { ...child, delstatus: true }, force: true, transaction });
   }
 }
 
@@ -99,7 +121,12 @@ async function purgeChildren(Model, options) {
 async function softDelete(Model, options) {
   const { transaction } = options;
   const pk = Model.primaryKeyAttributes.length === 1 ? Model.primaryKeyAttributes[0] : null;
-  const rows = await Model.findAll({ where: options.where ?? {}, attributes: pk ? [pk] : undefined, transaction, ...(options.limit && { limit: options.limit }) });
+  const rows = await Model.findAll({
+    where: options.where ?? {},
+    attributes: pk ? [pk] : undefined,
+    transaction,
+    ...(options.limit && { limit: options.limit }),
+  });
   if (!rows.length) return 0;
   const ids = pk ? rows.map((r) => r.get(pk)) : null;
 
@@ -110,8 +137,10 @@ async function softDelete(Model, options) {
     const child = { [assoc.foreignKey]: ids };
     const rule = String(assoc.options.onDelete ?? 'SET NULL').toUpperCase();
     if (rule === 'CASCADE') await assoc.target.destroy({ where: child, transaction });
-    else if (rule === 'SET NULL') await assoc.target.update({ [assoc.foreignKey]: null }, { where: child, transaction, hooks: false });
-    else if (await assoc.target.count({ where: child, transaction })) throw fkError(`${assoc.target.tableName}.${assoc.foreignKey} still refers to ${Model.tableName}`);
+    else if (rule === 'SET NULL')
+      await assoc.target.update({ [assoc.foreignKey]: null }, { where: child, transaction, hooks: false });
+    else if (await assoc.target.count({ where: child, transaction }))
+      throw fkError(`${assoc.target.tableName}.${assoc.foreignKey} still refers to ${Model.tableName}`);
   }
 
   const stamp = { delstatus: true, delondt: new Date(), authdel: currentUser() };
@@ -136,7 +165,9 @@ function keepJoinsOptional(include) {
 }
 
 export function installAudit(sequelize) {
-  const optionalJoins = (options) => { if (options?.include) options.include = keepJoinsOptional(options.include); };
+  const optionalJoins = (options) => {
+    if (options?.include) options.include = keepJoinsOptional(options.include);
+  };
   sequelize.addHook('beforeFind', optionalJoins);
   sequelize.addHook('beforeCount', optionalJoins);
 
@@ -144,7 +175,11 @@ export function installAudit(sequelize) {
   sequelize.addHook('beforeDefine', (attributes, options) => {
     Object.assign(attributes, columns());
     const own = Boolean(options.paranoid);
-    if (!own && !HARD_DELETE.has(options.modelName)) options.defaultScope = { ...(options.defaultScope ?? {}), where: { ...(options.defaultScope?.where ?? {}), delstatus: false } };
+    if (!own && !HARD_DELETE.has(options.modelName))
+      options.defaultScope = {
+        ...(options.defaultScope ?? {}),
+        where: { ...(options.defaultScope?.where ?? {}), delstatus: false },
+      };
   });
 
   sequelize.addHook('afterDefine', (Model) => {
@@ -154,7 +189,13 @@ export function installAudit(sequelize) {
     Model.upsert = async function stampedUpsert(values, options = {}) {
       const who = currentUser();
       const now = new Date();
-      const full = { ...values, authadd: values.authadd ?? who, addondt: values.addondt ?? now, authedit: who, editondt: now };
+      const full = {
+        ...values,
+        authadd: values.authadd ?? who,
+        addondt: values.addondt ?? now,
+        authedit: who,
+        editondt: now,
+      };
       await purgeDeletedHolding(this, full, options.transaction);
       const fields = options.fields ?? Object.keys(full).filter((k) => k !== 'authadd' && k !== 'addondt');
       return upsert.call(this, full, { ...options, fields });
@@ -173,7 +214,10 @@ export function installAudit(sequelize) {
     Model.prototype.destroy = async function instanceDestroy(options = {}) {
       if (options.force) return hardInstanceDestroy.call(this, options);
       const pk = this.constructor.primaryKeyAttributes;
-      const n = await this.constructor.destroy({ where: Object.fromEntries(pk.map((k) => [k, this.get(k)])), transaction: options.transaction });
+      const n = await this.constructor.destroy({
+        where: Object.fromEntries(pk.map((k) => [k, this.get(k)])),
+        transaction: options.transaction,
+      });
       if (n) this.set({ delstatus: true, delondt: new Date(), authdel: currentUser() }, { raw: true });
       return this;
     };
@@ -190,7 +234,8 @@ export function installAudit(sequelize) {
       return;
     }
     instance.set({ authedit: who, editondt: now });
-    if (Array.isArray(options.fields)) for (const f of ['authedit', 'editondt']) if (!options.fields.includes(f)) options.fields.push(f);
+    if (Array.isArray(options.fields))
+      for (const f of ['authedit', 'editondt']) if (!options.fields.includes(f)) options.fields.push(f);
   });
   sequelize.addHook('beforeBulkCreate', async (instances, options) => {
     const who = currentUser();
@@ -200,13 +245,15 @@ export function installAudit(sequelize) {
       if (!instance.get('addondt')) instance.set('addondt', now);
       await purgeDeletedHolding(instance.constructor, instance.dataValues, options.transaction);
     }
-    if (Array.isArray(options.fields)) for (const f of ['authadd', 'addondt']) if (!options.fields.includes(f)) options.fields.push(f);
+    if (Array.isArray(options.fields))
+      for (const f of ['authadd', 'addondt']) if (!options.fields.includes(f)) options.fields.push(f);
   });
   sequelize.addHook('beforeBulkUpdate', (options) => {
     if (options.hooks === false || !options.attributes) return;
     options.attributes.authedit = currentUser();
     options.attributes.editondt = new Date();
-    if (Array.isArray(options.fields)) for (const f of ['authedit', 'editondt']) if (!options.fields.includes(f)) options.fields.push(f);
+    if (Array.isArray(options.fields))
+      for (const f of ['authedit', 'editondt']) if (!options.fields.includes(f)) options.fields.push(f);
   });
   // models that soft-delete their own way (enquiries) mirror it into the audit columns
   sequelize.addHook('beforeDestroy', (instance, options) => {

@@ -4,7 +4,10 @@ const METHODS = ['cash', 'card', 'upi', 'bank'].map((v) => ({ value: v, label: v
 
 export default function Expenses() {
   return (
-    <ResourcePage title="Expenses" path="/accounts/expenses" writeRoles={['admin', 'accountant']}
+    <ResourcePage
+      title="Expenses"
+      path="/accounts/expenses"
+      writeRoles={['admin', 'accountant']}
       fields={[
         { key: 'category', label: 'Category', required: true },
         { key: 'description', label: 'Description' },
@@ -20,6 +23,7 @@ export default function Expenses() {
         { key: 'amount', label: 'Amount' },
         { key: 'method', label: 'Method' },
         { key: 'reference', label: 'Reference' },
-      ]} />
+      ]}
+    />
   );
 }

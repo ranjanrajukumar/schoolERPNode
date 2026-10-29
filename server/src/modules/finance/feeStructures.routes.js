@@ -4,7 +4,10 @@ import { crudRouter } from '../../utils/crud.js';
 async function list() {
   const rows = await FeeStructure.findAll({
     include: [{ model: SchoolClass, attributes: ['name', 'section'] }],
-    order: [['classId', 'ASC'], ['id', 'ASC']],
+    order: [
+      ['classId', 'ASC'],
+      ['id', 'ASC'],
+    ],
   });
   return rows.map((r) => ({
     id: r.id,

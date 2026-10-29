@@ -8,7 +8,8 @@ import { useEffect } from 'react';
  * A button is guarded when it has a data-sure attribute (use data-sure="off" to opt out), or when its label starts with a
  * destructive word. "Cancel" is guarded only inside a table row, where it cancels a record; in a form it just closes the form.
  */
-const WORDS = /^(delete|remove|withdraw|purge|unlink|finali[sz]e|hire|enroll|make offer|reset(?! password)|restore standard|use default|new key|issue a new key|receive)/i;
+const WORDS =
+  /^(delete|remove|withdraw|purge|unlink|finali[sz]e|hire|enroll|make offer|reset(?! password)|restore standard|use default|new key|issue a new key|receive)/i;
 const ARM_MS = 4000;
 
 function needsSure(button) {
@@ -29,14 +30,21 @@ export function useSureClicks() {
       clearTimeout(timer);
       if (!armed) return;
       armed.removeAttribute('data-armed');
-      if (label === null) armed.removeAttribute('aria-label'); else armed.setAttribute('aria-label', label);
+      if (label === null) armed.removeAttribute('aria-label');
+      else armed.setAttribute('aria-label', label);
       armed = null;
     };
 
     const onClick = (event) => {
       const button = event.target instanceof Element ? event.target.closest('button') : null;
-      if (!button || button.disabled || !needsSure(button)) { disarm(); return; }
-      if (armed === button) { disarm(); return; } // the second click: let it through
+      if (!button || button.disabled || !needsSure(button)) {
+        disarm();
+        return;
+      }
+      if (armed === button) {
+        disarm();
+        return;
+      } // the second click: let it through
       event.preventDefault();
       event.stopPropagation(); // capture phase: React never sees the first click
       disarm();
@@ -46,8 +54,12 @@ export function useSureClicks() {
       button.setAttribute('aria-label', `Sure? Click again to ${button.textContent.trim().toLowerCase()}`);
       timer = setTimeout(disarm, ARM_MS);
     };
-    const onKey = (event) => { if (event.key === 'Escape') disarm(); };
-    const onFocusOut = (event) => { if (armed && event.target === armed && event.relatedTarget !== armed) disarm(); };
+    const onKey = (event) => {
+      if (event.key === 'Escape') disarm();
+    };
+    const onFocusOut = (event) => {
+      if (armed && event.target === armed && event.relatedTarget !== armed) disarm();
+    };
 
     document.addEventListener('click', onClick, true);
     document.addEventListener('keydown', onKey);

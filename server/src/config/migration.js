@@ -8,7 +8,18 @@ import { AUDIT_COLUMNS } from '../models/auditSoftDelete.js';
 import bcrypt from 'bcryptjs';
 import { Sequelize } from 'sequelize';
 import { dbSsl } from './dbSsl.js';
-import { LeaveType, LmsCourse, LmsTag, LmsEnrollment, LmsLesson, LmsSubmission, Setting, Student, sequelize, User } from '../models/index.js';
+import {
+  LeaveType,
+  LmsCourse,
+  LmsTag,
+  LmsEnrollment,
+  LmsLesson,
+  LmsSubmission,
+  Setting,
+  Student,
+  sequelize,
+  User,
+} from '../models/index.js';
 import { migrateLegacyLmsFiles } from '../modules/academics/lmsFiles.service.js';
 import { env } from './env.js';
 import { ensureForeignKeys } from './integrity.js';
@@ -66,7 +77,11 @@ const ADDED_COLUMNS = [
   { table: 'lms_quizzes', column: 'due_on', definition: 'DATE NULL' },
   { table: 'lms_lessons', column: 'attachment_data', definition: 'LONGTEXT NULL' },
   { table: 'lms_lessons', column: 'module_id', definition: 'INT NULL' },
-  { table: 'lms_quiz_attempts', column: 'review_status', definition: "VARCHAR(20) NOT NULL DEFAULT 'reviewed'" },
+  {
+    table: 'lms_quiz_attempts',
+    column: 'review_status',
+    definition: "VARCHAR(20) NOT NULL DEFAULT 'reviewed'",
+  },
   { table: 'lms_quiz_attempts', column: 'feedback', definition: 'VARCHAR(1000) NULL' },
   { table: 'lms_quiz_attempts', column: 'question_scores', definition: 'JSON NULL' },
   { table: 'lms_lessons', column: 'attachment_key', definition: 'VARCHAR(64) NULL' },
@@ -145,7 +160,11 @@ const ADDED_COLUMNS = [
   { table: 'admissions', column: 'interview_date', definition: 'DATE NULL' },
   { table: 'admissions', column: 'interview_time', definition: 'VARCHAR(5) NULL' },
   { table: 'admissions', column: 'interview_panel', definition: 'VARCHAR(100) NULL' },
-  { table: 'admissions', column: 'interview_result', definition: "ENUM('pending','recommended','not_recommended') NULL" },
+  {
+    table: 'admissions',
+    column: 'interview_result',
+    definition: "ENUM('pending','recommended','not_recommended') NULL",
+  },
   { table: 'admissions', column: 'offer_expiry', definition: 'DATE NULL' },
   { table: 'timetable_slots', column: 'room_id', definition: 'INT NULL' },
   { table: 'classes', column: 'branch_id', definition: 'INT NULL' },
@@ -175,11 +194,18 @@ async function moveExtrasToSideTable() {
     json: new Set(ENQUIRY_FIELDS.filter((f) => f.type === 'json').map((f) => f.key)),
     bool: new Set(ENQUIRY_FIELDS.filter((f) => f.type === 'bool').map((f) => f.key)),
   };
-  for (const [table, entity, keys] of [['admissions', 'admission', ENQUIRY_FIELDS.map((f) => f.key)], ['students', 'student', [...STUDENT_EXTRA_KEYS, 'source', 'referredBy']]]) {
+  for (const [table, entity, keys] of [
+    ['admissions', 'admission', ENQUIRY_FIELDS.map((f) => f.key)],
+    ['students', 'student', [...STUDENT_EXTRA_KEYS, 'source', 'referredBy']],
+  ]) {
     const existing = await queryInterface.describeTable(table);
-    const present = keys.filter((k) => existing[snake(k)] && !(table === 'admissions' && ['source', 'referredBy'].includes(k)));
+    const present = keys.filter(
+      (k) => existing[snake(k)] && !(table === 'admissions' && ['source', 'referredBy'].includes(k)),
+    );
     if (!present.length) continue;
-    const [rows] = await sequelize.query(`SELECT id, ${present.map((k) => `\`${snake(k)}\` AS \`${k}\``).join(', ')} FROM \`${table}\` WHERE ${present.map((k) => `\`${snake(k)}\` IS NOT NULL`).join(' OR ')}`);
+    const [rows] = await sequelize.query(
+      `SELECT id, ${present.map((k) => `\`${snake(k)}\` AS \`${k}\``).join(', ')} FROM \`${table}\` WHERE ${present.map((k) => `\`${snake(k)}\` IS NOT NULL`).join(' OR ')}`,
+    );
     for (const { id, ...values } of rows) {
       const clean = {};
       for (const [k, v] of Object.entries(values)) {
@@ -196,30 +222,45 @@ async function ensureColumns() {
   const queryInterface = sequelize.getQueryInterface();
   for (const { table, column, definition } of ADDED_COLUMNS) {
     const existing = await queryInterface.describeTable(table);
-    if (!existing[column]) await sequelize.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
+    if (!existing[column])
+      await sequelize.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
   }
   await sequelize.query('ALTER TABLE lms_progress MODIFY COLUMN completed_at DATETIME NULL');
   await sequelize.query('ALTER TABLE lms_quiz_attempts MODIFY COLUMN score DECIMAL(8,2) NOT NULL');
   await sequelize.query('ALTER TABLE lms_quiz_attempts MODIFY COLUMN max_score DECIMAL(8,2) NOT NULL');
-  await sequelize.query('UPDATE lms_progress SET viewed_at = completed_at, view_count = 1 WHERE completed_at IS NOT NULL AND viewed_at IS NULL');
+  await sequelize.query(
+    'UPDATE lms_progress SET viewed_at = completed_at, view_count = 1 WHERE completed_at IS NOT NULL AND viewed_at IS NULL',
+  );
   const movedLmsFiles = await migrateLegacyLmsFiles([LmsLesson, LmsSubmission]);
-  if (movedLmsFiles) console.log(`Moved ${movedLmsFiles} LMS file(s) into ${process.env.LMS_STORAGE_DIR || 'uploads/lms'}.`);
+  if (movedLmsFiles)
+    console.log(`Moved ${movedLmsFiles} LMS file(s) into ${process.env.LMS_STORAGE_DIR || 'uploads/lms'}.`);
   const courses = await LmsCourse.findAll({ attributes: ['id', 'classId'] });
   for (const course of courses) {
-    const students = await Student.findAll({ where: { classId: course.classId, status: 'active' }, attributes: ['id'], raw: true });
-    if (students.length) await LmsEnrollment.bulkCreate(students.map((student) => ({ courseId: course.id, studentId: student.id, active: true })), { ignoreDuplicates: true });
+    const students = await Student.findAll({
+      where: { classId: course.classId, status: 'active' },
+      attributes: ['id'],
+      raw: true,
+    });
+    if (students.length)
+      await LmsEnrollment.bulkCreate(
+        students.map((student) => ({ courseId: course.id, studentId: student.id, active: true })),
+        { ignoreDuplicates: true },
+      );
   }
   // the audit and soft-delete columns on every table, old ones included
   for (const model of Object.values(sequelize.models)) {
     const existing = await queryInterface.describeTable(model.tableName);
     for (const [column, definition] of Object.entries(AUDIT_COLUMNS)) {
-      if (!existing[column]) await sequelize.query(`ALTER TABLE \`${model.tableName}\` ADD COLUMN \`${column}\` ${definition}`);
+      if (!existing[column])
+        await sequelize.query(`ALTER TABLE \`${model.tableName}\` ADD COLUMN \`${column}\` ${definition}`);
     }
   }
   await moveExtrasToSideTable();
   // Enquiries that predate the enquiry date take the day they were entered. Safe to repeat.
   // An applicant marked enrolled whose student no longer exists goes back to holding an offer. Safe to repeat.
-  await sequelize.query("UPDATE admissions SET status = 'approved', student_id = NULL, enrolled_on = NULL WHERE status = 'enrolled' AND (student_id IS NULL OR student_id NOT IN (SELECT id FROM students))");
+  await sequelize.query(
+    "UPDATE admissions SET status = 'approved', student_id = NULL, enrolled_on = NULL WHERE status = 'enrolled' AND (student_id IS NULL OR student_id NOT IN (SELECT id FROM students))",
+  );
   await sequelize.query('UPDATE admissions SET enquiry_on = DATE(created_at) WHERE enquiry_on IS NULL');
 }
 
@@ -231,7 +272,9 @@ async function enforceRelationships() {
   const { added, blocked } = await ensureForeignKeys();
   if (added.length) console.log(`Added ${added.length} missing foreign key(s).`);
   if (blocked.length) {
-    console.warn(`WARNING: ${blocked.length} relationship(s) are not enforced because of orphaned rows: ${blocked.map((b) => `${b.child}.${b.column}`).join(', ')}. Run "npm run db:orphans" to review them.`);
+    console.warn(
+      `WARNING: ${blocked.length} relationship(s) are not enforced because of orphaned rows: ${blocked.map((b) => `${b.child}.${b.column}`).join(', ')}. Run "npm run db:orphans" to review them.`,
+    );
   }
 }
 
@@ -242,7 +285,11 @@ async function enforceRelationships() {
 /** The first time, give the tag master a few starting tags so a teacher can tag a course straight away. */
 async function ensureLmsTags() {
   if (await LmsTag.count()) return;
-  await LmsTag.bulkCreate(['Maths', 'Science', 'English', 'Reading', 'Revision', 'Homework', 'Exam prep', 'Project'].map((name) => ({ name })));
+  await LmsTag.bulkCreate(
+    ['Maths', 'Science', 'English', 'Reading', 'Revision', 'Homework', 'Exam prep', 'Project'].map(
+      (name) => ({ name }),
+    ),
+  );
 }
 
 async function ensureLeaveTypes() {
@@ -250,10 +297,14 @@ async function ensureLeaveTypes() {
   // half days and timely leave need fractions
   await sequelize.query('ALTER TABLE leave_requests MODIFY COLUMN days DECIMAL(4,1) NOT NULL');
   await sequelize.query('ALTER TABLE student_leaves MODIFY COLUMN days DECIMAL(4,1) NOT NULL');
-  await sequelize.query("ALTER TABLE leave_types MODIFY COLUMN approver ENUM('admin','class_teacher','department_head') NOT NULL DEFAULT 'admin'");
+  await sequelize.query(
+    "ALTER TABLE leave_types MODIFY COLUMN approver ENUM('admin','class_teacher','department_head') NOT NULL DEFAULT 'admin'",
+  );
   if (!(await LeaveType.count())) {
     // the allowances used to be settings; keep whatever the school had saved
-    const saved = await Setting.findAll({ where: { key: ['leave.casualDays', 'leave.sickDays', 'leave.earnedDays'] } });
+    const saved = await Setting.findAll({
+      where: { key: ['leave.casualDays', 'leave.sickDays', 'leave.earnedDays'] },
+    });
     const v = Object.fromEntries(saved.map((r) => [r.key, JSON.parse(r.value)]));
     await LeaveType.bulkCreate([
       { name: 'Casual', appliesTo: 'staff', yearlyDays: v['leave.casualDays'] ?? 12 },
@@ -265,7 +316,9 @@ async function ensureLeaveTypes() {
     const sick = await LeaveType.findOne({ where: { name: 'Sick' } });
     if (v['leave.sickDays'] !== undefined) await sick.update({ yearlyDays: v['leave.sickDays'] });
   }
-  await sequelize.query('UPDATE leave_requests lr JOIN leave_types lt ON LOWER(lt.name) = LOWER(lr.type) SET lr.leave_type_id = lt.id WHERE lr.leave_type_id IS NULL');
+  await sequelize.query(
+    'UPDATE leave_requests lr JOIN leave_types lt ON LOWER(lt.name) = LOWER(lr.type) SET lr.leave_type_id = lt.id WHERE lr.leave_type_id IS NULL',
+  );
 }
 
 /** Creates missing tables (never alters existing ones) and seeds the first admin. */
@@ -274,7 +327,10 @@ async function ensureFilesInDatabase() {
   const { moveFilesToDatabase } = await import('../modules/files/files.service.js');
   const { StudentFile, StaffFile } = await import('../models/index.js');
   const { moved, missing } = await moveFilesToDatabase([StudentFile, StaffFile]);
-  if (moved || missing) console.log(`Files moved into the database: ${moved}${missing ? `; ${missing} could not be found on disk` : ''}`);
+  if (moved || missing)
+    console.log(
+      `Files moved into the database: ${moved}${missing ? `; ${missing} could not be found on disk` : ''}`,
+    );
 }
 
 /** The mobile app's menu lives in the database; add any default tile or page the table does not have yet. */

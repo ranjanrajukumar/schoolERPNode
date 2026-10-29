@@ -8,8 +8,13 @@ test('production startup rejects public credentials and missing staging origins'
   const saved = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
   try {
     Object.assign(process.env, {
-      NODE_ENV: 'production', DB_HOST: 'db', DB_USER: 'school', DB_NAME: 'school',
-      JWT_SECRET: 'a'.repeat(48), ADMIN_PASSWORD: 'admin123', CLIENT_ORIGIN: 'https://school.example',
+      NODE_ENV: 'production',
+      DB_HOST: 'db',
+      DB_USER: 'school',
+      DB_NAME: 'school',
+      JWT_SECRET: 'a'.repeat(48),
+      ADMIN_PASSWORD: 'admin123',
+      CLIENT_ORIGIN: 'https://school.example',
     });
     assert.throws(assertEnvironment, /ADMIN_PASSWORD/);
 

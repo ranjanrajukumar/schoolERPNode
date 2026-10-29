@@ -16,27 +16,59 @@ const blank = (v) => v === undefined || v === null || String(v).trim() === '';
 const SUBMITTABLE = ['draft', 'enquiry'];
 const FORM_FIELDS = [...new Set([...ADMISSION_FIELDS, 'referredBy', 'academicYear'])];
 
-const clean = (body) => Object.fromEntries(FORM_FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, blank(body[f]) ? null : typeof body[f] === 'string' ? body[f].trim() : body[f]]));
+const clean = (body) =>
+  Object.fromEntries(
+    FORM_FIELDS.filter((f) => body[f] !== undefined).map((f) => [
+      f,
+      blank(body[f]) ? null : typeof body[f] === 'string' ? body[f].trim() : body[f],
+    ]),
+  );
 
 /** The form's own first and last name become the applicant name, the way the enquiry form does it. */
 function withName(body, data) {
-  if (body.firstName !== undefined || body.lastName !== undefined) data.applicantName = [body.firstName, body.lastName].map((x) => String(x ?? '').trim()).filter(Boolean).join(' ');
+  if (body.firstName !== undefined || body.lastName !== undefined)
+    data.applicantName = [body.firstName, body.lastName]
+      .map((x) => String(x ?? '').trim())
+      .filter(Boolean)
+      .join(' ');
   return data;
 }
 
-const listDocs = async (admissionId) => (await ApplicationDocument.findAll({ where: { admissionId }, attributes: ['id', 'title', 'originalName', 'mimeType', 'size', 'createdAt'], order: [['id', 'ASC']] }))
-  .map((d) => ({ id: d.id, title: d.title, name: d.originalName, mimeType: d.mimeType, size: d.size, uploadedAt: d.createdAt }));
+const listDocs = async (admissionId) =>
+  (
+    await ApplicationDocument.findAll({
+      where: { admissionId },
+      attributes: ['id', 'title', 'originalName', 'mimeType', 'size', 'createdAt'],
+      order: [['id', 'ASC']],
+    })
+  ).map((d) => ({
+    id: d.id,
+    title: d.title,
+    name: d.originalName,
+    mimeType: d.mimeType,
+    size: d.size,
+    uploadedAt: d.createdAt,
+  }));
 
 export async function getApplication(id) {
   const a = await Admission.findByPk(id);
   if (!a) throw notFound('Application not found');
   const [first, ...rest] = a.applicantName.trim().split(/\s+/);
-  return { ...a.toJSON(), ...(await loadExtras('admission', id)), choices: parseChoices(a.choices), firstName: first, lastName: rest.join(' '), documents: await listDocs(id), services: await describeServices(a) };
+  return {
+    ...a.toJSON(),
+    ...(await loadExtras('admission', id)),
+    choices: parseChoices(a.choices),
+    firstName: first,
+    lastName: rest.join(' '),
+    documents: await listDocs(id),
+    services: await describeServices(a),
+  };
 }
 
 async function checkYear(data) {
   if (!data.academicYear) return;
-  if ((await AcademicYear.count()) && !(await AcademicYear.findOne({ where: { name: data.academicYear } }))) throw badRequest('Academic year is not one of the academic years');
+  if ((await AcademicYear.count()) && !(await AcademicYear.findOne({ where: { name: data.academicYear } })))
+    throw badRequest('Academic year is not one of the academic years');
 }
 
 /** Saves a draft. With no id a new draft is created; the application number is assigned from its record number. */
@@ -47,7 +79,8 @@ export async function saveDraft(id, body) {
   await checkDetails({ ...body, ...data });
   await checkYear(data);
   if (body.choices !== undefined) {
-    const classId = data.classId ?? (id ? (await Admission.findByPk(id, { attributes: ['classId'] }))?.classId : null);
+    const classId =
+      data.classId ?? (id ? (await Admission.findByPk(id, { attributes: ['classId'] }))?.classId : null);
     data.choices = JSON.stringify(await cleanChoices(body.choices, classId));
   }
   if (!id) {
@@ -58,7 +91,8 @@ export async function saveDraft(id, body) {
   }
   const a = await Admission.findByPk(id);
   if (!a) throw notFound('Application not found');
-  if (['enrolled', 'rejected'].includes(a.status)) throw conflict(`A ${a.status} application cannot be changed here`);
+  if (['enrolled', 'rejected'].includes(a.status))
+    throw conflict(`A ${a.status} application cannot be changed here`);
   if (data.applicantName === '') delete data.applicantName;
   if (!data.source) delete data.source; // the column cannot be empty
   await a.update(data);
@@ -67,9 +101,11 @@ export async function saveDraft(id, body) {
 }
 
 /** What has to be filled in before an application can be submitted, as the form's own labels. */
-export function missingForSubmit(a, years) {
+function missingForSubmit(a, years) {
   const need = [];
-  const [first, ...rest] = String(a.applicantName ?? '').trim().split(/\s+/);
+  const [first, ...rest] = String(a.applicantName ?? '')
+    .trim()
+    .split(/\s+/);
   if (!first) need.push('First name');
   if (!rest.length) need.push('Last name');
   if (!a.dob) need.push('Date of birth');
@@ -86,14 +122,20 @@ export function missingForSubmit(a, years) {
 export async function submitApplication(id, body) {
   const a = await Admission.findByPk(id);
   if (!a) throw notFound('Application not found');
-  if (!SUBMITTABLE.includes(a.status)) throw conflict(a.status === 'applied' ? 'This application has already been submitted' : `A ${a.status} application cannot be submitted`);
+  if (!SUBMITTABLE.includes(a.status))
+    throw conflict(
+      a.status === 'applied'
+        ? 'This application has already been submitted'
+        : `A ${a.status} application cannot be submitted`,
+    );
   if (body && Object.keys(body).length > 1) await saveDraft(id, body);
   const fresh = await Admission.findByPk(id);
   const need = missingForSubmit(fresh, (await AcademicYear.count()) > 0);
   const docsMissing = await missingDocuments(id);
   if (docsMissing.length) need.push(...docsMissing.map((d) => `${d} (upload)`));
   if (need.length) throw badRequest(`Please complete: ${need.join(', ')}`);
-  if (body?.consent !== true) throw badRequest('Please confirm the information is accurate and consent to being contacted');
+  if (body?.consent !== true)
+    throw badRequest('Please confirm the information is accurate and consent to being contacted');
   await fresh.update({ status: 'applied', consentAt: new Date(), followUpOn: null });
   return { id: fresh.id };
 }
@@ -104,13 +146,26 @@ const DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
 export async function addDocument(id, { buffer, name, title, byName }) {
   const a = await Admission.findByPk(id, { attributes: ['id', 'status'] });
   if (!a) throw notFound('Application not found');
-  if (a.status === 'enrolled') throw conflict('An enrolled applicant has no application to add documents to; use the student record');
+  if (a.status === 'enrolled')
+    throw conflict('An enrolled applicant has no application to add documents to; use the student record');
   if (!Buffer.isBuffer(buffer) || !buffer.length) throw badRequest('No file received');
   if (buffer.length > MAX_BYTES) throw badRequest(`A file must be ${MAX_BYTES / 1024 / 1024} MB or smaller`);
   const mimeType = sniff(buffer);
   if (!DOC_TYPES.includes(mimeType)) throw badRequest('Only PDF, JPG, PNG or WebP files are allowed');
-  if ((await ApplicationDocument.count({ where: { admissionId: id } })) >= 10) throw badRequest('An application can have at most 10 documents');
-  const doc = await ApplicationDocument.create({ admissionId: id, title: String(title ?? '').trim().slice(0, 100) || null, originalName: String(name || 'document').slice(0, 255), mimeType, size: buffer.length, data: buffer.toString('base64'), uploadedByName: byName });
+  if ((await ApplicationDocument.count({ where: { admissionId: id } })) >= 10)
+    throw badRequest('An application can have at most 10 documents');
+  const doc = await ApplicationDocument.create({
+    admissionId: id,
+    title:
+      String(title ?? '')
+        .trim()
+        .slice(0, 100) || null,
+    originalName: String(name || 'document').slice(0, 255),
+    mimeType,
+    size: buffer.length,
+    data: buffer.toString('base64'),
+    uploadedByName: byName,
+  });
   return { id: doc.id, title: doc.title, name: doc.originalName, mimeType, size: doc.size };
 }
 
@@ -123,7 +178,8 @@ export async function readDocument(id, docId) {
 export async function removeDocument(id, docId) {
   const a = await Admission.findByPk(id, { attributes: ['status'] });
   if (a?.status === 'enrolled') throw conflict('An enrolled applicant has no application to change');
-  if (!(await ApplicationDocument.destroy({ where: { id: docId, admissionId: id } }))) throw notFound('Document not found');
+  if (!(await ApplicationDocument.destroy({ where: { id: docId, admissionId: id } })))
+    throw notFound('Document not found');
 }
 
 /**
@@ -134,20 +190,44 @@ export async function carryOverToStudent(admissionId, studentId, byName) {
   const problems = [];
   for (const d of await ApplicationDocument.findAll({ where: { admissionId } })) {
     try {
-      await saveFile({ studentId, kind: 'document', title: d.title || d.originalName.replace(/\.[^.]+$/, ''), originalName: d.originalName, buffer: Buffer.from(d.data, 'base64'), uploadedByName: byName });
-    } catch (err) { problems.push(`${d.originalName}: ${err.message}`); }
+      await saveFile({
+        studentId,
+        kind: 'document',
+        title: d.title || d.originalName.replace(/\.[^.]+$/, ''),
+        originalName: d.originalName,
+        buffer: Buffer.from(d.data, 'base64'),
+        uploadedByName: byName,
+      });
+    } catch (err) {
+      problems.push(`${d.originalName}: ${err.message}`);
+    }
   }
   const photo = await Photo.findOne({ where: { entity: 'enquiry', entityId: admissionId } });
   if (photo) {
     await Photo.destroy({ where: { entity: 'student', entityId: studentId } });
-    await Photo.create({ entity: 'student', entityId: studentId, mimeType: photo.mimeType, size: photo.size, originalName: photo.originalName, data: photo.data, uploadedByName: byName });
+    await Photo.create({
+      entity: 'student',
+      entityId: studentId,
+      mimeType: photo.mimeType,
+      size: photo.size,
+      originalName: photo.originalName,
+      data: photo.data,
+      uploadedByName: byName,
+    });
   }
   return problems;
 }
 
 /** The required documents (Master data → Application documents) that have not been uploaded to this application yet. */
-export async function missingDocuments(admissionId) {
-  const required = await MasterItem.findAll({ where: { type: 'application_document', required: true, active: true }, attributes: ['name'] });
-  const have = new Set((await ApplicationDocument.findAll({ where: { admissionId }, attributes: ['title'] })).map((d) => String(d.title ?? '').toLowerCase()));
+async function missingDocuments(admissionId) {
+  const required = await MasterItem.findAll({
+    where: { type: 'application_document', required: true, active: true },
+    attributes: ['name'],
+  });
+  const have = new Set(
+    (await ApplicationDocument.findAll({ where: { admissionId }, attributes: ['title'] })).map((d) =>
+      String(d.title ?? '').toLowerCase(),
+    ),
+  );
   return required.map((r) => r.name).filter((n) => !have.has(n.toLowerCase()));
 }

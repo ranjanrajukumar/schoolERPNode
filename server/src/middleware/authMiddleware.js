@@ -24,24 +24,36 @@ export async function requireAuth(req, res, next) {
   if (!user) return res.status(401).json({ error: 'Unauthorized' });
   // A custom role is its base role narrowed to some modules: it can never do more than the base role, only less.
   // a temporary password must be replaced first: only the sign-in and password endpoints work until then
-  if (user.mustChangePassword && !req.originalUrl.startsWith('/api/auth/')) return res.status(403).json({ error: 'Please change your password first.', mustChangePassword: true });
+  if (user.mustChangePassword && !req.originalUrl.startsWith('/api/auth/'))
+    return res.status(403).json({ error: 'Please change your password first.', mustChangePassword: true });
   setCurrentUser(user.name); // the audit columns on whatever this request saves or deletes
-  req.user = { id: user.id, name: user.name, role: user.Role?.baseRole ?? user.role, staffId: user.staffId ?? null, mustChangePassword: Boolean(user.mustChangePassword) };
+  req.user = {
+    id: user.id,
+    name: user.name,
+    role: user.Role?.baseRole ?? user.role,
+    staffId: user.staffId ?? null,
+    mustChangePassword: Boolean(user.mustChangePassword),
+  };
   if (user.roleId) {
     req.user.customRole = user.Role?.name ?? null;
     req.user.permissions = user.Role ? JSON.parse(user.Role.permissions) : {}; // a role that vanished grants nothing
-    if (!permits(req.user.permissions, req.method, req.originalUrl)) return res.status(403).json({ error: 'Your role does not include this area' });
+    if (!permits(req.user.permissions, req.method, req.originalUrl))
+      return res.status(403).json({ error: 'Your role does not include this area' });
   }
   next();
 }
 
-export const requireRole = (...roles) => (req, res, next) =>
-  roles.includes(req.user.role) ? next() : res.status(403).json({ error: 'Forbidden' });
+export const requireRole =
+  (...roles) =>
+  (req, res, next) =>
+    roles.includes(req.user.role) ? next() : res.status(403).json({ error: 'Forbidden' });
 
 const READ_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 /** Any signed-in user may read; only the listed roles may create, change or delete. */
-export const writeRoles = (...roles) => (req, res, next) =>
-  READ_METHODS.has(req.method) || roles.includes(req.user.role)
-    ? next()
-    : res.status(403).json({ error: 'Forbidden' });
+export const writeRoles =
+  (...roles) =>
+  (req, res, next) =>
+    READ_METHODS.has(req.method) || roles.includes(req.user.role)
+      ? next()
+      : res.status(403).json({ error: 'Forbidden' });

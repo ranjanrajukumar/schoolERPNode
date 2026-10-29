@@ -4,7 +4,7 @@ import { GradeBand, GradingSetting } from '../../models/index.js';
  * Fallback grade scale (percentage -> grade) used until the school saves its own under Grade setup.
  * Ordered from the highest threshold down.
  */
-export const DEFAULT_BANDS = [
+const DEFAULT_BANDS = [
   { min: 90, grade: 'A+' },
   { min: 80, grade: 'A' },
   { min: 70, grade: 'B' },
@@ -15,7 +15,7 @@ export const DEFAULT_BANDS = [
 ];
 
 /** Fallback: a subject is failed below this percentage. */
-export const DEFAULT_PASS_PERCENT = 40;
+const DEFAULT_PASS_PERCENT = 40;
 
 /**
  * The school's grading policy: the saved bands and pass mark, or the defaults when none are saved.
@@ -26,7 +26,9 @@ export async function loadGrading() {
     GradeBand.findAll({ order: [['minPercent', 'DESC']] }),
     GradingSetting.findByPk(1),
   ]);
-  const bands = rows.length ? rows.map((b) => ({ min: Number(b.minPercent), grade: b.grade })) : DEFAULT_BANDS;
+  const bands = rows.length
+    ? rows.map((b) => ({ min: Number(b.minPercent), grade: b.grade }))
+    : DEFAULT_BANDS;
   const passPercent = setting ? Number(setting.passPercent) : DEFAULT_PASS_PERCENT;
   return {
     bands,

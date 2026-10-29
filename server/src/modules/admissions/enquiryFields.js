@@ -126,18 +126,38 @@ export const ENQUIRY_FIELDS = [
   { key: 'specialization', label: 'Specialization in', type: 'text', max: 100 },
 ];
 
-export const QUALIFICATION_COLUMNS = [
-  ['exam', 'Class passed', 60], ['board', 'Board', 100], ['institute', 'School', 120], ['subject', 'Subjects', 80], ['medium', 'Medium', 30], ['eduStatus', 'Status', 30],
-  ['year', 'Year of passing', 4], ['rollNo', 'Roll no.', 30], ['marksObtained', 'Marks obtained', 8], ['maxMarks', 'Out of', 8], ['percent', 'Marks %', 6], ['grade', 'Division / grade', 30],
+const QUALIFICATION_COLUMNS = [
+  ['exam', 'Class passed', 60],
+  ['board', 'Board', 100],
+  ['institute', 'School', 120],
+  ['subject', 'Subjects', 80],
+  ['medium', 'Medium', 30],
+  ['eduStatus', 'Status', 30],
+  ['year', 'Year of passing', 4],
+  ['rollNo', 'Roll no.', 30],
+  ['marksObtained', 'Marks obtained', 8],
+  ['maxMarks', 'Out of', 8],
+  ['percent', 'Marks %', 6],
+  ['grade', 'Division / grade', 30],
 ];
-export const SIBLING_COLUMNS = [['type', 'Relation', 30], ['admissionNo', 'Admission no. / employee code', 40], ['name', 'Name', 120], ['className', 'Class', 40]];
+const SIBLING_COLUMNS = [
+  ['type', 'Relation', 30],
+  ['admissionNo', 'Admission no. / employee code', 40],
+  ['name', 'Name', 120],
+  ['className', 'Class', 40],
+];
 const MAX_QUALIFICATIONS = 10;
 const MAX_SIBLINGS = 10;
 
 /** The stored qualifications as a list (an old or empty value is an empty list). */
-export const parseQualifications = (stored) => {
+const parseQualifications = (stored) => {
   if (Array.isArray(stored)) return stored;
-  try { const v = stored ? JSON.parse(stored) : []; return Array.isArray(v) ? v : []; } catch { return []; }
+  try {
+    const v = stored ? JSON.parse(stored) : [];
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
 };
 
 /** Checks the qualification rows from a form: trimmed, empty rows dropped, year and percent sensible. Returns { rows } or { error }. */
@@ -152,13 +172,26 @@ function cleanQualifications(input) {
       row[key] = v;
     }
     if (QUALIFICATION_COLUMNS.every(([key]) => key === 'exam' || !row[key])) continue; // only the exam name: nothing recorded yet
-    if (row.year && !(Number(row.year) >= 1950 && Number(row.year) <= new Date().getFullYear() + 1 && Number.isInteger(Number(row.year)))) return { error: `${row.exam || 'Qualification'}: year of passing is not valid` };
-    if (row.percent && !(Number(row.percent) >= 0 && Number(row.percent) <= 100)) return { error: `${row.exam || 'Qualification'}: marks % must be between 0 and 100` };
-    for (const key of ['marksObtained', 'maxMarks']) if (row[key] && !(Number(row[key]) >= 0)) return { error: `${row.exam || 'Qualification'}: marks must be a number, zero or more` };
-    if (row.marksObtained && row.maxMarks && Number(row.marksObtained) > Number(row.maxMarks)) return { error: `${row.exam || 'Qualification'}: marks obtained cannot be above the maximum` };
+    if (
+      row.year &&
+      !(
+        Number(row.year) >= 1950 &&
+        Number(row.year) <= new Date().getFullYear() + 1 &&
+        Number.isInteger(Number(row.year))
+      )
+    )
+      return { error: `${row.exam || 'Qualification'}: year of passing is not valid` };
+    if (row.percent && !(Number(row.percent) >= 0 && Number(row.percent) <= 100))
+      return { error: `${row.exam || 'Qualification'}: marks % must be between 0 and 100` };
+    for (const key of ['marksObtained', 'maxMarks'])
+      if (row[key] && !(Number(row[key]) >= 0))
+        return { error: `${row.exam || 'Qualification'}: marks must be a number, zero or more` };
+    if (row.marksObtained && row.maxMarks && Number(row.marksObtained) > Number(row.maxMarks))
+      return { error: `${row.exam || 'Qualification'}: marks obtained cannot be above the maximum` };
     rows.push(row);
   }
-  if (rows.length > MAX_QUALIFICATIONS) return { error: `At most ${MAX_QUALIFICATIONS} qualifications can be recorded` };
+  if (rows.length > MAX_QUALIFICATIONS)
+    return { error: `At most ${MAX_QUALIFICATIONS} qualifications can be recorded` };
   return { rows };
 }
 
@@ -170,7 +203,8 @@ function cleanSiblings(input) {
     const row = {};
     for (const [key, label, max] of SIBLING_COLUMNS) {
       const v = raw?.[key] === undefined || raw?.[key] === null ? '' : String(raw[key]).trim();
-      if (v.length > max) return { error: `Sibling ${label.toLowerCase()} must be ${max} characters or fewer` };
+      if (v.length > max)
+        return { error: `Sibling ${label.toLowerCase()} must be ${max} characters or fewer` };
       row[key] = v;
     }
     if (SIBLING_COLUMNS.every(([key]) => key === 'type' || !row[key])) continue; // only the relation: nothing recorded yet
@@ -194,33 +228,50 @@ export function cleanEnquiryExtras(body) {
       data[f.key] = q.rows.length ? q.rows : null;
       continue;
     }
-    if (f.type === 'bool') { data[f.key] = body[f.key] === true || body[f.key] === 'true' || body[f.key] === 1; continue; }
+    if (f.type === 'bool') {
+      data[f.key] = body[f.key] === true || body[f.key] === 'true' || body[f.key] === 1;
+      continue;
+    }
     if (f.type === 'date') {
-      if (blank(body[f.key])) { data[f.key] = null; continue; }
+      if (blank(body[f.key])) {
+        data[f.key] = null;
+        continue;
+      }
       const d = String(body[f.key]).slice(0, 10);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || Number.isNaN(new Date(d).getTime())) return { error: `${f.label} is not a valid date` };
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || Number.isNaN(new Date(d).getTime()))
+        return { error: `${f.label} is not a valid date` };
       if (d > today()) return { error: `${f.label} cannot be in the future` };
-      data[f.key] = d; continue;
+      data[f.key] = d;
+      continue;
     }
     if (f.type === 'number') {
-      if (blank(body[f.key])) { data[f.key] = null; continue; }
+      if (blank(body[f.key])) {
+        data[f.key] = null;
+        continue;
+      }
       const n = Number(body[f.key]);
       if (!Number.isFinite(n) || n < 0) return { error: `${f.label} must be a number, zero or more` };
       if (/Percent$/.test(f.key) && n > 100) return { error: `${f.label} cannot be above 100` };
       if (n > 99999999999) return { error: `${f.label} is too large` };
-      data[f.key] = n; continue;
+      data[f.key] = n;
+      continue;
     }
     const v = blank(body[f.key]) ? null : String(body[f.key]).trim();
     if (v && v.length > f.max) return { error: `${f.label} must be ${f.max} characters or fewer` };
     data[f.key] = v;
   }
   for (const f of ENQUIRY_FIELDS) {
-    if (/Email$/.test(f.key) && data[f.key] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data[f.key])) return { error: `${f.label} is not a valid email address` };
-    if (/Phone$/.test(f.key) && data[f.key] && !/^[0-9+()\-\s]{5,20}$/.test(data[f.key])) return { error: `${f.label} must be a phone number` };
+    if (/Email$/.test(f.key) && data[f.key] && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data[f.key]))
+      return { error: `${f.label} is not a valid email address` };
+    if (/Phone$/.test(f.key) && data[f.key] && !/^[0-9+()\-\s]{5,20}$/.test(data[f.key]))
+      return { error: `${f.label} must be a phone number` };
   }
-  if (data.bloodGroup && !BLOOD_GROUPS.includes(data.bloodGroup)) return { error: 'Blood group is not valid' };
-  if (data.landline && !/^[0-9+()\-\s]{5,20}$/.test(data.landline)) return { error: 'Landline must be a phone number' };
-  if (data.curLandline && !/^[0-9+()\-\s]{5,20}$/.test(data.curLandline)) return { error: 'Current landline must be a phone number' };
+  if (data.bloodGroup && !BLOOD_GROUPS.includes(data.bloodGroup))
+    return { error: 'Blood group is not valid' };
+  if (data.landline && !/^[0-9+()\-\s]{5,20}$/.test(data.landline))
+    return { error: 'Landline must be a phone number' };
+  if (data.curLandline && !/^[0-9+()\-\s]{5,20}$/.test(data.curLandline))
+    return { error: 'Current landline must be a phone number' };
   return { data };
 }
 

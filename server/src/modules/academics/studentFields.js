@@ -39,16 +39,24 @@ export const DETAIL_FIELDS = [
 export const DETAIL_KEYS = DETAIL_FIELDS.map((f) => f.key);
 
 /** The registration details an applicant can have before enrolment: everything except what the school assigns on admission. */
-export const ADMISSION_DETAIL_KEYS = DETAIL_KEYS.filter((k) => !['admissionDate', 'rollNo', 'remarks'].includes(k));
+export const ADMISSION_DETAIL_KEYS = DETAIL_KEYS.filter(
+  (k) => !['admissionDate', 'rollNo', 'remarks'].includes(k),
+);
 
 const snake = (key) => key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
 
 /** The same columns for the admissions table. */
-export const ADMISSION_DETAIL_COLUMNS_FOR = (columns) => columns.filter((c) => ADMISSION_DETAIL_KEYS.includes(c.column.replace(/_([a-z])/g, (_m, ch) => ch.toUpperCase()))).map((c) => ({ ...c, table: 'admissions' }));
+export const ADMISSION_DETAIL_COLUMNS_FOR = (columns) =>
+  columns
+    .filter((c) =>
+      ADMISSION_DETAIL_KEYS.includes(c.column.replace(/_([a-z])/g, (_m, ch) => ch.toUpperCase())),
+    )
+    .map((c) => ({ ...c, table: 'admissions' }));
 
 /** ALTER TABLE definitions for databases created before these fields existed. */
 export const DETAIL_COLUMNS = DETAIL_FIELDS.map((f) => ({
   table: 'students',
   column: snake(f.key),
-  definition: f.type === 'date' ? 'DATE NULL' : f.type === 'number' ? 'DECIMAL(5,2) NULL' : `VARCHAR(${f.max}) NULL`,
+  definition:
+    f.type === 'date' ? 'DATE NULL' : f.type === 'number' ? 'DECIMAL(5,2) NULL' : `VARCHAR(${f.max}) NULL`,
 }));

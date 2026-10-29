@@ -13,7 +13,7 @@ export function MenuIcon({ name, data, size = 36 }) {
 }
 
 /** One icon with its label, four to a row. */
-export function IconTile({ icon, iconData, label, onPress }) {
+function IconTile({ icon, iconData, label, onPress }) {
   return (
     <Pressable onPress={onPress} style={{ width: '25%', alignItems: 'center', paddingVertical: space.md, paddingHorizontal: 2 }} accessibilityRole="button" accessibilityLabel={label}>
       <MenuIcon name={icon} data={iconData} />

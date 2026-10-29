@@ -3,8 +3,16 @@ import { classOption } from '../academics/ClassSubjects.jsx';
 
 export default function FeeStructures() {
   return (
-    <ResourcePage title="Fee structure" path="/fee-structures" writeRoles={['admin', 'accountant']}
-      extra={<p className="hint">Items defined here are billed automatically when an applicant is enrolled, and in bulk from Fees &amp; payments.</p>}
+    <ResourcePage
+      title="Fee structure"
+      path="/fee-structures"
+      writeRoles={['admin', 'accountant']}
+      extra={
+        <p className="hint">
+          Items defined here are billed automatically when an applicant is enrolled, and in bulk from Fees
+          &amp; payments.
+        </p>
+      }
       fields={[
         { key: 'classId', label: 'Class', required: true, optionsFrom: classOption },
         { key: 'title', label: 'Fee item', required: true },
@@ -16,6 +24,7 @@ export default function FeeStructures() {
         { key: 'title', label: 'Fee item' },
         { key: 'amount', label: 'Amount' },
         { key: 'dueDate', label: 'Due' },
-      ]} />
+      ]}
+    />
   );
 }

@@ -7,8 +7,10 @@
 const TOKEN = /\{(YYYY|YY|MM|TYPE|SEQ(?::([1-9]))?)\}/g;
 
 /** Settings pattern: letters, digits, - _ . / and known tokens only, with a {SEQ} so every number stays unique. */
-export const FORMULA_PATTERN = /^(?=.*\{SEQ(?::[1-9])?\})(?:[A-Za-z0-9\-_./]|\{(?:YYYY|YY|MM|TYPE|SEQ(?::[1-9])?)\})+$/;
-export const FORMULA_HELP = 'letters, digits and dashes plus {YYYY} {YY} {MM} {TYPE} and a required {SEQ:4} (running number), e.g. ADM-{YYYY}-{SEQ:4}';
+export const FORMULA_PATTERN =
+  /^(?=.*\{SEQ(?::[1-9])?\})(?:[A-Za-z0-9\-_./]|\{(?:YYYY|YY|MM|TYPE|SEQ(?::[1-9])?)\})+$/;
+export const FORMULA_HELP =
+  'letters, digits and dashes plus {YYYY} {YY} {MM} {TYPE} and a required {SEQ:4} (running number), e.g. ADM-{YYYY}-{SEQ:4}';
 
 export function formatNumber(formula, { seq, date = new Date(), type = '' }) {
   const year = String(date.getFullYear());
@@ -29,7 +31,8 @@ export async function nextNumber({ model, field, formula, transaction, type = ''
   let seq = ((await model.max('id', { transaction })) || 0) + 1;
   for (;;) {
     const candidate = formatNumber(formula, { seq, type });
-    if (!(await model.findOne({ where: { [field]: candidate }, attributes: ['id'], transaction }))) return candidate;
+    if (!(await model.findOne({ where: { [field]: candidate }, attributes: ['id'], transaction })))
+      return candidate;
     seq += 1;
   }
 }

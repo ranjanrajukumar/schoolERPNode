@@ -4,10 +4,17 @@ const vehicleOption = { path: '/transport/vehicles', map: (v) => ({ value: v.id,
 
 export default function TransportStaff() {
   return (
-    <ResourcePage title="Drivers & attendants" path="/transport/staff"
+    <ResourcePage
+      title="Drivers & attendants"
+      path="/transport/staff"
       fields={[
         { key: 'name', label: 'Name', required: true },
-        { key: 'role', label: 'Role', required: true, options: ['driver', 'attendant'].map((v) => ({ value: v, label: v })) },
+        {
+          key: 'role',
+          label: 'Role',
+          required: true,
+          options: ['driver', 'attendant'].map((v) => ({ value: v, label: v })),
+        },
         { key: 'phone', label: 'Phone' },
         { key: 'licenseNo', label: 'Licence no' },
         { key: 'licenseExpiry', label: 'Licence expires', type: 'date' },
@@ -20,6 +27,7 @@ export default function TransportStaff() {
         { key: 'licenseNo', label: 'Licence' },
         { key: 'licenseExpiry', label: 'Expires' },
         { key: 'vehicleRegNo', label: 'Vehicle' },
-      ]} />
+      ]}
+    />
   );
 }

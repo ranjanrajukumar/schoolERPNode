@@ -8,7 +8,7 @@ import { fromCents, toCents, today } from '../../utils/money.js';
 import { claimForIssue } from './libraryExtras.service.js';
 import { checkMembership } from './membership.service.js';
 
-export const BOOK_FIELDS = ['title', 'author', 'categoryId', 'isbn', 'copies'];
+const BOOK_FIELDS = ['title', 'author', 'categoryId', 'isbn', 'copies'];
 
 const MAX_LOAN_DAYS = 90;
 
@@ -16,9 +16,10 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const addDays = (date, days) => new Date(new Date(date).getTime() + days * DAY_MS).toISOString().slice(0, 10);
 const daysBetween = (from, to) => Math.round((new Date(to) - new Date(from)) / DAY_MS);
 
-const pick = (body) => Object.fromEntries(
-  BOOK_FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]),
-);
+const pick = (body) =>
+  Object.fromEntries(
+    BOOK_FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]),
+  );
 
 export async function createBook(body) {
   const data = pick(body);
@@ -34,7 +35,8 @@ export async function updateBook(id, body) {
   const data = pick(body);
   if (data.copies !== undefined) {
     const onLoan = book.copies - book.available;
-    if (Number(data.copies) < onLoan) throw conflict(`${onLoan} copies are on loan, so copies cannot go below that`);
+    if (Number(data.copies) < onLoan)
+      throw conflict(`${onLoan} copies are on loan, so copies cannot go below that`);
     data.available = Number(data.copies) - onLoan;
   }
   await book.update(data);
@@ -73,7 +75,8 @@ export async function listIssues({ open } = {}) {
 
 export async function issueBook({ bookId, studentId, days }) {
   const loanDays = days === undefined || days === '' ? await getSetting('library.loanDays') : Number(days);
-  if (!Number.isInteger(loanDays) || loanDays < 1 || loanDays > MAX_LOAN_DAYS) throw badRequest(`Loan period must be 1 to ${MAX_LOAN_DAYS} days`);
+  if (!Number.isInteger(loanDays) || loanDays < 1 || loanDays > MAX_LOAN_DAYS)
+    throw badRequest(`Loan period must be 1 to ${MAX_LOAN_DAYS} days`);
   return sequelize.transaction(async (transaction) => {
     const book = await Book.findByPk(bookId, { transaction, lock: transaction.LOCK.UPDATE });
     if (!book) throw notFound('Book not found');
@@ -115,7 +118,11 @@ export async function returnBook(issueId) {
     await book.update({ available: book.available + 1 }, { transaction });
     await issue.update({ returnedOn, fine }, { transaction });
     if (toCents(fine) > 0) {
-      await billStudents([issue.studentId], { title: fineTitle(issue.id, book.title), amount: fine, dueDate: returnedOn }, transaction);
+      await billStudents(
+        [issue.studentId],
+        { title: fineTitle(issue.id, book.title), amount: fine, dueDate: returnedOn },
+        transaction,
+      );
     }
     return { fine, lateDays, billed: toCents(fine) > 0 };
   });
@@ -124,13 +131,18 @@ export async function returnBook(issueId) {
 /** Bills fines from loans returned before fines were billed automatically. Safe to repeat. */
 export async function billPastFines() {
   const issues = await BookIssue.findAll({
-    where: { returnedOn: { [Op.ne]: null }, fine: { [Op.gt]: 0 } }, include: [{ model: Book, attributes: ['title'] }],
+    where: { returnedOn: { [Op.ne]: null }, fine: { [Op.gt]: 0 } },
+    include: [{ model: Book, attributes: ['title'] }],
   });
   let created = 0;
   let skipped = 0;
   await sequelize.transaction(async (transaction) => {
     for (const i of issues) {
-      const result = await billStudents([i.studentId], { title: fineTitle(i.id, i.Book.title), amount: i.fine, dueDate: i.returnedOn }, transaction);
+      const result = await billStudents(
+        [i.studentId],
+        { title: fineTitle(i.id, i.Book.title), amount: i.fine, dueDate: i.returnedOn },
+        transaction,
+      );
       created += result.created;
       skipped += result.skipped;
     }

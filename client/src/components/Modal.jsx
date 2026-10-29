@@ -22,7 +22,12 @@ export default function Modal({ open, title, onClose, children, wide = true, cla
     dirty.current = false;
     const previous = document.activeElement;
     document.body.classList.add('modal-open');
-    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); requestClose(); } };
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        requestClose();
+      }
+    };
     window.addEventListener('keydown', onKey);
     // Put focus in the popup so keyboard users start inside it.
     setTimeout(() => panel.current?.querySelector('input:not([type=hidden]), select, textarea')?.focus(), 50);
@@ -36,11 +41,24 @@ export default function Modal({ open, title, onClose, children, wide = true, cla
   if (!open) return null;
   return createPortal(
     <div className={`modal-backdrop${className ? ` ${className}` : ''}`}>
-      <div ref={panel} className={`modal${wide ? ' wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}
-        onChangeCapture={() => { dirty.current = true; }} onInputCapture={() => { dirty.current = true; }}>
+      <div
+        ref={panel}
+        className={`modal${wide ? ' wide' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        onChangeCapture={() => {
+          dirty.current = true;
+        }}
+        onInputCapture={() => {
+          dirty.current = true;
+        }}
+      >
         <header className="modal-head">
           <h2>{title}</h2>
-          <button type="button" className="icon-btn" onClick={requestClose} aria-label="Close">✕</button>
+          <button type="button" className="icon-btn" onClick={requestClose} aria-label="Close">
+            ✕
+          </button>
         </header>
         <div className="modal-body">{children}</div>
       </div>

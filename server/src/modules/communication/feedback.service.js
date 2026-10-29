@@ -15,17 +15,25 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * 1 = the student's class teacher (or the department head, for a staff member's grievance), 2 = the school office (admin), 3 = the principal.
  * Feedback (suggestions and praise) goes straight to the office.
  */
-export const LEVELS = [
+const LEVELS = [
   { level: 1, label: 'Class teacher / department head', short: 'L1' },
   { level: 2, label: 'School office', short: 'L2' },
   { level: 3, label: 'Principal', short: 'L3' },
 ];
 const levelLabel = (n) => LEVELS.find((l) => l.level === n)?.label ?? '';
 
-export const meta = async () => ({ levels: LEVELS, escalateAfterDays: await getSetting('grievance.escalateAfterDays') });
+export const meta = async () => ({
+  levels: LEVELS,
+  escalateAfterDays: await getSetting('grievance.escalateAfterDays'),
+});
 
 const withDetail = [
-  { model: Student, attributes: ['firstName', 'lastName', 'classId'], required: false, include: [{ model: SchoolClass, attributes: ['name', 'section', 'classTeacherId'], required: false }] },
+  {
+    model: Student,
+    attributes: ['firstName', 'lastName', 'classId'],
+    required: false,
+    include: [{ model: SchoolClass, attributes: ['name', 'section', 'classTeacherId'], required: false }],
+  },
   { model: FeedbackLog, required: false },
 ];
 
@@ -33,12 +41,16 @@ const withDetail = [
 async function levelOneHandler(f) {
   let staffId = null;
   if (f.studentId) {
-    const student = f.Student ?? await Student.findByPk(f.studentId, { include: [SchoolClass] });
+    const student = f.Student ?? (await Student.findByPk(f.studentId, { include: [SchoolClass] }));
     staffId = student?.SchoolClass?.classTeacherId ?? null;
   } else if (f.submittedByRole === 'staff') {
     const sender = await User.findByPk(f.submittedByUserId, { attributes: ['staffId'] });
-    const person = sender?.staffId ? await Staff.findByPk(sender.staffId, { attributes: ['id', 'departmentId'] }) : null;
-    const dept = person?.departmentId ? await Department.findByPk(person.departmentId, { attributes: ['headStaffId'] }) : null;
+    const person = sender?.staffId
+      ? await Staff.findByPk(sender.staffId, { attributes: ['id', 'departmentId'] })
+      : null;
+    const dept = person?.departmentId
+      ? await Department.findByPk(person.departmentId, { attributes: ['headStaffId'] })
+      : null;
     if (dept?.headStaffId && dept.headStaffId !== person.id) staffId = dept.headStaffId;
   }
   return staffId;
@@ -67,18 +79,31 @@ async function shape(f, user, { own }) {
     submittedByName: hide ? 'Anonymous' : f.submittedByName,
     submittedByRole: hide ? null : f.submittedByRole,
     studentName: hide || !f.Student ? null : `${f.Student.firstName} ${f.Student.lastName}`,
-    className: hide || !f.Student?.SchoolClass ? null : `${f.Student.SchoolClass.name}-${f.Student.SchoolClass.section}`,
+    className:
+      hide || !f.Student?.SchoolClass
+        ? null
+        : `${f.Student.SchoolClass.name}-${f.Student.SchoolClass.section}`,
     status: f.status,
     priority: f.priority,
     level: f.level,
     levelLabel: levelLabel(f.level),
     canAct: acting && !['resolved', 'closed'].includes(f.status),
-    canEscalate: acting && f.kind === 'grievance' && f.level < 3 && !['resolved', 'closed'].includes(f.status),
+    canEscalate:
+      acting && f.kind === 'grievance' && f.level < 3 && !['resolved', 'closed'].includes(f.status),
     response: f.response,
     respondedByName: f.respondedByName,
     respondedOn: f.respondedOn,
     createdAt: f.createdAt,
-    timeline: (f.FeedbackLogs ?? []).sort((a, b) => a.id - b.id).map((l) => ({ action: l.action, level: l.level, levelLabel: levelLabel(l.level), note: l.note, by: l.byName, at: l.createdAt })),
+    timeline: (f.FeedbackLogs ?? [])
+      .sort((a, b) => a.id - b.id)
+      .map((l) => ({
+        action: l.action,
+        level: l.level,
+        levelLabel: levelLabel(l.level),
+        note: l.note,
+        by: l.byName,
+        at: l.createdAt,
+      })),
   };
 }
 
@@ -86,7 +111,14 @@ async function nextTicket() {
   return nextNumber({ model: Feedback, field: 'ticketNo', formula: await getSetting('numbering.grievance') });
 }
 
-const log = (feedbackId, action, level, note, byName) => FeedbackLog.create({ feedbackId, action, level, note: note ? String(note).slice(0, 500) : null, byName: byName ?? null });
+const log = (feedbackId, action, level, note, byName) =>
+  FeedbackLog.create({
+    feedbackId,
+    action,
+    level,
+    note: note ? String(note).slice(0, 500) : null,
+    byName: byName ?? null,
+  });
 
 /** Tells whoever handles this level that something is waiting: the level-1 person, or the admins. */
 async function notifyLevel(f, title) {
@@ -96,7 +128,8 @@ async function notifyLevel(f, title) {
     const handler = staffId ? await User.findOne({ where: { staffId }, attributes: ['id'] }) : null;
     if (handler) ids = [handler.id];
   }
-  if (!ids.length) ids = (await User.findAll({ where: { role: 'admin' }, attributes: ['id'] })).map((a) => a.id);
+  if (!ids.length)
+    ids = (await User.findAll({ where: { role: 'admin' }, attributes: ['id'] })).map((a) => a.id);
   await notifyUsers(ids, { title, body: `${f.ticketNo}: ${f.subject}`, url: '/feedback' });
 }
 
@@ -109,7 +142,8 @@ export async function submit({ kind, category, subject, details, rating, anonymo
   if (!String(details ?? '').trim()) throw badRequest('Please describe it');
   if (String(details).length > 3000) throw badRequest('The description can be at most 3000 characters');
   const stars = rating === undefined || rating === null || rating === '' ? null : Number(rating);
-  if (stars !== null && (!Number.isInteger(stars) || stars < 1 || stars > 5)) throw badRequest('Rating must be from 1 to 5');
+  if (stars !== null && (!Number.isInteger(stars) || stars < 1 || stars > 5))
+    throw badRequest('Rating must be from 1 to 5');
 
   const row = await Feedback.create({
     ticketNo: await nextTicket(),
@@ -135,16 +169,27 @@ export async function submit({ kind, category, subject, details, rating, anonymo
 }
 
 /** Moves an untouched grievance up a level once it has waited too long. Runs whenever the lists are read. */
-export async function autoEscalate() {
+async function autoEscalate() {
   const days = await getSetting('grievance.escalateAfterDays');
   if (!days) return;
   const cutoff = new Date(Date.now() - days * DAY_MS);
-  const stale = await Feedback.findAll({ where: { kind: 'grievance', status: { [Op.in]: OPEN }, level: { [Op.lt]: 3 }, lastActionOn: { [Op.lt]: cutoff } } });
+  const stale = await Feedback.findAll({
+    where: {
+      kind: 'grievance',
+      status: { [Op.in]: OPEN },
+      level: { [Op.lt]: 3 },
+      lastActionOn: { [Op.lt]: cutoff },
+    },
+  });
   for (const f of stale) {
     await f.update({ level: f.level + 1, lastActionOn: new Date() });
     await log(f.id, 'auto_escalated', f.level, `No reply for ${days} day${days === 1 ? '' : 's'}`, null);
     await notifyLevel(f, 'Grievance escalated to you');
-    await notifyUsers([f.submittedByUserId], { title: `${f.ticketNo}: escalated`, body: `Moved up to ${levelLabel(f.level)}.`, url: f.submittedByRole === 'staff' ? '/feedback' : '/portal?tab=Feedback' });
+    await notifyUsers([f.submittedByUserId], {
+      title: `${f.ticketNo}: escalated`,
+      body: `Moved up to ${levelLabel(f.level)}.`,
+      url: f.submittedByRole === 'staff' ? '/feedback' : '/portal?tab=Feedback',
+    });
   }
 }
 
@@ -153,7 +198,11 @@ export async function list(user, { kind, status } = {}) {
   await autoEscalate();
   const admin = user.role === 'admin';
   const rows = await Feedback.findAll({
-    where: { ...(admin ? {} : { [Op.or]: [{ submittedByUserId: user.id }, { kind: 'grievance', level: 1 }] }), ...(kind && { kind }), ...(status && { status }) },
+    where: {
+      ...(admin ? {} : { [Op.or]: [{ submittedByUserId: user.id }, { kind: 'grievance', level: 1 }] }),
+      ...(kind && { kind }),
+      ...(status && { status }),
+    },
     include: withDetail,
     order: [['id', 'DESC']],
     limit: 500,
@@ -170,7 +219,12 @@ export async function list(user, { kind, status } = {}) {
 /** What one portal user sent (optionally about one child). */
 export async function listOwn(userId, studentId) {
   await autoEscalate();
-  const rows = await Feedback.findAll({ where: { submittedByUserId: userId, ...(studentId && { studentId }) }, include: withDetail, order: [['id', 'DESC']], limit: 100 });
+  const rows = await Feedback.findAll({
+    where: { submittedByUserId: userId, ...(studentId && { studentId }) },
+    include: withDetail,
+    order: [['id', 'DESC']],
+    limit: 100,
+  });
   return Promise.all(rows.map((f) => shape(f, null, { own: true })));
 }
 
@@ -187,7 +241,8 @@ export async function respond(id, { status, priority, response }, user) {
   if (status && !FEEDBACK_STATUSES.includes(status)) throw badRequest('Status is invalid');
   if (priority && !PRIORITIES.includes(priority)) throw badRequest('Priority is invalid');
   const text = response === undefined ? row.response : String(response).trim() || null;
-  if (['resolved', 'closed'].includes(status ?? row.status) && !text) throw badRequest('Write a response before resolving or closing');
+  if (['resolved', 'closed'].includes(status ?? row.status) && !text)
+    throw badRequest('Write a response before resolving or closing');
   const replied = text !== row.response;
   const statusChanged = status && status !== row.status;
   await row.update({
@@ -216,5 +271,9 @@ export async function escalate(id, { note }, user) {
   await row.update({ level: row.level + 1, status: 'open', lastActionOn: new Date() });
   await log(row.id, 'escalated', row.level, note, user.name);
   await notifyLevel(row, 'Grievance escalated to you');
-  await notifyUsers([row.submittedByUserId], { title: `${row.ticketNo}: escalated`, body: `Moved up to ${levelLabel(row.level)}.`, url: row.submittedByRole === 'staff' ? '/feedback' : '/portal?tab=Feedback' });
+  await notifyUsers([row.submittedByUserId], {
+    title: `${row.ticketNo}: escalated`,
+    body: `Moved up to ${levelLabel(row.level)}.`,
+    url: row.submittedByRole === 'staff' ? '/feedback' : '/portal?tab=Feedback',
+  });
 }

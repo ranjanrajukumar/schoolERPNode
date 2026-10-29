@@ -12,7 +12,16 @@ const DEBOUNCE_MS = 250;
  *
  * `value` is an id (or ''), `onChange(id, item)` gets '' and null when cleared. Arrow keys move, Enter picks, Escape closes.
  */
-export default function TypeaheadSelect({ kind, value, onChange, filters = {}, required = false, disabled = false, placeholder = 'Type to search…', exclude = [] }) {
+export default function TypeaheadSelect({
+  kind,
+  value,
+  onChange,
+  filters = {},
+  required = false,
+  disabled = false,
+  placeholder = 'Type to search…',
+  exclude = [],
+}) {
   const listId = useId();
   const box = useRef(null);
   const [text, setText] = useState('');
@@ -25,18 +34,40 @@ export default function TypeaheadSelect({ kind, value, onChange, filters = {}, r
 
   // A value that arrives from outside (editing a record, a link) is shown by name, fetched by id.
   useEffect(() => {
-    if (!value) { setSelected(null); return; }
+    if (!value) {
+      setSelected(null);
+      return;
+    }
     if (selected && String(selected.id) === String(value)) return;
     let cancelled = false;
-    api(`/lookup/${kind}?id=${encodeURIComponent(value)}`).then((rows) => { if (!cancelled && rows[0]) setSelected(rows[0]); }).catch(() => {});
-    return () => { cancelled = true; };
+    api(`/lookup/${kind}?id=${encodeURIComponent(value)}`)
+      .then((rows) => {
+        if (!cancelled && rows[0]) setSelected(rows[0]);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, [value, kind]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const search = useCallback((q) => {
-    setState('loading');
-    const params = new URLSearchParams({ q, ...filters, ...(exclude.length && { exclude: exclude.join(',') }) });
-    return api(`/lookup/${kind}?${params}`).then((rows) => { setOptions(rows); setActive(0); setState('idle'); }).catch(() => setState('error'));
-  }, [kind, filterKey, exclude.join(',')]); // eslint-disable-line react-hooks/exhaustive-deps
+  const search = useCallback(
+    (q) => {
+      setState('loading');
+      const params = new URLSearchParams({
+        q,
+        ...filters,
+        ...(exclude.length && { exclude: exclude.join(',') }),
+      });
+      return api(`/lookup/${kind}?${params}`)
+        .then((rows) => {
+          setOptions(rows);
+          setActive(0);
+          setState('idle');
+        })
+        .catch(() => setState('error'));
+    },
+    [kind, filterKey, exclude.join(',')],
+  ); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Search as the person types, a moment after they pause.
   useEffect(() => {
@@ -46,36 +77,87 @@ export default function TypeaheadSelect({ kind, value, onChange, filters = {}, r
   }, [text, open, search]);
 
   useEffect(() => {
-    const away = (e) => { if (box.current && !box.current.contains(e.target)) setOpen(false); };
+    const away = (e) => {
+      if (box.current && !box.current.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('mousedown', away);
     return () => document.removeEventListener('mousedown', away);
   }, []);
 
-  const pick = (item) => { setSelected(item); setText(''); setOpen(false); onChange(String(item.id), item); };
-  const clear = () => { setSelected(null); setText(''); onChange('', null); setOpen(true); };
+  const pick = (item) => {
+    setSelected(item);
+    setText('');
+    setOpen(false);
+    onChange(String(item.id), item);
+  };
+  const clear = () => {
+    setSelected(null);
+    setText('');
+    onChange('', null);
+    setOpen(true);
+  };
 
   const onKey = (e) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setOpen(true); setActive((a) => Math.min(a + 1, options.length - 1)); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => Math.max(a - 1, 0)); }
-    else if (e.key === 'Enter' && open && options[active]) { e.preventDefault(); pick(options[active]); }
-    else if (e.key === 'Escape') setOpen(false);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setOpen(true);
+      setActive((a) => Math.min(a + 1, options.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive((a) => Math.max(a - 1, 0));
+    } else if (e.key === 'Enter' && open && options[active]) {
+      e.preventDefault();
+      pick(options[active]);
+    } else if (e.key === 'Escape') setOpen(false);
   };
 
   return (
     <div className="typeahead" ref={box}>
       {selected ? (
         <div className="typeahead-chosen">
-          <span>{selected.label}{selected.sub && <small> · {selected.sub}</small>}</span>
-          {!disabled && <button type="button" className="link" style={{ color: 'inherit' }} onClick={clear} aria-label="Clear selection">×</button>}
+          <span>
+            {selected.label}
+            {selected.sub && <small> · {selected.sub}</small>}
+          </span>
+          {!disabled && (
+            <button
+              type="button"
+              className="link"
+              style={{ color: 'inherit' }}
+              onClick={clear}
+              aria-label="Clear selection"
+            >
+              ×
+            </button>
+          )}
           {/* keeps native form validation working: a required field with nothing chosen blocks submit */}
-          <input className="typeahead-proxy" tabIndex={-1} value={String(selected.id)} required={required} readOnly aria-hidden="true" />
+          <input
+            className="typeahead-proxy"
+            tabIndex={-1}
+            value={String(selected.id)}
+            required={required}
+            readOnly
+            aria-hidden="true"
+          />
         </div>
       ) : (
         <>
           <input
-            role="combobox" aria-expanded={open} aria-controls={listId} aria-autocomplete="list" autoComplete="off" disabled={disabled}
-            value={text} placeholder={placeholder} required={required}
-            onChange={(e) => { setText(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onKeyDown={onKey}
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listId}
+            aria-autocomplete="list"
+            autoComplete="off"
+            disabled={disabled}
+            value={text}
+            placeholder={placeholder}
+            required={required}
+            onChange={(e) => {
+              setText(e.target.value);
+              setOpen(true);
+            }}
+            onFocus={() => setOpen(true)}
+            onKeyDown={onKey}
           />
           {open && (
             <ul className="typeahead-list" id={listId} role="listbox">
@@ -83,9 +165,19 @@ export default function TypeaheadSelect({ kind, value, onChange, filters = {}, r
               {state === 'error' && <li className="typeahead-note">Could not search. Try again.</li>}
               {state === 'idle' && !options.length && <li className="typeahead-note">No match</li>}
               {options.map((o, i) => (
-                <li key={o.id} role="option" aria-selected={i === active} className={i === active ? 'on' : ''}
-                  onMouseDown={(e) => { e.preventDefault(); pick(o); }} onMouseEnter={() => setActive(i)}>
-                  {o.label}{o.sub && <small>{o.sub}</small>}
+                <li
+                  key={o.id}
+                  role="option"
+                  aria-selected={i === active}
+                  className={i === active ? 'on' : ''}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    pick(o);
+                  }}
+                  onMouseEnter={() => setActive(i)}
+                >
+                  {o.label}
+                  {o.sub && <small>{o.sub}</small>}
                 </li>
               ))}
             </ul>

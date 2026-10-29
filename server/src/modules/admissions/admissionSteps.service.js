@@ -8,14 +8,16 @@ const blank = (v) => v === undefined || v === null || v === '';
 async function open(id) {
   const admission = await Admission.findByPk(id);
   if (!admission) throw notFound('Admission not found');
-  if (['enrolled', 'rejected'].includes(admission.status)) throw conflict(`A ${admission.status} applicant cannot be changed here`);
+  if (['enrolled', 'rejected'].includes(admission.status))
+    throw conflict(`A ${admission.status} applicant cannot be changed here`);
   return admission;
 }
 
 /** Tests and interviews are for applicants whose application has been submitted, not for plain enquiries or drafts. */
 async function openForAssessment(id) {
   const admission = await open(id);
-  if (!['applied', 'waitlisted', 'approved'].includes(admission.status)) throw conflict('Submit the student application before scheduling a test or interview');
+  if (!['applied', 'waitlisted', 'approved'].includes(admission.status))
+    throw conflict('Submit the student application before scheduling a test or interview');
   return admission;
 }
 
@@ -27,7 +29,8 @@ export async function setTest(id, { testDate, testMarks, testMaxMarks }) {
   if (!(max > 0)) throw badRequest('Maximum marks must be above zero');
   const marks = blank(testMarks) ? null : Number(testMarks);
   if (marks !== null && !(marks >= 0 && marks <= max)) throw badRequest(`Marks must be between 0 and ${max}`);
-  if (marks !== null && testDate > today()) throw badRequest('Marks cannot be entered for a test that is still in the future');
+  if (marks !== null && testDate > today())
+    throw badRequest('Marks cannot be entered for a test that is still in the future');
   await admission.update({ testDate, testMarks: marks, testMaxMarks: max });
 }
 
@@ -45,13 +48,24 @@ export async function setInterview(id, { interviewDate, interviewTime, interview
   if (blank(interviewPanel)) throw badRequest('Interview panel is required');
   const result = blank(interviewResult) ? 'pending' : interviewResult;
   if (!INTERVIEW_RESULTS.includes(result)) throw badRequest('Unknown interview result');
-  if (result !== 'pending' && interviewDate > today()) throw badRequest('A result cannot be recorded for an interview that is still in the future');
-  await admission.update({ interviewDate, interviewTime, interviewPanel: String(interviewPanel).trim(), interviewResult: result });
+  if (result !== 'pending' && interviewDate > today())
+    throw badRequest('A result cannot be recorded for an interview that is still in the future');
+  await admission.update({
+    interviewDate,
+    interviewTime,
+    interviewPanel: String(interviewPanel).trim(),
+    interviewResult: result,
+  });
 }
 
 export async function clearInterview(id) {
   const admission = await open(id);
-  await admission.update({ interviewDate: null, interviewTime: null, interviewPanel: null, interviewResult: null });
+  await admission.update({
+    interviewDate: null,
+    interviewTime: null,
+    interviewPanel: null,
+    interviewResult: null,
+  });
 }
 
 /** An offer is an approved applicant; the expiry is the date the family must confirm by. */
@@ -64,36 +78,68 @@ export async function setOfferExpiry(id, { offerExpiry }) {
 }
 
 const named = (a) => ({
-  id: a.id, applicantName: a.applicantName, guardianName: a.guardianName, guardianPhone: a.guardianPhone,
-  className: a.SchoolClass ? `${a.SchoolClass.name}-${a.SchoolClass.section}` : null, status: a.status,
+  id: a.id,
+  applicantName: a.applicantName,
+  guardianName: a.guardianName,
+  guardianPhone: a.guardianPhone,
+  className: a.SchoolClass ? `${a.SchoolClass.name}-${a.SchoolClass.section}` : null,
+  status: a.status,
 });
 const include = [{ model: SchoolClass, attributes: ['name', 'section'] }];
-const order = [['id', 'DESC']];
 
 export async function listTests() {
   const { Op } = await import('sequelize');
   const rows = await Admission.findAll({
-    where: { testDate: { [Op.ne]: null }, status: { [Op.notIn]: ['rejected'] } }, include, order: [['testDate', 'DESC'], ['id', 'DESC']],
+    where: { testDate: { [Op.ne]: null }, status: { [Op.notIn]: ['rejected'] } },
+    include,
+    order: [
+      ['testDate', 'DESC'],
+      ['id', 'DESC'],
+    ],
   });
   return rows.map((a) => ({
-    ...named(a), testDate: a.testDate, testMarks: a.testMarks, testMaxMarks: a.testMaxMarks,
-    percent: a.testMarks === null ? null : Math.round((Number(a.testMarks) / Number(a.testMaxMarks)) * 1000) / 10,
+    ...named(a),
+    testDate: a.testDate,
+    testMarks: a.testMarks,
+    testMaxMarks: a.testMaxMarks,
+    percent:
+      a.testMarks === null ? null : Math.round((Number(a.testMarks) / Number(a.testMaxMarks)) * 1000) / 10,
   }));
 }
 
 export async function listInterviews() {
   const { Op } = await import('sequelize');
   const rows = await Admission.findAll({
-    where: { interviewDate: { [Op.ne]: null }, status: { [Op.notIn]: ['rejected'] } }, include, order: [['interviewDate', 'ASC'], ['interviewTime', 'ASC']],
+    where: { interviewDate: { [Op.ne]: null }, status: { [Op.notIn]: ['rejected'] } },
+    include,
+    order: [
+      ['interviewDate', 'ASC'],
+      ['interviewTime', 'ASC'],
+    ],
   });
   return rows.map((a) => ({
-    ...named(a), interviewDate: a.interviewDate, interviewTime: a.interviewTime, interviewPanel: a.interviewPanel, interviewResult: a.interviewResult,
+    ...named(a),
+    interviewDate: a.interviewDate,
+    interviewTime: a.interviewTime,
+    interviewPanel: a.interviewPanel,
+    interviewResult: a.interviewResult,
   }));
 }
 
 export async function listOffers() {
-  const rows = await Admission.findAll({ where: { status: 'approved' }, include, order: [['offerExpiry', 'ASC'], ['id', 'DESC']] });
-  return rows.map((a) => ({ ...named(a), offerExpiry: a.offerExpiry, expired: Boolean(a.offerExpiry && a.offerExpiry < today()) }));
+  const rows = await Admission.findAll({
+    where: { status: 'approved' },
+    include,
+    order: [
+      ['offerExpiry', 'ASC'],
+      ['id', 'DESC'],
+    ],
+  });
+  return rows.map((a) => ({
+    ...named(a),
+    offerExpiry: a.offerExpiry,
+    expired: Boolean(a.offerExpiry && a.offerExpiry < today()),
+  }));
 }
 
 /** Funnel and workload figures for the admission team. */
@@ -118,12 +164,23 @@ export async function admissionSummary() {
     stages: stages.map((s) => ({ stage: s, count: count((a) => a.status === s) })),
     online: count((a) => a.source === 'online'),
     office: count((a) => a.source !== 'online'),
-    conversionPercent: rows.length ? Math.round((count((a) => a.status === 'enrolled') / rows.length) * 1000) / 10 : 0,
-    acceptancePercent: decided ? Math.round((count((a) => ['approved', 'enrolled'].includes(a.status)) / decided) * 1000) / 10 : 0,
+    conversionPercent: rows.length
+      ? Math.round((count((a) => a.status === 'enrolled') / rows.length) * 1000) / 10
+      : 0,
+    acceptancePercent: decided
+      ? Math.round((count((a) => ['approved', 'enrolled'].includes(a.status)) / decided) * 1000) / 10
+      : 0,
     testsTaken: scored.length,
     averageTestPercent: scored.length
-      ? Math.round((scored.reduce((sum, a) => sum + (Number(a.testMarks) / Number(a.testMaxMarks)) * 100, 0) / scored.length) * 10) / 10 : null,
-    upcomingInterviews: count((a) => a.interviewDate && a.interviewDate >= today() && !['rejected', 'enrolled'].includes(a.status)),
+      ? Math.round(
+          (scored.reduce((sum, a) => sum + (Number(a.testMarks) / Number(a.testMaxMarks)) * 100, 0) /
+            scored.length) *
+            10,
+        ) / 10
+      : null,
+    upcomingInterviews: count(
+      (a) => a.interviewDate && a.interviewDate >= today() && !['rejected', 'enrolled'].includes(a.status),
+    ),
     expiredOffers: count((a) => a.status === 'approved' && a.offerExpiry && a.offerExpiry < today()),
     byClass: [...byClass.values()].sort((a, b) => a.className.localeCompare(b.className)),
   };

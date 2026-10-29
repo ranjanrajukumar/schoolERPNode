@@ -33,12 +33,14 @@ function shapeFee(fee) {
 export async function listFees({ studentId, classId, status } = {}) {
   const rows = await Fee.findAll({
     where: studentId ? { studentId } : {},
-    include: [{
-      model: Student,
-      attributes: ['firstName', 'lastName', 'admissionNo', 'classId'],
-      required: true,
-      where: classId ? { classId } : {},
-    }],
+    include: [
+      {
+        model: Student,
+        attributes: ['firstName', 'lastName', 'admissionNo', 'classId'],
+        required: true,
+        where: classId ? { classId } : {},
+      },
+    ],
     order: [['id', 'DESC']],
   });
   const fees = rows.map(shapeFee);
@@ -50,7 +52,11 @@ export async function listFees({ studentId, classId, status } = {}) {
  * title is skipped, so running a generation twice never double-bills.
  */
 export async function billStudents(studentIds, { title, amount, dueDate }, transaction) {
-  const existing = await Fee.findAll({ where: { title, studentId: studentIds }, attributes: ['studentId'], transaction });
+  const existing = await Fee.findAll({
+    where: { title, studentId: studentIds },
+    attributes: ['studentId'],
+    transaction,
+  });
   const billed = new Set(existing.map((f) => f.studentId));
   const rows = studentIds
     .filter((id) => !billed.has(id))
@@ -90,7 +96,8 @@ export async function recordPayment(feeId, { amount, method = 'cash', paidOn }, 
   const cents = toCents(amount);
   if (!Number.isFinite(cents) || cents <= 0) throw badRequest('Payment amount must be greater than zero');
   if (!METHODS.includes(method)) throw badRequest('Payment method is invalid');
-  if (!(await PAYMENT_METHODS.enabled()).includes(method)) throw badRequest(`The school does not accept ${method} payments (see Settings → Payments)`);
+  if (!(await PAYMENT_METHODS.enabled()).includes(method))
+    throw badRequest(`The school does not accept ${method} payments (see Settings → Payments)`);
   const partialAllowed = await PAYMENT_METHODS.partialAllowed();
   const prefix = await PAYMENT_METHODS.receiptPrefix();
 
@@ -100,11 +107,20 @@ export async function recordPayment(feeId, { amount, method = 'cash', paidOn }, 
 
     const balance = toCents(fee.amount) - toCents(fee.paidAmount);
     if (cents > balance) throw conflict(`Payment exceeds the balance of ${fromCents(balance)}`);
-    if (!partialAllowed && cents !== balance) throw conflict(`Part payments are switched off: pay the full balance of ${fromCents(balance)}`);
+    if (!partialAllowed && cents !== balance)
+      throw conflict(`Part payments are switched off: pay the full balance of ${fromCents(balance)}`);
 
-    const payment = await Payment.create({
-      feeId, amount: fromCents(cents), method, paidOn: paidOn || today(), receivedBy, receiptNo: `TMP-${crypto.randomUUID().replaceAll('-', '').slice(0, 20)}`,
-    }, { transaction });
+    const payment = await Payment.create(
+      {
+        feeId,
+        amount: fromCents(cents),
+        method,
+        paidOn: paidOn || today(),
+        receivedBy,
+        receiptNo: `TMP-${crypto.randomUUID().replaceAll('-', '').slice(0, 20)}`,
+      },
+      { transaction },
+    );
     await payment.update({ receiptNo: `${prefix}-${String(payment.id).padStart(6, '0')}` }, { transaction });
     await fee.update({ paidAmount: fromCents(toCents(fee.paidAmount) + cents) }, { transaction });
     return payment;
@@ -128,7 +144,13 @@ export async function getReceipt(paymentId) {
     paidOn: payment.paidOn,
     method: payment.method,
     amount: payment.amount,
-    fee: { id: fee.id, title: fee.title, amount: fee.amount, paidAmount: fee.paidAmount, balance: fromCents(toCents(fee.amount) - toCents(fee.paidAmount)) },
+    fee: {
+      id: fee.id,
+      title: fee.title,
+      amount: fee.amount,
+      paidAmount: fee.paidAmount,
+      balance: fromCents(toCents(fee.amount) - toCents(fee.paidAmount)),
+    },
     student: {
       id: student.id,
       admissionNo: student.admissionNo,
@@ -146,9 +168,13 @@ export async function updateFee(id, data) {
   return sequelize.transaction(async (transaction) => {
     const fee = await Fee.findByPk(id, { transaction, lock: transaction.LOCK.UPDATE });
     if (!fee) return false;
-    if (data.studentId !== undefined && Number(data.studentId) !== fee.studentId) throw conflict('A fee cannot be moved to another student; delete it and bill the right student');
-    if (data.amount !== undefined && toCents(data.amount) !== toCents(fee.amount)
-      && (toCents(fee.paidAmount) > 0 || await Payment.count({ where: { feeId: id }, transaction }))) {
+    if (data.studentId !== undefined && Number(data.studentId) !== fee.studentId)
+      throw conflict('A fee cannot be moved to another student; delete it and bill the right student');
+    if (
+      data.amount !== undefined &&
+      toCents(data.amount) !== toCents(fee.amount) &&
+      (toCents(fee.paidAmount) > 0 || (await Payment.count({ where: { feeId: id }, transaction })))
+    ) {
       throw conflict('This fee has payments; use a discount or fine to change its amount');
     }
     const { studentId, ...changes } = data;
@@ -162,7 +188,7 @@ export async function deleteFee(id) {
   return sequelize.transaction(async (transaction) => {
     const fee = await Fee.findByPk(id, { transaction, lock: transaction.LOCK.UPDATE });
     if (!fee) return false;
-    if (toCents(fee.paidAmount) > 0 || await Payment.count({ where: { feeId: id }, transaction })) {
+    if (toCents(fee.paidAmount) > 0 || (await Payment.count({ where: { feeId: id }, transaction }))) {
       throw conflict('This fee has payments (or refunded payments) and cannot be deleted');
     }
     await fee.destroy({ transaction });

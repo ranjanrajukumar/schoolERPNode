@@ -13,7 +13,11 @@ function load() {
   const file = path.join(dir, 'private.pem');
   if (fs.existsSync(file)) return fs.readFileSync(file, 'utf8');
   fs.mkdirSync(dir, { recursive: true });
-  const { privateKey } = crypto.generateKeyPairSync('rsa', { modulusLength: 2048, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } });
+  const { privateKey } = crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+  });
   fs.writeFileSync(file, privateKey, { mode: 0o600 });
   console.log('Made a new signing key in global/keys/private.pem: keep it, and back it up');
   return privateKey;

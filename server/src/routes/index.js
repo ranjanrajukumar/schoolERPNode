@@ -95,7 +95,9 @@ router.use('/app-menu', appMenuRoutes); // the mobile app's menu: every role rea
 
 // Parents and students get the portal and nothing else: every staff-facing route below is closed to them.
 router.use('/portal', requireRole('parent', 'student'), portalRoutes);
-router.use((req, res, next) => (['parent', 'student'].includes(req.user.role) ? res.status(403).json({ error: 'Forbidden' }) : next()));
+router.use((req, res, next) =>
+  ['parent', 'student'].includes(req.user.role) ? res.status(403).json({ error: 'Forbidden' }) : next(),
+);
 
 router.use('/student-accounts', requireRole('admin'), studentAccountsRoutes);
 router.use('/parents', requireRole('admin'), parentsRoutes);

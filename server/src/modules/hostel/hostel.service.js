@@ -1,6 +1,13 @@
 import { Op } from 'sequelize';
 import {
-  Hostel, HostelAllocation, HostelAttendance, HostelMeal, HostelRoom, HostelVisitor, Student, sequelize,
+  Hostel,
+  HostelAllocation,
+  HostelAttendance,
+  HostelMeal,
+  HostelRoom,
+  HostelVisitor,
+  Student,
+  sequelize,
 } from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { today } from '../../utils/money.js';
@@ -16,14 +23,19 @@ const studentName = (s) => `${s.firstName} ${s.lastName}`;
 /** Beds in use per room id. */
 async function occupancyByRoom() {
   const counts = await HostelAllocation.findAll({
-    attributes: ['roomId', [sequelize.fn('COUNT', sequelize.col('id')), 'n']], group: ['roomId'], raw: true,
+    attributes: ['roomId', [sequelize.fn('COUNT', sequelize.col('id')), 'n']],
+    group: ['roomId'],
+    raw: true,
   });
   return new Map(counts.map((c) => [c.roomId, Number(c.n)]));
 }
 
 export async function listHostels() {
   const [hostels, occupied] = await Promise.all([
-    Hostel.findAll({ include: [{ model: HostelRoom, attributes: ['id', 'capacity'] }], order: [['name', 'ASC']] }),
+    Hostel.findAll({
+      include: [{ model: HostelRoom, attributes: ['id', 'capacity'] }],
+      order: [['name', 'ASC']],
+    }),
     occupancyByRoom(),
   ]);
   return hostels.map((h) => {
@@ -50,19 +62,26 @@ export async function listRooms({ hostelId } = {}) {
     HostelRoom.findAll({
       where: hostelId ? { hostelId } : {},
       include: [{ model: Hostel, attributes: ['name'] }],
-      order: [['hostelId', 'ASC'], ['roomNo', 'ASC']],
+      order: [
+        ['hostelId', 'ASC'],
+        ['roomNo', 'ASC'],
+      ],
     }),
     occupancyByRoom(),
   ]);
   return rooms.map((r) => ({
-    ...r.toJSON(), Hostel: undefined, hostelName: r.Hostel.name, occupied: occupied.get(r.id) ?? 0,
+    ...r.toJSON(),
+    Hostel: undefined,
+    hostelName: r.Hostel.name,
+    occupied: occupied.get(r.id) ?? 0,
   }));
 }
 
 export async function deleteRoom(id) {
   const room = await HostelRoom.findByPk(id);
   if (!room) throw notFound('Room not found');
-  if (await HostelAllocation.count({ where: { roomId: id } })) throw conflict('Students are allocated to this room');
+  if (await HostelAllocation.count({ where: { roomId: id } }))
+    throw conflict('Students are allocated to this room');
   await room.destroy();
 }
 
@@ -70,9 +89,17 @@ export async function listAllocations({ hostelId } = {}) {
   const rows = await HostelAllocation.findAll({
     include: [
       { model: Student, attributes: ['firstName', 'lastName', 'admissionNo'] },
-      { model: HostelRoom, required: true, where: hostelId ? { hostelId } : {}, include: [{ model: Hostel, attributes: ['name'] }] },
+      {
+        model: HostelRoom,
+        required: true,
+        where: hostelId ? { hostelId } : {},
+        include: [{ model: Hostel, attributes: ['name'] }],
+      },
     ],
-    order: [['roomId', 'ASC'], ['id', 'ASC']],
+    order: [
+      ['roomId', 'ASC'],
+      ['id', 'ASC'],
+    ],
   });
   return rows.map((a) => ({
     studentId: a.studentId,
@@ -109,12 +136,20 @@ function boardingDetails(body) {
   if (phone && !PHONE.test(phone)) throw badRequest('Local guardian phone is invalid');
   const mealPlan = text(body.mealPlan, 20, 'Meal plan');
   if (mealPlan && !MEAL_PLANS.includes(mealPlan)) throw badRequest('Meal plan is invalid');
-  const deposit = body.securityDeposit === undefined || body.securityDeposit === '' || body.securityDeposit === null ? null : Number(body.securityDeposit);
+  const deposit =
+    body.securityDeposit === undefined || body.securityDeposit === '' || body.securityDeposit === null
+      ? null
+      : Number(body.securityDeposit);
   if (deposit !== null && !(deposit >= 0)) throw badRequest('Security deposit must be zero or more');
   return {
-    bedNo: text(body.bedNo, 20, 'Bed number'), mealPlan, localGuardianName: text(body.localGuardianName, 100, 'Local guardian name'), localGuardianPhone: phone,
-    localGuardianRelation: text(body.localGuardianRelation, 40, 'Local guardian relation'), securityDeposit: deposit,
-    consentReceived: body.consentReceived === true || body.consentReceived === 'true', remarks: text(body.remarks, 255, 'Remarks'),
+    bedNo: text(body.bedNo, 20, 'Bed number'),
+    mealPlan,
+    localGuardianName: text(body.localGuardianName, 100, 'Local guardian name'),
+    localGuardianPhone: phone,
+    localGuardianRelation: text(body.localGuardianRelation, 40, 'Local guardian relation'),
+    securityDeposit: deposit,
+    consentReceived: body.consentReceived === true || body.consentReceived === 'true',
+    remarks: text(body.remarks, 255, 'Remarks'),
   };
 }
 
@@ -136,22 +171,34 @@ export async function allocateStudent(body) {
     if (!room) throw notFound('Room not found');
     const hostel = await Hostel.findByPk(room.hostelId, { transaction });
     const required = { boys: 'male', girls: 'female' }[hostel.type];
-    if (required && student.gender !== required) throw conflict(`${hostel.name} only takes ${required} students`);
+    if (required && student.gender !== required)
+      throw conflict(`${hostel.name} only takes ${required} students`);
 
     const taken = await HostelAllocation.count({
-      where: { roomId, studentId: { [Op.ne]: student.id } }, transaction,
+      where: { roomId, studentId: { [Op.ne]: student.id } },
+      transaction,
     });
     if (taken >= room.capacity) throw conflict(`Room ${room.roomNo} is full (${room.capacity} beds)`);
 
-    if (details.bedNo && await HostelAllocation.findOne({ where: { roomId, bedNo: details.bedNo, studentId: { [Op.ne]: student.id } }, transaction })) {
+    if (
+      details.bedNo &&
+      (await HostelAllocation.findOne({
+        where: { roomId, bedNo: details.bedNo, studentId: { [Op.ne]: student.id } },
+        transaction,
+      }))
+    ) {
       throw conflict(`Bed ${details.bedNo} in room ${room.roomNo} is already taken`);
     }
-    await HostelAllocation.upsert({ studentId, roomId, startDate: startDate || null, ...details }, { transaction });
+    await HostelAllocation.upsert(
+      { studentId, roomId, startDate: startDate || null, ...details },
+      { transaction },
+    );
   });
 }
 
 export async function vacateStudent(studentId) {
-  if (!(await HostelAllocation.destroy({ where: { studentId } }))) throw notFound('Student is not in the hostel');
+  if (!(await HostelAllocation.destroy({ where: { studentId } })))
+    throw notFound('Student is not in the hostel');
 }
 
 /** Bills each boarder their room's monthly fee through the normal fee flow; never double-bills. */
@@ -170,7 +217,11 @@ export async function generateHostelFees({ month, dueDate }) {
         transaction,
       });
       if (!boarders.length) continue;
-      const result = await billStudents(boarders.map((b) => b.studentId), { title, amount: room.monthlyFee, dueDate }, transaction);
+      const result = await billStudents(
+        boarders.map((b) => b.studentId),
+        { title, amount: room.monthlyFee, dueDate },
+        transaction,
+      );
       created += result.created;
       skipped += result.skipped;
     }
@@ -186,7 +237,9 @@ export async function getRoster(hostelId, date) {
       { model: HostelRoom, attributes: ['roomNo'], where: { hostelId } },
     ],
   });
-  const marks = await HostelAttendance.findAll({ where: { date, studentId: boarders.map((b) => b.studentId) } });
+  const marks = await HostelAttendance.findAll({
+    where: { date, studentId: boarders.map((b) => b.studentId) },
+  });
   const byStudent = new Map(marks.map((m) => [m.studentId, m.status]));
   return boarders
     .sort((a, b) => a.HostelRoom.roomNo.localeCompare(b.HostelRoom.roomNo, undefined, { numeric: true }))
@@ -201,7 +254,8 @@ export async function getRoster(hostelId, date) {
 
 export async function saveAttendance({ date, records = [] }) {
   if (!date) throw badRequest('date is required');
-  if (records.some((r) => !ATTENDANCE.includes(r.status))) throw badRequest('Status must be present, absent or leave');
+  if (records.some((r) => !ATTENDANCE.includes(r.status)))
+    throw badRequest('Status must be present, absent or leave');
   await sequelize.transaction(async (transaction) => {
     for (const { studentId, status } of records) {
       await HostelAttendance.upsert({ studentId, date, status }, { transaction });
@@ -210,8 +264,13 @@ export async function saveAttendance({ date, records = [] }) {
 }
 
 export async function listMeals(hostelId) {
-  const rows = await HostelMeal.findAll({ where: hostelId ? { hostelId } : {}, order: [['hostelId', 'ASC']] });
-  return rows.sort((a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal));
+  const rows = await HostelMeal.findAll({
+    where: hostelId ? { hostelId } : {},
+    order: [['hostelId', 'ASC']],
+  });
+  return rows.sort(
+    (a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day) || MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal),
+  );
 }
 
 /** One menu entry per hostel, day and meal; saving again replaces it. */
@@ -235,16 +294,25 @@ export async function listVisitors({ open } = {}) {
     limit: 200,
   });
   return rows.map((v) => ({
-    ...v.toJSON(), Student: undefined, studentName: studentName(v.Student), admissionNo: v.Student.admissionNo,
+    ...v.toJSON(),
+    Student: undefined,
+    studentName: studentName(v.Student),
+    admissionNo: v.Student.admissionNo,
   }));
 }
 
 export async function checkInVisitor({ studentId, visitorName, relation, phone, purpose }) {
-  if (!studentId || !String(visitorName ?? '').trim()) throw badRequest('Student and visitor name are required');
-  if (!(await HostelAllocation.findOne({ where: { studentId } }))) throw conflict('That student does not live in the hostel');
+  if (!studentId || !String(visitorName ?? '').trim())
+    throw badRequest('Student and visitor name are required');
+  if (!(await HostelAllocation.findOne({ where: { studentId } })))
+    throw conflict('That student does not live in the hostel');
   await HostelVisitor.create({
-    studentId, visitorName: String(visitorName).trim(), relation: relation || null, phone: phone || null,
-    purpose: purpose || null, checkIn: new Date(),
+    studentId,
+    visitorName: String(visitorName).trim(),
+    relation: relation || null,
+    phone: phone || null,
+    purpose: purpose || null,
+    checkIn: new Date(),
   });
 }
 

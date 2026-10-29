@@ -3,7 +3,9 @@ import { api } from '../../services/api.js';
 
 export default function AcademicYears() {
   return (
-    <ResourcePage title="Academic years" path="/academic-years"
+    <ResourcePage
+      title="Academic years"
+      path="/academic-years"
       fields={[
         { key: 'name', label: 'Name (e.g. 2026-27)', required: true },
         { key: 'startDate', label: 'Starts', type: 'date', required: true },
@@ -15,10 +17,18 @@ export default function AcademicYears() {
         { key: 'endDate', label: 'Ends' },
         { key: 'isCurrent', label: 'Current', render: (r) => (r.isCurrent ? 'Yes' : '') },
       ]}
-      rowActions={(r, reload) => !r.isCurrent && (
-        <button onClick={async () => { await api(`/academic-years/${r.id}/set-current`, { method: 'POST' }); reload(); }}>
-          Make current
-        </button>
-      )} />
+      rowActions={(r, reload) =>
+        !r.isCurrent && (
+          <button
+            onClick={async () => {
+              await api(`/academic-years/${r.id}/set-current`, { method: 'POST' });
+              reload();
+            }}
+          >
+            Make current
+          </button>
+        )
+      }
+    />
   );
 }

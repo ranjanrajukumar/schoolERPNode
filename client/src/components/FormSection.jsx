@@ -27,8 +27,13 @@ export default function FormSection({ title, index = 0, sub, glyph, tone, childr
   return (
     <section className="card">
       <header className="card-head">
-        <span className={`tile-icon ${tone ?? look?.[1] ?? TONES[index % TONES.length]}`} aria-hidden="true">{glyph ?? look?.[0] ?? GLYPHS[index % GLYPHS.length]}</span>
-        <span><h2>{title}</h2>{(sub ?? look?.[2]) && <small>{sub ?? look?.[2]}</small>}</span>
+        <span className={`tile-icon ${tone ?? look?.[1] ?? TONES[index % TONES.length]}`} aria-hidden="true">
+          {glyph ?? look?.[0] ?? GLYPHS[index % GLYPHS.length]}
+        </span>
+        <span>
+          <h2>{title}</h2>
+          {(sub ?? look?.[2]) && <small>{sub ?? look?.[2]}</small>}
+        </span>
       </header>
       <div className="enq-grid">{children}</div>
     </section>

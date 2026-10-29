@@ -1,5 +1,14 @@
 import {
-  Exam, ExamGroup, GradeBand, GradingSetting, Mark, RevaluationRequest, SchoolClass, Student, Subject, sequelize,
+  Exam,
+  ExamGroup,
+  GradeBand,
+  GradingSetting,
+  Mark,
+  RevaluationRequest,
+  SchoolClass,
+  Student,
+  Subject,
+  sequelize,
 } from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { loadGrading } from './grading.js';
@@ -17,10 +26,14 @@ export async function saveGrading({ passPercent, bands }) {
   if (!Array.isArray(bands) || !bands.length) throw badRequest('Add at least one grade');
 
   const clean = bands.map((b) => ({ grade: String(b.grade ?? '').trim(), minPercent: Number(b.min) }));
-  if (clean.some((b) => !b.grade || b.grade.length > 10)) throw badRequest('Every grade needs a name of up to 10 characters');
-  if (clean.some((b) => Number.isNaN(b.minPercent) || b.minPercent < 0 || b.minPercent > 100)) throw badRequest('Each lower limit must be between 0 and 100');
-  if (new Set(clean.map((b) => b.minPercent)).size !== clean.length) throw badRequest('Two grades cannot start at the same percentage');
-  if (new Set(clean.map((b) => b.grade.toLowerCase())).size !== clean.length) throw badRequest('Grade names must be different');
+  if (clean.some((b) => !b.grade || b.grade.length > 10))
+    throw badRequest('Every grade needs a name of up to 10 characters');
+  if (clean.some((b) => Number.isNaN(b.minPercent) || b.minPercent < 0 || b.minPercent > 100))
+    throw badRequest('Each lower limit must be between 0 and 100');
+  if (new Set(clean.map((b) => b.minPercent)).size !== clean.length)
+    throw badRequest('Two grades cannot start at the same percentage');
+  if (new Set(clean.map((b) => b.grade.toLowerCase())).size !== clean.length)
+    throw badRequest('Grade names must be different');
   if (!clean.some((b) => b.minPercent === 0)) throw badRequest('The lowest grade must start at 0%');
 
   await sequelize.transaction(async (transaction) => {
@@ -34,7 +47,10 @@ export async function saveGrading({ passPercent, bands }) {
 
 export async function listGroups() {
   const groups = await ExamGroup.findAll({
-    include: [{ model: SchoolClass, attributes: ['name', 'section'] }, { model: Exam, attributes: ['id', 'name', 'weight'] }],
+    include: [
+      { model: SchoolClass, attributes: ['name', 'section'] },
+      { model: Exam, attributes: ['id', 'name', 'weight'] },
+    ],
     order: [['id', 'DESC']],
   });
   return groups.map((g) => ({
@@ -57,7 +73,8 @@ export async function assignExam(examId, groupId, weight) {
   }
   const next = { examGroupId: groupId || null };
   if (weight !== undefined && weight !== '') {
-    if (!Number.isInteger(Number(weight)) || Number(weight) < 1 || Number(weight) > 1000) throw badRequest('Weight must be a whole number from 1 to 1000');
+    if (!Number.isInteger(Number(weight)) || Number(weight) < 1 || Number(weight) > 1000)
+      throw badRequest('Weight must be a whole number from 1 to 1000');
     next.weight = Number(weight);
   }
   await exam.update(next);
@@ -71,7 +88,12 @@ export async function getGroupResults(groupId) {
   const group = await ExamGroup.findByPk(groupId, { include: [SchoolClass] });
   if (!group) throw notFound('Exam group not found');
   const exams = await Exam.findAll({ where: { examGroupId: groupId }, order: [['id', 'ASC']] });
-  if (!exams.length) return { group: { id: group.id, name: group.name, className: className(group.SchoolClass) }, exams: [], rows: [] };
+  if (!exams.length)
+    return {
+      group: { id: group.id, name: group.name, className: className(group.SchoolClass) },
+      exams: [],
+      rows: [],
+    };
 
   const policy = await loadGrading();
   const perExam = [];
@@ -80,7 +102,16 @@ export async function getGroupResults(groupId) {
   const students = new Map();
   for (const { exam, rows } of perExam) {
     for (const r of rows) {
-      const s = students.get(r.studentId) ?? { studentId: r.studentId, admissionNo: r.admissionNo, name: r.name, weighted: 0, weights: 0, taken: 0, results: [], parts: {} };
+      const s = students.get(r.studentId) ?? {
+        studentId: r.studentId,
+        admissionNo: r.admissionNo,
+        name: r.name,
+        weighted: 0,
+        weights: 0,
+        taken: 0,
+        results: [],
+        parts: {},
+      };
       s.weighted += r.percentage * exam.weight;
       s.weights += exam.weight;
       s.taken += 1;
@@ -90,12 +121,28 @@ export async function getGroupResults(groupId) {
     }
   }
 
-  const rows = [...students.values()].map((s) => {
-    const percentage = round(s.weighted / s.weights);
-    const result = s.results.includes('fail') ? 'fail' : (s.results.includes('incomplete') || s.taken < exams.length) ? 'incomplete' : 'pass';
-    return { studentId: s.studentId, admissionNo: s.admissionNo, name: s.name, parts: s.parts, percentage, grade: policy.gradeFor(percentage), result };
-  }).sort((a, b) => b.percentage - a.percentage);
-  rows.forEach((r, i) => { r.rank = i > 0 && rows[i - 1].percentage === r.percentage ? rows[i - 1].rank : i + 1; });
+  const rows = [...students.values()]
+    .map((s) => {
+      const percentage = round(s.weighted / s.weights);
+      const result = s.results.includes('fail')
+        ? 'fail'
+        : s.results.includes('incomplete') || s.taken < exams.length
+          ? 'incomplete'
+          : 'pass';
+      return {
+        studentId: s.studentId,
+        admissionNo: s.admissionNo,
+        name: s.name,
+        parts: s.parts,
+        percentage,
+        grade: policy.gradeFor(percentage),
+        result,
+      };
+    })
+    .sort((a, b) => b.percentage - a.percentage);
+  rows.forEach((r, i) => {
+    r.rank = i > 0 && rows[i - 1].percentage === r.percentage ? rows[i - 1].rank : i + 1;
+  });
 
   return {
     group: { id: group.id, name: group.name, className: className(group.SchoolClass) },
@@ -111,19 +158,35 @@ export async function meritList({ examId, groupId, limit }) {
   if (!examId && !groupId) throw badRequest('Choose an exam or an exam group');
   const top = Math.min(Math.max(Number(limit) || 10, 1), 200);
 
-  let title; let className_; let rows; let key;
+  let title;
+  let className_;
+  let rows;
+  let key;
   if (groupId) {
     const g = await getGroupResults(groupId);
-    title = g.group.name; className_ = g.group.className; rows = g.rows; key = 'percentage';
+    title = g.group.name;
+    className_ = g.group.className;
+    rows = g.rows;
+    key = 'percentage';
   } else {
     const r = await getResults(examId);
     const cls = await SchoolClass.findByPk(r.exam.classId);
-    title = r.exam.name; className_ = className(cls); rows = r.rows; key = 'total';
+    title = r.exam.name;
+    className_ = className(cls);
+    rows = r.rows;
+    key = 'total';
   }
 
   const passed = rows.filter((r) => r.result === 'pass').sort((a, b) => b[key] - a[key]);
-  passed.forEach((r, i) => { r.merit = i > 0 && passed[i - 1][key] === r[key] ? passed[i - 1].merit : i + 1; });
-  return { title, className: className_, basedOn: key === 'percentage' ? 'weighted percentage' : 'total marks', rows: passed.filter((r) => r.merit <= top) };
+  passed.forEach((r, i) => {
+    r.merit = i > 0 && passed[i - 1][key] === r[key] ? passed[i - 1].merit : i + 1;
+  });
+  return {
+    title,
+    className: className_,
+    basedOn: key === 'percentage' ? 'weighted percentage' : 'total marks',
+    rows: passed.filter((r) => r.merit <= top),
+  };
 }
 
 /* ---------- Revaluation ---------- */
@@ -170,9 +233,20 @@ export async function requestRevaluation({ examId, studentId, subjectId, reason 
   if (!String(reason ?? '').trim()) throw badRequest('A reason is required');
   const mark = await Mark.findOne({ where: { examId, studentId, subjectId } });
   if (!mark) throw notFound('There is no recorded mark for that student, exam and subject');
-  const open = await RevaluationRequest.findOne({ where: { examId, studentId, subjectId, status: 'pending' } });
+  const open = await RevaluationRequest.findOne({
+    where: { examId, studentId, subjectId, status: 'pending' },
+  });
   if (open) throw conflict('A revaluation request is already pending for this subject');
-  return (await RevaluationRequest.create({ examId, studentId, subjectId, originalMarks: mark.marks, reason: reason.trim(), requestedBy })).id;
+  return (
+    await RevaluationRequest.create({
+      examId,
+      studentId,
+      subjectId,
+      originalMarks: mark.marks,
+      reason: reason.trim(),
+      requestedBy,
+    })
+  ).id;
 }
 
 /**
@@ -181,20 +255,45 @@ export async function requestRevaluation({ examId, studentId, subjectId, reason 
  */
 export async function decideRevaluation(id, decision, { newMarks, remarks }, user) {
   return sequelize.transaction(async (transaction) => {
-    const req = await RevaluationRequest.findByPk(id, { transaction, lock: transaction.LOCK.UPDATE, include: [{ model: Exam, attributes: ['maxMarks'] }] });
+    const req = await RevaluationRequest.findByPk(id, {
+      transaction,
+      lock: transaction.LOCK.UPDATE,
+      include: [{ model: Exam, attributes: ['maxMarks'] }],
+    });
     if (!req) throw notFound('Revaluation request not found');
     if (req.status !== 'pending') throw conflict(`This request is already ${req.status}`);
 
     if (decision === 'accepted') {
       const marks = Number(newMarks);
-      if (newMarks === undefined || newMarks === '' || Number.isNaN(marks) || marks < 0 || marks > req.Exam.maxMarks) {
+      if (
+        newMarks === undefined ||
+        newMarks === '' ||
+        Number.isNaN(marks) ||
+        marks < 0 ||
+        marks > req.Exam.maxMarks
+      ) {
         throw badRequest(`The revised mark must be between 0 and ${req.Exam.maxMarks}`);
       }
-      await Mark.upsert({ examId: req.examId, studentId: req.studentId, subjectId: req.subjectId, marks }, { transaction });
-      await req.update({ status: 'accepted', newMarks: marks, remarks: remarks?.trim() || null, decidedBy: user.id, decidedByName: user.name }, { transaction });
+      await Mark.upsert(
+        { examId: req.examId, studentId: req.studentId, subjectId: req.subjectId, marks },
+        { transaction },
+      );
+      await req.update(
+        {
+          status: 'accepted',
+          newMarks: marks,
+          remarks: remarks?.trim() || null,
+          decidedBy: user.id,
+          decidedByName: user.name,
+        },
+        { transaction },
+      );
     } else {
       if (!String(remarks ?? '').trim()) throw badRequest('Give a reason for rejecting');
-      await req.update({ status: 'rejected', remarks: remarks.trim(), decidedBy: user.id, decidedByName: user.name }, { transaction });
+      await req.update(
+        { status: 'rejected', remarks: remarks.trim(), decidedBy: user.id, decidedByName: user.name },
+        { transaction },
+      );
     }
   });
 }

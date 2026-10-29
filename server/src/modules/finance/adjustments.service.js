@@ -3,7 +3,7 @@ import { Fee, FeeAdjustment, Payment, Refund, Student, sequelize } from '../../m
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { fromCents, toCents, today } from '../../utils/money.js';
 
-export const LATE_FEE_REASON = 'Late fee';
+const LATE_FEE_REASON = 'Late fee';
 
 function positiveCents(amount, label) {
   const cents = toCents(amount);
@@ -31,11 +31,13 @@ export async function adjustFee(feeId, { kind, amount, reason }, userId) {
 
     const total = toCents(fee.amount);
     const next = kind === 'discount' ? total - cents : total + cents;
-    if (next < toCents(fee.paidAmount)) throw conflict('A discount cannot reduce the fee below what has already been paid');
+    if (next < toCents(fee.paidAmount))
+      throw conflict('A discount cannot reduce the fee below what has already been paid');
 
     await fee.update({ amount: fromCents(next) }, { transaction });
     const row = await FeeAdjustment.create(
-      { feeId, kind, amount: fromCents(cents), reason: why, createdBy: userId }, { transaction },
+      { feeId, kind, amount: fromCents(cents), reason: why, createdBy: userId },
+      { transaction },
     );
     return row.id;
   });
@@ -57,15 +59,21 @@ export async function applyLateFines({ amount }, userId) {
       transaction,
       lock: transaction.LOCK.UPDATE,
     });
-    const charged = new Set((await FeeAdjustment.findAll({
-      where: { kind: 'fine', reason: LATE_FEE_REASON, feeId: overdue.map((f) => f.id) }, transaction,
-    })).map((a) => a.feeId));
+    const charged = new Set(
+      (
+        await FeeAdjustment.findAll({
+          where: { kind: 'fine', reason: LATE_FEE_REASON, feeId: overdue.map((f) => f.id) },
+          transaction,
+        })
+      ).map((a) => a.feeId),
+    );
 
     let applied = 0;
     for (const fee of overdue.filter((f) => !charged.has(f.id))) {
       await fee.update({ amount: fromCents(toCents(fee.amount) + cents) }, { transaction });
       await FeeAdjustment.create(
-        { feeId: fee.id, kind: 'fine', amount: fromCents(cents), reason: LATE_FEE_REASON, createdBy: userId }, { transaction },
+        { feeId: fee.id, kind: 'fine', amount: fromCents(cents), reason: LATE_FEE_REASON, createdBy: userId },
+        { transaction },
       );
       applied += 1;
     }
@@ -77,7 +85,12 @@ export async function applyLateFines({ amount }, userId) {
 export async function listPaymentHistory({ studentId } = {}) {
   const rows = await Payment.findAll({
     include: [
-      { model: Fee, required: true, where: studentId ? { studentId } : {}, include: [{ model: Student, attributes: ['firstName', 'lastName', 'admissionNo'] }] },
+      {
+        model: Fee,
+        required: true,
+        where: studentId ? { studentId } : {},
+        include: [{ model: Student, attributes: ['firstName', 'lastName', 'admissionNo'] }],
+      },
       { model: Refund, required: false },
     ],
     order: [['id', 'DESC']],
@@ -112,14 +125,18 @@ export async function refundPayment(paymentId, { amount, reason }, userId) {
     if (!payment) throw notFound('Payment not found');
     const fee = await Fee.findByPk(payment.feeId, { transaction, lock: transaction.LOCK.UPDATE });
 
-    const refunded = (await Refund.findAll({ where: { paymentId }, transaction }))
-      .reduce((sum, r) => sum + toCents(r.amount), 0);
+    const refunded = (await Refund.findAll({ where: { paymentId }, transaction })).reduce(
+      (sum, r) => sum + toCents(r.amount),
+      0,
+    );
     const refundable = toCents(payment.amount) - refunded;
-    if (cents > refundable) throw conflict(`Only ${fromCents(refundable)} of this payment can still be refunded`);
+    if (cents > refundable)
+      throw conflict(`Only ${fromCents(refundable)} of this payment can still be refunded`);
 
     await fee.update({ paidAmount: fromCents(toCents(fee.paidAmount) - cents) }, { transaction });
     const row = await Refund.create(
-      { paymentId, amount: fromCents(cents), reason: why, refundedOn: today(), createdBy: userId }, { transaction },
+      { paymentId, amount: fromCents(cents), reason: why, refundedOn: today(), createdBy: userId },
+      { transaction },
     );
     return row.id;
   });
