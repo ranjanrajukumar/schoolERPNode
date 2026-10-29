@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   const login = useCallback(async (email, password) => {
-    const { token: t, mustChangePassword } = await api('/auth/login', { method: 'POST', body: { email, password } });
+    const { token: t, mustChangePassword } = await api('/auth/login', { method: 'POST', body: { email, password }, patient: true });
     setToken(t);
     setMustChange(Boolean(mustChangePassword));
     setTokenState(t);

@@ -15,8 +15,10 @@ const unreachable = (res, data) => !res || [502, 503, 504].includes(res.status) 
  * Calls the API. A read (GET) that finds the server briefly unreachable is retried a few times, so a restart passes unnoticed;
  * a save is never retried automatically (it could be sent twice) and fails with a plain message instead.
  */
-export async function api(path, { method = 'GET', body } = {}) {
-  const attempts = method === 'GET' ? RETRY_DELAYS.length + 1 : 1;
+export async function api(path, { method = 'GET', body, patient = false } = {}) {
+  // A patient call (sign-in) is safe to repeat and waits for a sleeping free-tier server to wake, about 90 seconds at most.
+  const delays = patient ? Array(18).fill(5000) : RETRY_DELAYS;
+  const attempts = patient || method === 'GET' ? delays.length + 1 : 1;
   let res = null;
   let data = {};
   for (let i = 0; i < attempts; i += 1) {
@@ -35,7 +37,7 @@ export async function api(path, { method = 'GET', body } = {}) {
       data = {};
     }
     if (!unreachable(res, data) || i === attempts - 1) break;
-    await wait(RETRY_DELAYS[i]);
+    await wait(delays[i]);
   }
   if (unreachable(res, data)) throw new Error('The server is not responding. Please wait a moment and try again.');
   if (res.status === 401 && path !== '/auth/login') {
