@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -219,9 +220,11 @@ export default function Library() {
           <p className="hint">Manage books, issue them to students and follow what is overdue.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           {user?.role === 'admin' && (
             <button type="button" className="ghost" onClick={billPast} disabled={busy}>
               Bill earlier fines
@@ -345,12 +348,16 @@ export default function Library() {
                     </td>
                     {canWrite && (
                       <td className="row-actions">
-                        <button type="button" className="ghost" onClick={() => openBook(b)}>
-                          Edit
-                        </button>
-                        <button type="button" className="ghost danger" onClick={() => removeBook(b)}>
-                          Delete
-                        </button>
+                        <Gate action="edit">
+                          <button type="button" className="ghost" onClick={() => openBook(b)}>
+                            Edit
+                          </button>
+                        </Gate>
+                        <Gate action="delete">
+                          <button type="button" className="ghost danger" onClick={() => removeBook(b)}>
+                            Delete
+                          </button>
+                        </Gate>
                       </td>
                     )}
                   </tr>

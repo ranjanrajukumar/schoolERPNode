@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -359,9 +360,11 @@ export default function MonthlyAttendance({ kind }) {
             />{' '}
             <span>Show unmarked as absent</span>
           </label>
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button type="button" className="ghost" onClick={() => window.print()}>
             Print
           </button>

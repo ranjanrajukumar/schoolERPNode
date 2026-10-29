@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 
 const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -56,9 +57,11 @@ export default function HostelReports() {
           <p className="hint">Boarders, rooms and tonight&apos;s roll call at a glance.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export occupancy
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export occupancy
+            </button>
+          </Gate>
         </div>
       </div>
 

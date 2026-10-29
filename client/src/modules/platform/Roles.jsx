@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -178,12 +179,16 @@ export default function Roles() {
                       .join(', ')}
                   </td>
                   <td className="row-actions">
-                    <button type="button" className="ghost" onClick={() => openEdit(r)}>
-                      Edit
-                    </button>
-                    <button type="button" className="ghost" onClick={() => remove(r)}>
-                      Delete
-                    </button>
+                    <Gate action="edit">
+                      <button type="button" className="ghost" onClick={() => openEdit(r)}>
+                        Edit
+                      </button>
+                    </Gate>
+                    <Gate action="delete">
+                      <button type="button" className="ghost" onClick={() => remove(r)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

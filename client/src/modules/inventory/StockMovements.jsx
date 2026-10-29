@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -165,9 +166,11 @@ export default function StockMovements({ type }) {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button type="button" className="big-action" onClick={openNew}>
             {isIn ? '＋ Add stock' : 'Issue stock'}
           </button>

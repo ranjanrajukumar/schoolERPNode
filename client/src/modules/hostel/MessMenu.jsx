@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -177,13 +178,17 @@ export default function MessMenu() {
                             {m.items}
                             {canWrite && (
                               <small className="block">
-                                <button type="button" className="link" onClick={() => openEntry(d, meal)}>
-                                  Edit
-                                </button>{' '}
+                                <Gate action="edit">
+                                  <button type="button" className="link" onClick={() => openEntry(d, meal)}>
+                                    Edit
+                                  </button>
+                                </Gate>{' '}
                                 ·{' '}
-                                <button type="button" className="link" onClick={() => remove(m)}>
-                                  Remove
-                                </button>
+                                <Gate action="delete">
+                                  <button type="button" className="link" onClick={() => remove(m)}>
+                                    Remove
+                                  </button>
+                                </Gate>
                               </small>
                             )}
                           </>

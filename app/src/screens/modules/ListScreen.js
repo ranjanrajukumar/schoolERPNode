@@ -7,6 +7,8 @@ import { color, space } from '../../theme';
 import { Badge, Banner, Button, Card, Chips, Empty, Loading, Muted, Screen, Title, useLoad } from '../../ui';
 import { autoRow } from '../../registry/format';
 import { findScreen } from '../../registry';
+import { useAuth } from '../../auth';
+import { useCan } from '../../rights';
 import { useChild } from '../family/ChildContext';
 
 const LIMIT = 100;
@@ -16,6 +18,8 @@ export default function ListScreen({ route, navigation }) {
   const { registry, moduleKey, screenKey } = route.params;
   const cfg = findScreen(registry, moduleKey, screenKey);
   const kids = useChild(); // only present in the parent and student app
+  const { user } = useAuth();
+  const can = useCan(moduleKey, screenKey);
   const child = cfg.scope === 'child' ? kids?.child ?? null : null;
   const path = typeof cfg.path === 'function' ? cfg.path(child) : cfg.path;
 
@@ -45,7 +49,7 @@ export default function ListScreen({ route, navigation }) {
     <Screen back={!route.params.root} onRefresh={reload} refreshing={loading && data !== null}>
       <Title sub={cfg.sub}>{cfg.title}</Title>
       {cfg.scope === 'child' && kids ? <Chips options={kids.list.map((c) => ({ value: c.id, label: c.name.split(' ')[0] }))} value={kids.child?.id} onChange={kids.setChildId} /> : null}
-      {cfg.create ? <Button title={cfg.create.label} onPress={() => setCreating(true)} style={{ marginBottom: space.md }} /> : null}
+      {cfg.create && (!cfg.create.roles || cfg.create.roles.includes(user?.role)) && can('create') ? <Button title={cfg.create.label} onPress={() => setCreating(true)} style={{ marginBottom: space.md }} /> : null}
       <Banner text={notice} kind="ok" />
       <Banner text={error} />
       {all.length > 6 ? (

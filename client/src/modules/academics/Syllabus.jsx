@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -305,9 +306,11 @@ export default function Syllabus() {
                     </td>
                     <td className="row-actions">
                       {canWrite && (
-                        <button type="button" className="ghost" onClick={() => remove(t)}>
-                          Delete
-                        </button>
+                        <Gate action="delete">
+                          <button type="button" className="ghost" onClick={() => remove(t)}>
+                            Delete
+                          </button>
+                        </Gate>
                       )}
                     </td>
                   </tr>

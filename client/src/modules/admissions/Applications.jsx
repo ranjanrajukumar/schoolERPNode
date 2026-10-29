@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { useLocation } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Pagination from '../../components/Pagination.jsx';
@@ -204,9 +205,11 @@ export default function Applications() {
           <p className="hint">Manage applications and guide students through the admission process.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button
             type="button"
             className="big-action"
@@ -395,9 +398,11 @@ export default function Applications() {
                     >
                       {r.stage === 'draft' ? 'Continue' : 'Edit'}
                     </button>
-                    <button type="button" className="ghost danger" onClick={() => remove(r)}>
-                      Delete
-                    </button>
+                    <Gate action="delete">
+                      <button type="button" className="ghost danger" onClick={() => remove(r)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

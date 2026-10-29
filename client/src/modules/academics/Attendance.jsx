@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -207,9 +208,11 @@ export default function Attendance() {
           <p className="hint">Take attendance and monitor student presence by class.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export report
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export report
+            </button>
+          </Gate>
           <button
             type="button"
             className="big-action"

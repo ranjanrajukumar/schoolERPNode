@@ -41,21 +41,29 @@ const ICONS = {
   'help-and-support': '🛟',
 };
 
-const module = (label, roles, entries) => ({
-  label,
-  slug: slug(label),
-  icon: ICONS[slug(label)] ?? '•',
-  roles,
-  items: entries.map((entry) => {
-    const [itemLabel, to, itemRoles] = Array.isArray(entry) ? entry : [entry];
-    return {
-      label: itemLabel,
-      to: to ?? `/planned/${slug(label)}/${slug(itemLabel)}`,
-      built: Boolean(to),
-      roles: itemRoles ?? roles,
-    };
-  }),
-});
+const module = (label, roles, entries) => {
+  const used = new Set();
+  return {
+    label,
+    slug: slug(label),
+    key: slug(label), // the id of this group in the stored menu (app_menu_items, audience "web")
+    icon: ICONS[slug(label)] ?? '•',
+    roles,
+    items: entries.map((entry) => {
+      const [itemLabel, to, itemRoles] = Array.isArray(entry) ? entry : [entry];
+      let key = `${slug(label)}.${slug(itemLabel)}`;
+      while (used.has(key)) key += '-2'; // two entries with the same label in one group
+      used.add(key);
+      return {
+        key,
+        label: itemLabel,
+        to: to ?? `/planned/${slug(label)}/${slug(itemLabel)}`,
+        built: Boolean(to),
+        roles: itemRoles ?? roles,
+      };
+    }),
+  };
+};
 
 // What a student (or a parent, for a child) can open. Each entry is a section of the portal page, chosen by ?tab=.
 const portalMenu = (who) => {
@@ -292,6 +300,7 @@ export const MENU = [
     ['Users', '/users'],
     ['Roles', '/roles'],
     ['Permissions', '/permissions'],
+    ['Role Rights', '/role-rights'],
     ['User Groups', '/user-groups'],
     ['Login History', '/login-history'],
     ['Audit Log', '/audit'],
@@ -333,4 +342,29 @@ export function findPlanned(moduleSlug, itemSlug) {
   const group = MENU.find((m) => m.slug === moduleSlug);
   const item = group?.items.find((i) => i.to === `/planned/${moduleSlug}/${itemSlug}`);
   return group && item ? { group, item } : null;
+}
+
+/**
+ * Applies the menu stored in the database (rows from GET /app-menu/web: key, parentKey, label, icon, iconData, position, already limited to
+ * the signed-in role) to the built-in MENU. Where the database has nothing, the built-in menu is used as it is.
+ */
+export function applyStoredMenu(rows, role) {
+  if (!rows?.length) return MENU;
+  const byKey = new Map(rows.map((r) => [r.key, r]));
+  const at = (key) => byKey.get(key)?.position ?? 0;
+  return MENU.filter((g) => byKey.has(g.key))
+    .sort((a, b) => at(a.key) - at(b.key))
+    .map((g) => {
+      const row = byKey.get(g.key);
+      return {
+        ...g,
+        label: row.label,
+        icon: row.iconData ? { src: row.iconData } : row.icon,
+        roles: [role],
+        items: g.items
+          .filter((i) => byKey.has(i.key))
+          .sort((a, b) => at(a.key) - at(b.key))
+          .map((i) => ({ ...i, label: byKey.get(i.key).label, roles: [role] })),
+      };
+    });
 }

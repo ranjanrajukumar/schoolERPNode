@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
@@ -339,9 +340,11 @@ export default function ActivityDetail() {
                       </button>
                     )}
                     {canWrite && p.status === 'registered' && ['planned', 'open'].includes(a.status) && (
-                      <button type="button" className="ghost" onClick={() => withdraw(p)}>
-                        Remove
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => withdraw(p)}>
+                          Remove
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

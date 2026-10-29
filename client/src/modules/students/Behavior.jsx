@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
@@ -283,9 +284,11 @@ export default function Behavior() {
                   <td>{r.recordedByName}</td>
                   <td className="row-actions">
                     {(user?.role === 'admin' || r.recordedByName === user?.name) && (
-                      <button type="button" className="ghost" onClick={() => remove(r)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(r)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -293,13 +294,17 @@ export default function Recruitment() {
                       >
                         {o.status === 'open' ? 'Close' : 'Reopen'}
                       </button>
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => run(() => api(`/recruitment/openings/${o.id}`, { method: 'DELETE' }))}
-                      >
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() =>
+                            run(() => api(`/recruitment/openings/${o.id}`, { method: 'DELETE' }))
+                          }
+                        >
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   </tr>
                 ))}
@@ -368,15 +373,17 @@ export default function Recruitment() {
                         </button>
                       )}
                       {a.status !== 'hired' && (
-                        <button
-                          type="button"
-                          className="ghost"
-                          onClick={() =>
-                            run(() => api(`/recruitment/applicants/${a.id}`, { method: 'DELETE' }))
-                          }
-                        >
-                          Delete
-                        </button>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost"
+                            onClick={() =>
+                              run(() => api(`/recruitment/applicants/${a.id}`, { method: 'DELETE' }))
+                            }
+                          >
+                            Delete
+                          </button>
+                        </Gate>
                       )}
                     </td>
                   </tr>

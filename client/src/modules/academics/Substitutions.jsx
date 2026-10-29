@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Pagination from '../../components/Pagination.jsx';
 import { localDate } from '../../utils/dates.js';
@@ -199,17 +200,19 @@ export default function Substitutions() {
                       {r.substitution ? (
                         <>
                           <span className="badge paid">● {r.substitution.substituteName}</span>
-                          <button
-                            type="button"
-                            className="ghost"
-                            onClick={() =>
-                              run(() =>
-                                api(`/scheduling/substitutions/${r.substitution.id}`, { method: 'DELETE' }),
-                              )
-                            }
-                          >
-                            Remove
-                          </button>
+                          <Gate action="delete">
+                            <button
+                              type="button"
+                              className="ghost"
+                              onClick={() =>
+                                run(() =>
+                                  api(`/scheduling/substitutions/${r.substitution.id}`, { method: 'DELETE' }),
+                                )
+                              }
+                            >
+                              Remove
+                            </button>
+                          </Gate>
                         </>
                       ) : (
                         <>

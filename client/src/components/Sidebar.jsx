@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { MENU } from '../config/menu.js';
+import { useWebMenu } from '../hooks/useWebMenu.js';
 import SchoolBrand from './SchoolBrand.jsx';
 
 // Shown to every signed-in user, whatever a custom role includes.
@@ -31,6 +31,7 @@ export default function Sidebar({ onNavigate }) {
   const { user, logout } = useAuth();
   const { pathname, search } = useLocation();
   const role = user?.role;
+  const MENU = useWebMenu();
 
   // Hide groups and items the role can never use, and groups left with nothing to show.
   const groups = MENU.filter((g) => g.roles.includes(role))
@@ -64,7 +65,7 @@ export default function Sidebar({ onNavigate }) {
               >
                 <span>
                   <span className="nav-icon" aria-hidden="true">
-                    {g.icon}
+                    {g.icon?.src ? <img src={g.icon.src} alt="" width="18" height="18" /> : g.icon}
                   </span>
                   {g.label}
                 </span>

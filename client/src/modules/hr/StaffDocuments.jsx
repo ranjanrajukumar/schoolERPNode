@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, fetchBlob, uploadFile } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -196,9 +197,11 @@ export default function StaffDocuments() {
                       <button type="button" onClick={() => open(f)}>
                         View
                       </button>
-                      <button type="button" className="ghost" onClick={() => remove(f)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(f)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   </tr>
                 ))}

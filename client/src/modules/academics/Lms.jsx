@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, fetchBlob, uploadFile } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import LmsAssessmentPanel from './LmsAssessmentPanel.jsx';
@@ -557,26 +558,30 @@ export default function Lms() {
                       <button type="button" className="ghost" onClick={() => publish(c)}>
                         {c.published ? 'Unpublish' : 'Publish'}
                       </button>
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => {
-                          setEditingCourse(c);
-                          setTitle(c.title);
-                          setDescription(c.description ?? '');
-                          setTags(c.tags ?? []);
-                          setBannerImage(c.bannerImage ?? '');
-                          setCertificateEnabled(Boolean(c.certificateEnabled));
-                          setClassId(String(c.classId));
-                          setSubjectId(String(c.subjectId));
-                          setCourseModal(true);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button type="button" className="ghost" onClick={() => removeCourse(c)}>
-                        Delete
-                      </button>
+                      <Gate action="edit">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => {
+                            setEditingCourse(c);
+                            setTitle(c.title);
+                            setDescription(c.description ?? '');
+                            setTags(c.tags ?? []);
+                            setBannerImage(c.bannerImage ?? '');
+                            setCertificateEnabled(Boolean(c.certificateEnabled));
+                            setClassId(String(c.classId));
+                            setSubjectId(String(c.subjectId));
+                            setCourseModal(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </Gate>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => removeCourse(c)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   </tr>
                 ))}
@@ -783,9 +788,15 @@ export default function Lms() {
                               <button type="button" className="ghost" onClick={() => toggleModule(g.module)}>
                                 {g.module.published ? 'Unpublish' : 'Publish'}
                               </button>
-                              <button type="button" className="ghost" onClick={() => removeModule(g.module)}>
-                                Delete
-                              </button>
+                              <Gate action="delete">
+                                <button
+                                  type="button"
+                                  className="ghost"
+                                  onClick={() => removeModule(g.module)}
+                                >
+                                  Delete
+                                </button>
+                              </Gate>
                             </>
                           )}
                         </div>
@@ -821,12 +832,16 @@ export default function Lms() {
                                 Download
                               </button>
                             )}
-                            <button type="button" className="ghost" onClick={() => editLesson(l)}>
-                              Edit
-                            </button>
-                            <button type="button" className="ghost" onClick={() => removeLesson(l)}>
-                              Delete
-                            </button>
+                            <Gate action="edit">
+                              <button type="button" className="ghost" onClick={() => editLesson(l)}>
+                                Edit
+                              </button>
+                            </Gate>
+                            <Gate action="delete">
+                              <button type="button" className="ghost" onClick={() => removeLesson(l)}>
+                                Delete
+                              </button>
+                            </Gate>
                           </div>
                         </div>
                       ))}
@@ -895,9 +910,11 @@ export default function Lms() {
                   <article key={a.id} className="card" style={{ marginTop: 10 }}>
                     <div className="profile-head">
                       <b>{a.title}</b>
-                      <button type="button" className="ghost" onClick={() => removeAnnouncement(a)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => removeAnnouncement(a)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </div>
                     <p style={{ whiteSpace: 'pre-wrap' }}>{a.body}</p>
                     <small>

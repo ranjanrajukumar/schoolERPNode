@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -212,9 +213,11 @@ export default function StudyMaterials() {
                   <td>{m.createdByName}</td>
                   <td className="row-actions">
                     {canWrite && (user.role === 'admin' || m.createdByName === user.name) && (
-                      <button type="button" className="ghost" onClick={() => remove(m)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(m)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

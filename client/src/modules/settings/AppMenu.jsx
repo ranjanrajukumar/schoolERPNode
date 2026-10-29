@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, uploadFile } from '../../services/api.js';
+import { refreshWebMenu } from '../../hooks/useWebMenu.js';
 
 const AUDIENCES = [
   ['staff', 'Staff app (admin, teacher, accountant)'],
   ['family', 'Parent and student app'],
+  ['web', 'Website (this sidebar)'],
 ];
 const ROLES = {
   staff: [
@@ -15,8 +18,23 @@ const ROLES = {
     ['parent', 'Parent'],
     ['student', 'Student'],
   ],
+  web: [
+    ['admin', 'Admin'],
+    ['teacher', 'Teacher'],
+    ['accountant', 'Accountant'],
+    ['parent', 'Parent'],
+    ['student', 'Student'],
+  ],
 };
-const KIND = { module: 'Module', quick: 'Shortcut', list: 'Page', stats: 'Summary', custom: 'Page' };
+const KIND = {
+  module: 'Module',
+  quick: 'Shortcut',
+  list: 'Page',
+  stats: 'Summary',
+  custom: 'Page',
+  page: 'Page',
+  planned: 'Planned page',
+};
 
 // A few of the outline icons the app can show (Ionicons names). Any name from the Ionicons set works; this list only suggests.
 const ICON_NAMES = [
@@ -107,7 +125,10 @@ export default function AppMenu() {
     load();
   }, [load]);
 
-  const replace = (item) => setRows((all) => all.map((r) => (r.id === item.id ? item : r)));
+  const replace = (item) => {
+    refreshWebMenu();
+    setRows((all) => all.map((r) => (r.id === item.id ? item : r)));
+  };
   const save = async (item, patch, done) => {
     setError('');
     setNotice('');
@@ -205,10 +226,12 @@ export default function AppMenu() {
     <>
       <div className="profile-head">
         <div>
-          <h1>Mobile app menu</h1>
+          <h1>Menus and icons</h1>
           <p className="hint">
-            Rename tiles, choose their icons, reorder them, limit them to roles, or hide them. The app picks
-            the changes up the next time it is opened.
+            Rename tiles, choose their icons, reorder them, limit them to roles, or hide them, for the mobile
+            app and for this website's sidebar. Everything is stored in the database table{' '}
+            <code>app_menu_items</code> (audience <code>{audience}</code>); the app and the website pick the
+            changes up the next time they are opened.
           </p>
         </div>
         <div className="head-actions">
@@ -250,7 +273,7 @@ export default function AppMenu() {
             />
           </label>
           <span className="showing">
-            <b>{rows.length}</b> items{hidden ? `, ${hidden} hidden` : ''}
+            Table <code>app_menu_items</code> · <b>{rows.length}</b> items{hidden ? `, ${hidden} hidden` : ''}
           </span>
         </div>
         <datalist id="menu-icons">
@@ -264,7 +287,7 @@ export default function AppMenu() {
               <tr>
                 <th>Item</th>
                 <th>Label</th>
-                <th>Icon name</th>
+                <th>{audience === 'web' ? 'Icon (symbol)' : 'Icon name'}</th>
                 <th>Picture</th>
                 <th>Who sees it</th>
                 <th>Shown</th>
@@ -299,8 +322,8 @@ export default function AppMenu() {
                       <input
                         defaultValue={item.icon}
                         key={`i${item.id}${item.icon}`}
-                        list="menu-icons"
-                        maxLength={60}
+                        list={audience === 'web' ? undefined : 'menu-icons'}
+                        maxLength={audience === 'web' ? 16 : 60}
                         aria-label={`Icon for ${item.key}`}
                         onBlur={(e) =>
                           e.target.value.trim() !== item.icon && save(item, { icon: e.target.value })
@@ -334,9 +357,11 @@ export default function AppMenu() {
                         <>
                           {' '}
                           ·{' '}
-                          <button type="button" className="link" onClick={() => removePicture(item)}>
-                            Remove
-                          </button>
+                          <Gate action="delete">
+                            <button type="button" className="link" onClick={() => removePicture(item)}>
+                              Remove
+                            </button>
+                          </Gate>
                         </>
                       ) : null}
                     </td>

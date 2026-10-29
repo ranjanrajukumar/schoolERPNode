@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { api } from '../../api';
 import { Badge, Banner, Button, Card, Chips, Empty, Field, Heading, Muted, Row, niceDate, todayKey, useLoad } from '../../ui';
 import { ChildScreen } from './ChildContext';
+import { useCan } from '../../rights';
 
 const TONE = { approved: 'green', pending: 'amber', rejected: 'red', cancelled: 'grey' };
 
@@ -47,6 +48,7 @@ function ApplyForm({ child, onSaved }) {
 }
 
 export default function LeaveScreen() {
+  const can = useCan('academic', 'leave');
   const [error, setError] = useState('');
 
   const cancel = (child, leave, reload) => {
@@ -70,7 +72,7 @@ export default function LeaveScreen() {
       path={(c) => `/portal/children/${c.id}/leaves`}
       render={(leaves, child, reload) => (
         <>
-          <ApplyForm child={child} onSaved={reload} />
+          {can('create') ? <ApplyForm child={child} onSaved={reload} /> : null}
           <Banner text={error} />
           <Card>
             <Heading>Requests</Heading>

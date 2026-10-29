@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
@@ -231,15 +232,17 @@ export default function FeeGroups() {
                       <td>{i.amount}</td>
                       <td>{i.dueDate || '—'}</td>
                       <td className="row-actions">
-                        <button
-                          type="button"
-                          className="ghost"
-                          onClick={() =>
-                            run(() => api(`/fee-groups/${g.id}/items/${i.id}`, { method: 'DELETE' }))
-                          }
-                        >
-                          Remove
-                        </button>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost"
+                            onClick={() =>
+                              run(() => api(`/fee-groups/${g.id}/items/${i.id}`, { method: 'DELETE' }))
+                            }
+                          >
+                            Remove
+                          </button>
+                        </Gate>
                       </td>
                     </tr>
                   ))}

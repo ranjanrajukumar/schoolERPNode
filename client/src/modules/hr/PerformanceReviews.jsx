@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -132,9 +133,11 @@ export default function PerformanceReviews() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="big-action" onClick={openNew}>
-            + New review
-          </button>
+          <Gate action="create">
+            <button type="button" className="big-action" onClick={openNew}>
+              + New review
+            </button>
+          </Gate>
         </div>
       </div>
       {error && !entry && (
@@ -234,17 +237,19 @@ export default function PerformanceReviews() {
                   <td className="row-actions">
                     {r.status === 'draft' && (
                       <>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setError('');
-                            setEditId(r.id);
-                            setForm(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, r[k] ?? ''])));
-                            setEntry(true);
-                          }}
-                        >
-                          Edit
-                        </button>
+                        <Gate action="edit">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setError('');
+                              setEditId(r.id);
+                              setForm(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, r[k] ?? ''])));
+                              setEntry(true);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </Gate>
                         <button
                           type="button"
                           className="ghost"
@@ -254,13 +259,17 @@ export default function PerformanceReviews() {
                         >
                           Finalise
                         </button>
-                        <button
-                          type="button"
-                          className="ghost"
-                          onClick={() => run(() => api(`/performance-reviews/${r.id}`, { method: 'DELETE' }))}
-                        >
-                          Delete
-                        </button>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost"
+                            onClick={() =>
+                              run(() => api(`/performance-reviews/${r.id}`, { method: 'DELETE' }))
+                            }
+                          >
+                            Delete
+                          </button>
+                        </Gate>
                       </>
                     )}
                   </td>

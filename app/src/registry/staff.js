@@ -71,7 +71,31 @@ export const STAFF_MODULES = [
       { key: 'mark', title: 'Mark attendance', kind: 'custom', route: 'MarkAttendance' },
       { key: 'myclass', title: 'My class today', kind: 'custom', route: 'MyClass' },
       {
+        key: 'myattendance', title: 'My attendance', kind: 'list', path: () => `/hr/attendance/mine?month=${ym()}`, empty: 'Nothing marked for you this month.',
+        row: (r) => ({ title: niceDate(r.date), badge: { text: r.status, tone: { present: 'green', absent: 'red', late: 'amber', leave: 'amber' }[r.status] ?? 'grey' } }),
+      },
+      {
+        key: 'myleaves', title: 'My leave', kind: 'list', path: '/hr/leaves/mine', empty: 'You have not applied for leave.',
+        row: (r) => ({ title: dot(r.type, `${niceDate(r.fromDate)} to ${niceDate(r.toDate)}`), sub: r.reason, badge: badgeFor(r.status) }),
+        create: { label: '＋ Apply for my leave', path: '/hr/leaves', fields: [
+          { key: 'leaveTypeId', label: 'Leave type', required: true, optionsPath: '/leave-types?kind=staff', mapOption: (x) => ({ value: String(x.id), label: x.name }) },
+          { key: 'fromDate', label: 'From (YYYY-MM-DD)', required: true, default: today() },
+          { key: 'toDate', label: 'To (YYYY-MM-DD)', required: true, default: today() },
+          { key: 'reason', label: 'Reason', required: true, multiline: true },
+        ], body: (v) => ({ ...v, leaveTypeId: Number(v.leaveTypeId) }), submit: 'Send request', done: () => 'Leave request sent.' },
+        actions: [{ label: 'Withdraw request', tone: 'danger', roles: ['admin'], when: (r) => r.status === 'pending', path: (r) => `/hr/leaves/${r.id}/cancel`, body: () => ({}), confirm: 'Withdraw this leave request?', done: () => 'Withdrawn.' }],
+      },
+      { key: 'myleavebalance', title: 'My leave balance', kind: 'list', path: '/hr/leave-balance/mine', row: (r) => ({ title: r.type, sub: `${r.used ?? 0} used`, right: r.remaining === null ? 'No limit' : `${r.remaining} left` }) },
+      {
         key: 'leaves', title: 'Student leave', kind: 'list', path: '/student-leaves',
+        create: { label: '＋ Apply leave for a student', path: '/student-leaves', fields: [
+          { key: 'studentId', label: 'Student', required: true, optionsPath: '/students', mapOption: (x) => ({ value: String(x.id), label: `${x.firstName} ${x.lastName}` }) },
+          { key: 'leaveTypeId', label: 'Leave type', required: true, optionsPath: '/leave-types?kind=student', mapOption: (x) => ({ value: String(x.id), label: x.name }) },
+          { key: 'fromDate', label: 'From (YYYY-MM-DD)', required: true, default: today() },
+          { key: 'toDate', label: 'To (YYYY-MM-DD)', required: true, default: today() },
+          { key: 'reason', label: 'Reason', required: true, multiline: true },
+        ],
+          body: (v) => ({ ...v, studentId: Number(v.studentId), leaveTypeId: Number(v.leaveTypeId) }), submit: 'Send request', done: () => 'Leave recorded.' },
         filters: [{ label: 'Pending', test: (r) => r.status === 'pending' }],
         row: (r) => ({ title: r.studentName, sub: dot(r.className, `${niceDate(r.fromDate)} to ${niceDate(r.toDate)}`, r.leaveType), badge: badgeFor(r.status) }),
         actions: decide('/student-leaves').map((a) => ({ ...a, when: (r) => r.status === 'pending' && r.canDecide })),
@@ -280,6 +304,14 @@ export const STAFF_MODULES = [
       { key: 'summary', title: 'HR summary', kind: 'stats', roles: ['admin'], path: '/hr/reports', tiles: (d) => [{ label: 'Staff', value: d.headcount }, { label: 'Leave to decide', value: d.pendingLeaves, tone: 'amber' }], lists: [{ title: 'By department', rows: (d) => d.byDepartment, row: (x) => ({ title: x.department, right: x.headcount }) }] },
       {
         key: 'leaves', title: 'Staff leave', kind: 'list', roles: ['admin', 'teacher'], path: '/hr/leaves', filters: [{ label: 'Pending', test: (r) => r.status === 'pending' }],
+        create: { label: '＋ Apply leave for staff', roles: ['admin'], path: '/hr/leaves', fields: [
+          { key: 'staffId', label: 'Staff member', required: true, optionsPath: '/staff', mapOption: (x) => ({ value: String(x.id), label: `${x.firstName} ${x.lastName}` }) },
+          { key: 'leaveTypeId', label: 'Leave type', required: true, optionsPath: '/leave-types?kind=staff', mapOption: (x) => ({ value: String(x.id), label: x.name }) },
+          { key: 'fromDate', label: 'From (YYYY-MM-DD)', required: true, default: today() },
+          { key: 'toDate', label: 'To (YYYY-MM-DD)', required: true, default: today() },
+          { key: 'reason', label: 'Reason', required: true, multiline: true },
+        ],
+          body: (v) => ({ ...v, staffId: Number(v.staffId), leaveTypeId: Number(v.leaveTypeId) }), submit: 'Send request', done: () => 'Leave recorded.' },
         row: (r) => ({ title: r.staffName, sub: dot(r.type, `${niceDate(r.fromDate)} to ${niceDate(r.toDate)}`), badge: badgeFor(r.status) }),
         actions: decide('/hr/leaves').map((a) => ({ ...a, when: (r) => r.status === 'pending' && r.canDecide })),
       },

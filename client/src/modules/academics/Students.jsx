@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Pagination from '../../components/Pagination.jsx';
@@ -183,9 +184,11 @@ export default function Students() {
               ▤ ID cards
             </button>
           )}
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           {canWrite && (
             <button
               type="button"
@@ -346,22 +349,26 @@ export default function Students() {
                   </td>
                   <td className="row-actions">
                     {canWrite && (
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => {
-                          setSaved(null);
-                          setNotice('');
-                          setEntry({ id: s.id });
-                        }}
-                      >
-                        Edit
-                      </button>
+                      <Gate action="edit">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => {
+                            setSaved(null);
+                            setNotice('');
+                            setEntry({ id: s.id });
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </Gate>
                     )}
                     {canWrite && (
-                      <button type="button" className="ghost danger" onClick={() => remove(s)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(s)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                     <button
                       type="button"

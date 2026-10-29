@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -209,9 +210,11 @@ export default function InventoryRequests() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button type="button" className="big-action" onClick={openNew}>
             ＋ New request
           </button>
@@ -335,14 +338,18 @@ export default function InventoryRequests() {
                   </td>
                   <td className="row-actions">
                     {r.status === 'pending' && isAdmin && (
-                      <button type="button" onClick={() => openApprove(r)}>
-                        Approve
-                      </button>
+                      <Gate action="approve">
+                        <button type="button" onClick={() => openApprove(r)}>
+                          Approve
+                        </button>
+                      </Gate>
                     )}
                     {r.status === 'pending' && isAdmin && (
-                      <button type="button" className="ghost danger" onClick={() => openReject(r)}>
-                        Reject
-                      </button>
+                      <Gate action="approve">
+                        <button type="button" className="ghost danger" onClick={() => openReject(r)}>
+                          Reject
+                        </button>
+                      </Gate>
                     )}
                     {r.status === 'pending' && r.requestedBy === user.id && (
                       <button type="button" className="ghost" onClick={() => cancel(r)}>

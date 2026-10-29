@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
@@ -207,9 +208,11 @@ export default function HealthRecords() {
                     {a.emergencyPhone && <small className="block">{a.emergencyPhone}</small>}
                   </td>
                   <td className="row-actions">
-                    <button type="button" className="ghost" onClick={() => openFor(a.studentId)}>
-                      Edit
-                    </button>
+                    <Gate action="edit">
+                      <button type="button" className="ghost" onClick={() => openFor(a.studentId)}>
+                        Edit
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

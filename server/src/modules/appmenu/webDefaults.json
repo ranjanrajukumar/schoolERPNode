@@ -1,0 +1,2791 @@
+[
+  {
+    "audience": "web",
+    "key": "my-children",
+    "parentKey": null,
+    "kind": "module",
+    "label": "My Children",
+    "icon": "👪",
+    "roles": [
+      "parent"
+    ],
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "my-children.dashboard",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Dashboard",
+    "icon": "👪",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "my-children.child-profile",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Child Profile",
+    "icon": "👪",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "my-children.attendance",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Attendance",
+    "icon": "👪",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "my-children.class-timetable",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Class Timetable",
+    "icon": "👪",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "my-children.homework-and-assignments",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Homework & Assignments",
+    "icon": "👪",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "my-children.online-classes",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Online Classes",
+    "icon": "👪",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "my-children.learning-materials",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Learning Materials",
+    "icon": "👪",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "my-children.courses-and-lessons",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Courses & Lessons",
+    "icon": "👪",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "my-children.exams-and-results",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Exams & Results",
+    "icon": "👪",
+    "roles": null,
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "my-children.fees-and-payments",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Fees & Payments",
+    "icon": "👪",
+    "roles": null,
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "my-children.library",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Library",
+    "icon": "👪",
+    "roles": null,
+    "position": 110
+  },
+  {
+    "audience": "web",
+    "key": "my-children.activities",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Activities",
+    "icon": "👪",
+    "roles": null,
+    "position": 120
+  },
+  {
+    "audience": "web",
+    "key": "my-children.notices-and-announcements",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Notices & Announcements",
+    "icon": "👪",
+    "roles": null,
+    "position": 130
+  },
+  {
+    "audience": "web",
+    "key": "my-children.messages",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Messages",
+    "icon": "👪",
+    "roles": null,
+    "position": 140
+  },
+  {
+    "audience": "web",
+    "key": "my-children.events-and-calendar",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Events & Calendar",
+    "icon": "👪",
+    "roles": null,
+    "position": 150
+  },
+  {
+    "audience": "web",
+    "key": "my-children.transport-tracking",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Transport Tracking",
+    "icon": "👪",
+    "roles": null,
+    "position": 160
+  },
+  {
+    "audience": "web",
+    "key": "my-children.feedback-and-grievance",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Feedback & Grievance",
+    "icon": "👪",
+    "roles": null,
+    "position": 170
+  },
+  {
+    "audience": "web",
+    "key": "my-children.apply-for-leave",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Apply for Leave",
+    "icon": "👪",
+    "roles": null,
+    "position": 180
+  },
+  {
+    "audience": "web",
+    "key": "my-children.certificates-and-documents",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Certificates & Documents",
+    "icon": "👪",
+    "roles": null,
+    "position": 190
+  },
+  {
+    "audience": "web",
+    "key": "my-children.help-and-support",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Help & Support",
+    "icon": "👪",
+    "roles": null,
+    "position": 200
+  },
+  {
+    "audience": "web",
+    "key": "my-children.settings-and-change-password",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Settings & Change Password",
+    "icon": "👪",
+    "roles": null,
+    "position": 210
+  },
+  {
+    "audience": "web",
+    "key": "my-school",
+    "parentKey": null,
+    "kind": "module",
+    "label": "My School",
+    "icon": "🏫",
+    "roles": [
+      "student"
+    ],
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "my-school.dashboard",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Dashboard",
+    "icon": "🏫",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "my-school.my-profile",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "My Profile",
+    "icon": "🏫",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "my-school.attendance",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Attendance",
+    "icon": "🏫",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "my-school.class-timetable",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Class Timetable",
+    "icon": "🏫",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "my-school.homework-and-assignments",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Homework & Assignments",
+    "icon": "🏫",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "my-school.online-classes",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Online Classes",
+    "icon": "🏫",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "my-school.learning-materials",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Learning Materials",
+    "icon": "🏫",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "my-school.courses-and-lessons",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Courses & Lessons",
+    "icon": "🏫",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "my-school.exams-and-results",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Exams & Results",
+    "icon": "🏫",
+    "roles": null,
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "my-school.fees-and-payments",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Fees & Payments",
+    "icon": "🏫",
+    "roles": null,
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "my-school.library",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Library",
+    "icon": "🏫",
+    "roles": null,
+    "position": 110
+  },
+  {
+    "audience": "web",
+    "key": "my-school.notices-and-announcements",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Notices & Announcements",
+    "icon": "🏫",
+    "roles": null,
+    "position": 120
+  },
+  {
+    "audience": "web",
+    "key": "my-school.messages",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Messages",
+    "icon": "🏫",
+    "roles": null,
+    "position": 130
+  },
+  {
+    "audience": "web",
+    "key": "my-school.events-and-calendar",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Events & Calendar",
+    "icon": "🏫",
+    "roles": null,
+    "position": 140
+  },
+  {
+    "audience": "web",
+    "key": "my-school.transport-tracking",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Transport Tracking",
+    "icon": "🏫",
+    "roles": null,
+    "position": 150
+  },
+  {
+    "audience": "web",
+    "key": "my-school.feedback-and-grievance",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Feedback & Grievance",
+    "icon": "🏫",
+    "roles": null,
+    "position": 160
+  },
+  {
+    "audience": "web",
+    "key": "my-school.leave-requests",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Leave Requests",
+    "icon": "🏫",
+    "roles": null,
+    "position": 170
+  },
+  {
+    "audience": "web",
+    "key": "my-school.certificates-and-documents",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Certificates & Documents",
+    "icon": "🏫",
+    "roles": null,
+    "position": 180
+  },
+  {
+    "audience": "web",
+    "key": "my-school.help-and-support",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Help & Support",
+    "icon": "🏫",
+    "roles": null,
+    "position": 190
+  },
+  {
+    "audience": "web",
+    "key": "my-school.settings-and-change-password",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Settings & Change Password",
+    "icon": "🏫",
+    "roles": null,
+    "position": 200
+  },
+  {
+    "audience": "web",
+    "key": "dashboard",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Dashboard",
+    "icon": "🏠",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "dashboard.overview",
+    "parentKey": "dashboard",
+    "kind": "page",
+    "label": "Overview",
+    "icon": "🏠",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "dashboard.my-class",
+    "parentKey": "dashboard",
+    "kind": "page",
+    "label": "My Class",
+    "icon": "🏠",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "dashboard.today-s-attendance",
+    "parentKey": "dashboard",
+    "kind": "page",
+    "label": "Today’s Attendance",
+    "icon": "🏠",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "dashboard.fee-summary",
+    "parentKey": "dashboard",
+    "kind": "page",
+    "label": "Fee Summary",
+    "icon": "🏠",
+    "roles": [
+      "admin",
+      "accountant"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "dashboard.upcoming-events",
+    "parentKey": "dashboard",
+    "kind": "page",
+    "label": "Upcoming Events",
+    "icon": "🏠",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "dashboard.notices",
+    "parentKey": "dashboard",
+    "kind": "page",
+    "label": "Notices",
+    "icon": "🏠",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "admissions",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Admissions",
+    "icon": "📝",
+    "roles": [
+      "admin"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "admissions.admission-enquiries",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Admission Enquiries",
+    "icon": "📝",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "admissions.admission",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Admission",
+    "icon": "📝",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "admissions.entrance-tests",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Entrance Tests",
+    "icon": "📝",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "admissions.interview-schedule",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Interview Schedule",
+    "icon": "📝",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "admissions.admission-offers",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Admission Offers",
+    "icon": "📝",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "admissions.waiting-list",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Waiting List",
+    "icon": "📝",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "admissions.admission-reports",
+    "parentKey": "admissions",
+    "kind": "page",
+    "label": "Admission Reports",
+    "icon": "📝",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "students",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Students",
+    "icon": "🎓",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "students.registrations",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Registrations",
+    "icon": "🎓",
+    "roles": [
+      "admin"
+    ],
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "students.enrolled-students",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Enrolled Students",
+    "icon": "🎓",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "students.student-accounts",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Student Accounts",
+    "icon": "🎓",
+    "roles": [
+      "admin"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "students.student-attendance",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Student Attendance",
+    "icon": "🎓",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "students.student-health-records",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Student Health Records",
+    "icon": "🎓",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "students.student-behavior",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Student Behavior",
+    "icon": "🎓",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "students.year-end-promotion",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Year-end Promotion",
+    "icon": "🎓",
+    "roles": [
+      "admin"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "students.transfer-leaving-certificate",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Transfer / Leaving Certificate",
+    "icon": "🎓",
+    "roles": [
+      "admin"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "students.alumni",
+    "parentKey": "students",
+    "kind": "page",
+    "label": "Alumni",
+    "icon": "🎓",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "academics",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Academics",
+    "icon": "📚",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "academics.academics-overview",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Academics Overview",
+    "icon": "📚",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "academics.academic-years",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Academic Years",
+    "icon": "📚",
+    "roles": [
+      "admin"
+    ],
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "academics.classes-and-sections",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Classes & Sections",
+    "icon": "📚",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "academics.subjects",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Subjects",
+    "icon": "📚",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "academics.class-map",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Class Map",
+    "icon": "📚",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "academics.subject-map",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Subject Map",
+    "icon": "📚",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "academics.class-timetable",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Class Timetable",
+    "icon": "📚",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "academics.teacher-timetable",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Teacher Timetable",
+    "icon": "📚",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "academics.syllabus-and-lesson-plans",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Syllabus & Lesson Plans",
+    "icon": "📚",
+    "roles": null,
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "academics.homework-and-assignments",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Homework & Assignments",
+    "icon": "📚",
+    "roles": null,
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "academics.online-classes",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Online Classes",
+    "icon": "📚",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 110
+  },
+  {
+    "audience": "web",
+    "key": "academics.study-materials",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Study Materials",
+    "icon": "📚",
+    "roles": null,
+    "position": 120
+  },
+  {
+    "audience": "web",
+    "key": "academics.academic-calendar",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "Academic Calendar",
+    "icon": "📚",
+    "roles": null,
+    "position": 130
+  },
+  {
+    "audience": "web",
+    "key": "academics.list-of-holidays",
+    "parentKey": "academics",
+    "kind": "page",
+    "label": "List of Holidays",
+    "icon": "📚",
+    "roles": null,
+    "position": 140
+  },
+  {
+    "audience": "web",
+    "key": "learning-management",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Learning Management",
+    "icon": "•",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.dashboard",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Dashboard",
+    "icon": "•",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.courses-and-lessons",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Courses & Lessons",
+    "icon": "•",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.content-library",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Content Library",
+    "icon": "•",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.enrollment",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Enrollment",
+    "icon": "•",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.announcements",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Announcements",
+    "icon": "•",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.assignments",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Assignments",
+    "icon": "•",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.quizzes-and-tests",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Quizzes & Tests",
+    "icon": "•",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.student-progress",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "Student Progress",
+    "icon": "•",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "learning-management.lms-tags",
+    "parentKey": "learning-management",
+    "kind": "page",
+    "label": "LMS Tags",
+    "icon": "•",
+    "roles": [
+      "admin"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "timetable",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Timetable",
+    "icon": "🗓️",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "timetable.class-timetable",
+    "parentKey": "timetable",
+    "kind": "page",
+    "label": "Class Timetable",
+    "icon": "🗓️",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "timetable.teacher-timetable",
+    "parentKey": "timetable",
+    "kind": "page",
+    "label": "Teacher Timetable",
+    "icon": "🗓️",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "timetable.room-resource-schedule",
+    "parentKey": "timetable",
+    "kind": "page",
+    "label": "Room / Resource Schedule",
+    "icon": "🗓️",
+    "roles": [
+      "admin"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "timetable.substitution-management",
+    "parentKey": "timetable",
+    "kind": "page",
+    "label": "Substitution Management",
+    "icon": "🗓️",
+    "roles": [
+      "admin"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "timetable.timetable-reports",
+    "parentKey": "timetable",
+    "kind": "page",
+    "label": "Timetable Reports",
+    "icon": "🗓️",
+    "roles": [
+      "admin"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "attendance",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Attendance",
+    "icon": "✅",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "attendance.mark-attendance",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Mark Attendance",
+    "icon": "✅",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "attendance.monthly-attendance",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Monthly Attendance",
+    "icon": "✅",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "attendance.biometric-attendance",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Biometric Attendance",
+    "icon": "✅",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "attendance.period-attendance",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Period Attendance",
+    "icon": "✅",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "attendance.student-leave",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Student Leave",
+    "icon": "✅",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "attendance.student-leave-record",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Student Leave Record",
+    "icon": "✅",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "attendance.attendance-corrections",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Attendance Corrections",
+    "icon": "✅",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "attendance.parent-absence-alerts",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Parent Absence Alerts",
+    "icon": "✅",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "attendance.attendance-reports",
+    "parentKey": "attendance",
+    "kind": "page",
+    "label": "Attendance Reports",
+    "icon": "✅",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "examinations",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Examinations",
+    "icon": "🧪",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "examinations.exam-groups",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Exam Groups",
+    "icon": "🧪",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "examinations.subject-map",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Subject Map",
+    "icon": "🧪",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "examinations.grade-setup",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Grade Setup",
+    "icon": "🧪",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "examinations.exams-marks-and-results",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Exams, Marks & Results",
+    "icon": "🧪",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "examinations.holistic-progress-card",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Holistic Progress Card",
+    "icon": "🧪",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "examinations.merit-list",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Merit List",
+    "icon": "🧪",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "examinations.revaluation-requests",
+    "parentKey": "examinations",
+    "kind": "page",
+    "label": "Revaluation Requests",
+    "icon": "🧪",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Fees & Finance",
+    "icon": "💰",
+    "roles": [
+      "admin",
+      "accountant"
+    ],
+    "position": 110
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.fee-types",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Fee Types",
+    "icon": "💰",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.fee-groups",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Fee Groups",
+    "icon": "💰",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.fee-structure",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Fee Structure",
+    "icon": "💰",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.fees-and-payments",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Fees & Payments",
+    "icon": "💰",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.payment-history-and-receipts",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Payment History & Receipts",
+    "icon": "💰",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.fee-reminders",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Fee Reminders",
+    "icon": "💰",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.other-income",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Other Income",
+    "icon": "💰",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.expenses",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Expenses",
+    "icon": "💰",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "fees-and-finance.financial-reports",
+    "parentKey": "fees-and-finance",
+    "kind": "page",
+    "label": "Financial Reports",
+    "icon": "💰",
+    "roles": null,
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "transport",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Transport",
+    "icon": "🚌",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 120
+  },
+  {
+    "audience": "web",
+    "key": "transport.vehicles",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Vehicles",
+    "icon": "🚌",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "transport.drivers-and-attendants",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Drivers & Attendants",
+    "icon": "🚌",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "transport.routes",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Routes",
+    "icon": "🚌",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "transport.stops",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Stops",
+    "icon": "🚌",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "transport.student-route-assignment",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Student Route Assignment",
+    "icon": "🚌",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "transport.transport-fees",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Transport Fees",
+    "icon": "🚌",
+    "roles": [
+      "admin",
+      "accountant"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "transport.transport-attendance",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Transport Attendance",
+    "icon": "🚌",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "transport.bus-tracking-live-gps",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Bus Tracking (Live GPS)",
+    "icon": "🚌",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "transport.vehicle-maintenance",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Vehicle Maintenance",
+    "icon": "🚌",
+    "roles": null,
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "transport.transport-reports",
+    "parentKey": "transport",
+    "kind": "page",
+    "label": "Transport Reports",
+    "icon": "🚌",
+    "roles": null,
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "hostel",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Hostel",
+    "icon": "🛏️",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 130
+  },
+  {
+    "audience": "web",
+    "key": "hostel.hostels",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Hostels",
+    "icon": "🛏️",
+    "roles": [
+      "admin"
+    ],
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "hostel.hostel-rooms",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Hostel Rooms",
+    "icon": "🛏️",
+    "roles": [
+      "admin"
+    ],
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "hostel.room-allocation",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Room Allocation",
+    "icon": "🛏️",
+    "roles": [
+      "admin"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "hostel.hostel-attendance",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Hostel Attendance",
+    "icon": "🛏️",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "hostel.mess-management",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Mess Management",
+    "icon": "🛏️",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "hostel.hostel-fees",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Hostel Fees",
+    "icon": "🛏️",
+    "roles": [
+      "admin",
+      "accountant"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "hostel.visitor-log",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Visitor Log",
+    "icon": "🛏️",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "hostel.hostel-reports",
+    "parentKey": "hostel",
+    "kind": "page",
+    "label": "Hostel Reports",
+    "icon": "🛏️",
+    "roles": [
+      "admin"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "library",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Library",
+    "icon": "📖",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 140
+  },
+  {
+    "audience": "web",
+    "key": "library.book-categories",
+    "parentKey": "library",
+    "kind": "page",
+    "label": "Book Categories",
+    "icon": "📖",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "library.books-and-loans",
+    "parentKey": "library",
+    "kind": "page",
+    "label": "Books & Loans",
+    "icon": "📖",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "library.book-reservations",
+    "parentKey": "library",
+    "kind": "page",
+    "label": "Book Reservations",
+    "icon": "📖",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "library.library-members",
+    "parentKey": "library",
+    "kind": "page",
+    "label": "Library Members",
+    "icon": "📖",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "library.library-reports",
+    "parentKey": "library",
+    "kind": "page",
+    "label": "Library Reports",
+    "icon": "📖",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "inventory",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Inventory",
+    "icon": "📦",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 150
+  },
+  {
+    "audience": "web",
+    "key": "inventory.item-categories",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Item Categories",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "inventory.inventory-items",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Inventory Items",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "inventory.suppliers",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Suppliers",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "inventory.purchase-orders",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Purchase Orders",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "inventory.stock-in",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Stock In",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "inventory.stock-out",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Stock Out",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "inventory.inventory-requests",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Inventory Requests",
+    "icon": "📦",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "inventory.asset-register",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Asset Register",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "inventory.asset-maintenance",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Asset Maintenance",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "inventory.stock-reports",
+    "parentKey": "inventory",
+    "kind": "page",
+    "label": "Stock Reports",
+    "icon": "📦",
+    "roles": [
+      "admin"
+    ],
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Staff & HR",
+    "icon": "👥",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 160
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.departments",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Departments",
+    "icon": "👥",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.designations",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Designations",
+    "icon": "👥",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.staff-directory",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Staff Directory",
+    "icon": "👥",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.staff-documents",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Staff Documents",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.staff-attendance",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Staff Attendance",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.monthly-staff-attendance",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Monthly Staff Attendance",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.staff-leave",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Staff Leave",
+    "icon": "👥",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.staff-leave-balance",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Staff Leave Balance",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.payroll",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Payroll",
+    "icon": "👥",
+    "roles": [
+      "admin",
+      "accountant"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.recruitment",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Recruitment",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.performance-reviews",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "Performance Reviews",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 110
+  },
+  {
+    "audience": "web",
+    "key": "staff-and-hr.hr-reports",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "HR Reports",
+    "icon": "👥",
+    "roles": [
+      "admin"
+    ],
+    "position": 120
+  },
+  {
+    "audience": "web",
+    "key": "health-and-safety",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Health & Safety",
+    "icon": "🩺",
+    "roles": [
+      "admin"
+    ],
+    "position": 170
+  },
+  {
+    "audience": "web",
+    "key": "health-and-safety.student-health-records",
+    "parentKey": "health-and-safety",
+    "kind": "page",
+    "label": "Student Health Records",
+    "icon": "🩺",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "health-and-safety.clinic-visits",
+    "parentKey": "health-and-safety",
+    "kind": "page",
+    "label": "Clinic Visits",
+    "icon": "🩺",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "health-and-safety.incidents",
+    "parentKey": "health-and-safety",
+    "kind": "page",
+    "label": "Incidents",
+    "icon": "🩺",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "health-and-safety.safety-inspections",
+    "parentKey": "health-and-safety",
+    "kind": "page",
+    "label": "Safety Inspections",
+    "icon": "🩺",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "health-and-safety.health-and-safety-report",
+    "parentKey": "health-and-safety",
+    "kind": "page",
+    "label": "Health & Safety Report",
+    "icon": "🩺",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Events & Activities",
+    "icon": "🎉",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 180
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.school-events",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "School Events",
+    "icon": "🎉",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.celebrations",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "Celebrations",
+    "icon": "🎉",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.competitions",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "Competitions",
+    "icon": "🎉",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.clubs",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "Clubs",
+    "icon": "🎉",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.sports",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "Sports",
+    "icon": "🎉",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.field-trips",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "Field Trips",
+    "icon": "🎉",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.school-activities",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "School Activities",
+    "icon": "🎉",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "events-and-activities.activity-reports",
+    "parentKey": "events-and-activities",
+    "kind": "page",
+    "label": "Activity Reports",
+    "icon": "🎉",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Documents & Certificates",
+    "icon": "📄",
+    "roles": [
+      "admin"
+    ],
+    "position": 190
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.document-templates",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Document Templates",
+    "icon": "📄",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.id-cards",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "ID Cards",
+    "icon": "📄",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.requests-and-issued-register",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Requests & Issued Register",
+    "icon": "📄",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.bonafide-certificates",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Bonafide Certificates",
+    "icon": "📄",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.transfer-certificates",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Transfer Certificates",
+    "icon": "📄",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.character-certificates",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Character Certificates",
+    "icon": "📄",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.fee-certificates",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Fee Certificates",
+    "icon": "📄",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "communication",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Communication",
+    "icon": "💬",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 200
+  },
+  {
+    "audience": "web",
+    "key": "communication.notices",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Notices",
+    "icon": "💬",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "communication.feedback-and-grievance",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Feedback & Grievance",
+    "icon": "💬",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "communication.send-email",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Send Email",
+    "icon": "💬",
+    "roles": [
+      "admin"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "communication.send-sms",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Send SMS",
+    "icon": "💬",
+    "roles": [
+      "admin"
+    ],
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "communication.push-notifications",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Push Notifications",
+    "icon": "💬",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "communication.parent-messages",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Parent Messages",
+    "icon": "💬",
+    "roles": [
+      "admin"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "communication.staff-messages",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Staff Messages",
+    "icon": "💬",
+    "roles": [
+      "admin"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "communication.message-templates",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Message Templates",
+    "icon": "💬",
+    "roles": [
+      "admin"
+    ],
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "communication.communication-history",
+    "parentKey": "communication",
+    "kind": "page",
+    "label": "Communication History",
+    "icon": "💬",
+    "roles": [
+      "admin"
+    ],
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "parent-portal",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Parent Portal",
+    "icon": "👨‍👩‍👧",
+    "roles": [
+      "admin"
+    ],
+    "position": 210
+  },
+  {
+    "audience": "web",
+    "key": "parent-portal.parent-accounts",
+    "parentKey": "parent-portal",
+    "kind": "page",
+    "label": "Parent Accounts",
+    "icon": "👨‍👩‍👧",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "parent-portal.parent-login-activity",
+    "parentKey": "parent-portal",
+    "kind": "page",
+    "label": "Parent Login Activity",
+    "icon": "👨‍👩‍👧",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "parent-portal.parent-requests",
+    "parentKey": "parent-portal",
+    "kind": "page",
+    "label": "Parent Requests",
+    "icon": "👨‍👩‍👧",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "reports",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Reports",
+    "icon": "📊",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 220
+  },
+  {
+    "audience": "web",
+    "key": "reports.reports-overview",
+    "parentKey": "reports",
+    "kind": "page",
+    "label": "Reports Overview",
+    "icon": "📊",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "reports.academic-and-exam-reports",
+    "parentKey": "reports",
+    "kind": "page",
+    "label": "Academic & Exam Reports",
+    "icon": "📊",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "reports.transport-reports",
+    "parentKey": "reports",
+    "kind": "page",
+    "label": "Transport Reports",
+    "icon": "📊",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "reports.library-reports",
+    "parentKey": "reports",
+    "kind": "page",
+    "label": "Library Reports",
+    "icon": "📊",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "reports.stock-reports",
+    "parentKey": "reports",
+    "kind": "page",
+    "label": "Stock Reports",
+    "icon": "📊",
+    "roles": [
+      "admin"
+    ],
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "reports.custom-reports",
+    "parentKey": "reports",
+    "kind": "page",
+    "label": "Custom Reports",
+    "icon": "📊",
+    "roles": [
+      "admin"
+    ],
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "user-management",
+    "parentKey": null,
+    "kind": "module",
+    "label": "User Management",
+    "icon": "🔐",
+    "roles": [
+      "admin"
+    ],
+    "position": 230
+  },
+  {
+    "audience": "web",
+    "key": "user-management.users",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "Users",
+    "icon": "🔐",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "user-management.roles",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "Roles",
+    "icon": "🔐",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "user-management.permissions",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "Permissions",
+    "icon": "🔐",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "user-management.role-rights",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "Role Rights",
+    "icon": "🔐",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "user-management.user-groups",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "User Groups",
+    "icon": "🔐",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "user-management.login-history",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "Login History",
+    "icon": "🔐",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "user-management.audit-log",
+    "parentKey": "user-management",
+    "kind": "page",
+    "label": "Audit Log",
+    "icon": "🔐",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "settings",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Settings",
+    "icon": "⚙️",
+    "roles": [
+      "admin"
+    ],
+    "position": 240
+  },
+  {
+    "audience": "web",
+    "key": "settings.school-profile",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "School Profile",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "settings.leave-types-and-approval",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Leave Types & Approval",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "settings.public-links",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Public Links",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "settings.branches-campuses",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Branches / Campuses",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "settings.academic-years",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Academic Years",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "settings.classes-and-sections",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Classes & Sections",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "settings.master-data",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Master Data",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "settings.grade-setup",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Grade Setup",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
+    "key": "settings.id-card-design",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "ID Card Design",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 90
+  },
+  {
+    "audience": "web",
+    "key": "settings.notification-settings",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Notification Settings",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 100
+  },
+  {
+    "audience": "web",
+    "key": "settings.student-login-settings",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Student Login Settings",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 110
+  },
+  {
+    "audience": "web",
+    "key": "settings.payment-settings",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Payment Settings",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 120
+  },
+  {
+    "audience": "web",
+    "key": "settings.auto-numbering",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Auto Numbering",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 130
+  },
+  {
+    "audience": "web",
+    "key": "settings.integrations",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Integrations",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 140
+  },
+  {
+    "audience": "web",
+    "key": "settings.data-import-export",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Data Import / Export",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 150
+  },
+  {
+    "audience": "web",
+    "key": "settings.backup-and-restore",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Backup & Restore",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 160
+  },
+  {
+    "audience": "web",
+    "key": "settings.mobile-app-menu",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "Mobile App Menu",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 170
+  },
+  {
+    "audience": "web",
+    "key": "settings.system-preferences",
+    "parentKey": "settings",
+    "kind": "page",
+    "label": "System Preferences",
+    "icon": "⚙️",
+    "roles": null,
+    "position": 180
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Help & Support",
+    "icon": "🛟",
+    "roles": [
+      "admin",
+      "teacher",
+      "accountant"
+    ],
+    "position": 250
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.setup-and-go-live-guide",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "Setup & Go-Live Guide",
+    "icon": "🛟",
+    "roles": [
+      "admin"
+    ],
+    "position": 10
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.process-map",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "Process Map",
+    "icon": "🛟",
+    "roles": null,
+    "position": 20
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.class-readiness",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "Class Readiness",
+    "icon": "🛟",
+    "roles": [
+      "admin"
+    ],
+    "position": 30
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.help-center",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "Help Center",
+    "icon": "🛟",
+    "roles": null,
+    "position": 40
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.user-guide",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "User Guide",
+    "icon": "🛟",
+    "roles": null,
+    "position": 50
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.submit-a-support-request",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "Submit a Support Request",
+    "icon": "🛟",
+    "roles": null,
+    "position": 60
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.system-updates",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "System Updates",
+    "icon": "🛟",
+    "roles": null,
+    "position": 70
+  },
+  {
+    "audience": "web",
+    "key": "help-and-support.about-school-erp",
+    "parentKey": "help-and-support",
+    "kind": "page",
+    "label": "About School ERP",
+    "icon": "🛟",
+    "roles": null,
+    "position": 80
+  }
+]

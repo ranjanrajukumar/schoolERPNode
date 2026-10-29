@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Pagination from '../../components/Pagination.jsx';
@@ -89,9 +90,11 @@ export default function Results() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <Link className="big-action" to={`/exams/${examId}/marks`}>
             Enter marks
           </Link>

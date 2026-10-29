@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
@@ -106,9 +107,11 @@ export default function Parents() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="big-action" onClick={openNew}>
-            + New parent account
-          </button>
+          <Gate action="create">
+            <button type="button" className="big-action" onClick={openNew}>
+              + New parent account
+            </button>
+          </Gate>
         </div>
       </div>
       {error && (
@@ -222,22 +225,26 @@ export default function Parents() {
                     </button>
                   </td>
                   <td className="row-actions">
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={() => {
-                        setNotice('');
-                        setEntry({ id: p.id });
-                      }}
-                    >
-                      Edit
-                    </button>
+                    <Gate action="edit">
+                      <button
+                        type="button"
+                        className="ghost"
+                        onClick={() => {
+                          setNotice('');
+                          setEntry({ id: p.id });
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Gate>
                     <button type="button" className="ghost" onClick={() => reset(p)}>
                       Reset password
                     </button>
-                    <button type="button" className="ghost" onClick={() => remove(p)}>
-                      Delete
-                    </button>
+                    <Gate action="delete">
+                      <button type="button" className="ghost" onClick={() => remove(p)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

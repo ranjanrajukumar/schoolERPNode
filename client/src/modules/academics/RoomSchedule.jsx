@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -216,25 +217,29 @@ export default function RoomSchedule() {
                     <button type="button" onClick={() => setRoomId(String(r.id))}>
                       Schedule
                     </button>
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={() => {
-                        setError('');
-                        setEditId(r.id);
-                        setRoomForm({ name: r.name, kind: r.kind, capacity: r.capacity ?? '' });
-                        setEntry(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={() => run(() => api(`/scheduling/rooms/${r.id}`, { method: 'DELETE' }))}
-                    >
-                      Delete
-                    </button>
+                    <Gate action="edit">
+                      <button
+                        type="button"
+                        className="ghost"
+                        onClick={() => {
+                          setError('');
+                          setEditId(r.id);
+                          setRoomForm({ name: r.name, kind: r.kind, capacity: r.capacity ?? '' });
+                          setEntry(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Gate>
+                    <Gate action="delete">
+                      <button
+                        type="button"
+                        className="ghost"
+                        onClick={() => run(() => api(`/scheduling/rooms/${r.id}`, { method: 'DELETE' }))}
+                      >
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

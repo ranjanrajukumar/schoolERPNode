@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -244,9 +245,11 @@ export default function Homework() {
                       {canWrite ? 'Track' : 'View'}
                     </Link>
                     {canWrite && (user.role === 'admin' || h.createdByName === user.name) && (
-                      <button type="button" className="ghost" onClick={() => remove(h)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(h)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

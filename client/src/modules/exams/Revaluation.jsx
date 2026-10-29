@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -202,9 +203,11 @@ export default function Revaluation() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           {canDecide && (
             <button type="button" className="big-action" onClick={openLog}>
               ＋ Log a request
@@ -325,14 +328,18 @@ export default function Revaluation() {
                   {canDecide && (
                     <td className="row-actions">
                       {r.status === 'pending' && (
-                        <button type="button" onClick={() => openAccept(r)}>
-                          Accept
-                        </button>
+                        <Gate action="approve">
+                          <button type="button" onClick={() => openAccept(r)}>
+                            Accept
+                          </button>
+                        </Gate>
                       )}
                       {r.status === 'pending' && (
-                        <button type="button" className="ghost danger" onClick={() => openReject(r)}>
-                          Reject
-                        </button>
+                        <Gate action="approve">
+                          <button type="button" className="ghost danger" onClick={() => openReject(r)}>
+                            Reject
+                          </button>
+                        </Gate>
                       )}
                     </td>
                   )}

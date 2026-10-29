@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, fetchBlob, uploadFile } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 
@@ -146,9 +147,11 @@ export default function LmsParts({ course, lesson, onChanged }) {
               {p.kind === 'file' ? ` · ${p.hasAttachment ? p.attachmentName : 'no file uploaded yet'}` : ''}
             </small>
             <div className="row-actions">
-              <button type="button" className="ghost" onClick={() => edit(p)}>
-                Edit
-              </button>
+              <Gate action="edit">
+                <button type="button" className="ghost" onClick={() => edit(p)}>
+                  Edit
+                </button>
+              </Gate>
               <button type="button" className="ghost" onClick={() => toggle(p)}>
                 {p.published ? 'Unpublish' : 'Publish'}
               </button>
@@ -157,9 +160,11 @@ export default function LmsParts({ course, lesson, onChanged }) {
                   Download
                 </button>
               )}
-              <button type="button" className="ghost" onClick={() => remove(p)}>
-                Delete
-              </button>
+              <Gate action="delete">
+                <button type="button" className="ghost" onClick={() => remove(p)}>
+                  Delete
+                </button>
+              </Gate>
             </div>
           </li>
         ))}

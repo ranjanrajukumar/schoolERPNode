@@ -139,6 +139,7 @@ import ParentRequests from '../modules/portal/ParentRequests.jsx';
 import LoginHistory from '../modules/platform/LoginHistory.jsx';
 import Roles from '../modules/platform/Roles.jsx';
 import Permissions from '../modules/platform/Permissions.jsx';
+import RoleRights from '../modules/platform/RoleRights.jsx';
 import UserGroups from '../modules/platform/UserGroups.jsx';
 import Branches from '../modules/settings/Branches.jsx';
 import AppMenu from '../modules/settings/AppMenu.jsx';
@@ -274,6 +275,7 @@ export default function AppRoutes() {
           <Route path="login-history" element={<LoginHistory />} />
           <Route path="roles" element={<Roles />} />
           <Route path="permissions" element={<Permissions />} />
+          <Route path="role-rights" element={<RoleRights />} />
           <Route path="user-groups" element={<UserGroups />} />
           <Route path="branches" element={<Branches />} />
           <Route path="app-menu" element={<AppMenu />} />

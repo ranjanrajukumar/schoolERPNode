@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 
@@ -99,9 +100,11 @@ export default function LmsAnnouncements({ course }) {
         <article key={a.id} className="card" style={{ marginTop: 10 }}>
           <div className="profile-head">
             <b>{a.title}</b>
-            <button type="button" className="ghost" onClick={() => remove(a)}>
-              Delete
-            </button>
+            <Gate action="delete">
+              <button type="button" className="ghost" onClick={() => remove(a)}>
+                Delete
+              </button>
+            </Gate>
           </div>
           <p style={{ whiteSpace: 'pre-wrap' }}>{a.body}</p>
           <small>

@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 import { api, openPrivateFile, uploadBinary } from '../../api';
+import { useCan } from '../../rights';
 import ActionModal from '../../components/ActionModal';
 import { color, space } from '../../theme';
 import { Banner, Button, Card, Chips, Empty, Loading, Muted, Screen, Title } from '../../ui';
@@ -30,6 +31,7 @@ const courseForm = { label: 'New course', path: '/lms/courses', fields: [
 ] };
 
 export default function LmsManageScreen() {
+  const can = useCan('lms');
   const [courses, setCourses] = useState(null); const [course, setCourse] = useState(null);
   const [tab, setTab] = useState('Lessons'); const [rows, setRows] = useState([]); const [gradebook, setGradebook] = useState(null);
   const [modules, setModules] = useState([]);
@@ -93,17 +95,17 @@ export default function LmsManageScreen() {
     <Title sub="Courses, lesson documents, assignments, quizzes and student progress">Learning management</Title>
     <Banner text={notice} kind="ok" /><Banner text={error} />
     {!course ? <>
-      <Button title="Create course" onPress={() => courseAction('course-create', { ...courseForm, body: (v) => ({ ...v, classId: Number(v.classId), subjectId: Number(v.subjectId) }) })} style={{ marginBottom: space.md }} />
+      {can('create') && <Button title="Create course" onPress={() => courseAction('course-create', { ...courseForm, body: (v) => ({ ...v, classId: Number(v.classId), subjectId: Number(v.subjectId) }) })} style={{ marginBottom: space.md }} />}
       {courses === null ? <Loading /> : courses.length ? courses.map((c) => <Pressable key={c.id} onPress={() => { setCourse(c); setTab('Lessons'); }}><Card><Text style={{ color: color.ink, fontWeight: '800', fontSize: 16 }}>{c.title}</Text><Muted>{c.className} · {c.subjectName} · {c.studentCount} enrolled · {c.lessonCount} lessons · {c.published ? 'Published' : 'Draft'}</Muted></Card></Pressable>) : <Empty>No LMS courses yet.</Empty>}
     </> : <>
       <Button title="← All courses" kind="ghost" onPress={() => setCourse(null)} style={{ marginBottom: space.md }} />
       <Card><Text style={{ color: color.ink, fontWeight: '800', fontSize: 18 }}>{course.title}</Text><Muted>{course.className} · {course.subjectName}</Muted></Card>
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: space.sm }}>
-        <Button title="Edit / publish" kind="ghost" style={{ flex: 1 }} onPress={() => courseAction('course-update', { label: 'Edit course', path: `/lms/courses/${course.id}`, method: 'PUT', fields: courseFields(course), body: (v) => ({ ...v, published: v.published === 'true' }) }, { published: true })} />
-        <Button title="Delete course" kind="danger" style={{ flex: 1 }} onPress={() => courseAction('delete-course', { label: 'Delete course', path: `/lms/courses/${course.id}`, method: 'DELETE', confirm: 'Delete this course and its lessons, assessments and progress?', fields: [] })} />
+        {can('edit') && <Button title="Edit / publish" kind="ghost" style={{ flex: 1 }} onPress={() => courseAction('course-update', { label: 'Edit course', path: `/lms/courses/${course.id}`, method: 'PUT', fields: courseFields(course), body: (v) => ({ ...v, published: v.published === 'true' }) }, { published: true })} />}
+        {can('delete') && <Button title="Delete course" kind="danger" style={{ flex: 1 }} onPress={() => courseAction('delete-course', { label: 'Delete course', path: `/lms/courses/${course.id}`, method: 'DELETE', confirm: 'Delete this course and its lessons, assessments and progress?', fields: [] })} />}
       </View>
       <Chips options={tabs.map((t) => ({ value: t, label: t }))} value={tab} onChange={setTab} />
-      {tab !== 'Gradebook' && tab !== 'Enrollment' && <Button title={`Add ${tab === 'Lessons' ? 'lesson' : tab === 'Assignments' ? 'assignment' : tab === 'Quizzes' ? 'quiz' : tab === 'Modules' ? 'module' : 'announcement'}`} onPress={() => tab === 'Modules' ? moduleAction() : tab === 'Lessons' ? lessonAction() : tab === 'Assignments' ? assignmentAction() : tab === 'Quizzes' ? quizAction() : courseAction('announcement-create', { label: 'Post course announcement', path: `/lms/courses/${course.id}/announcements`, method: 'POST', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'body', label: 'Message', required: true, multiline: true }], body: (v) => v })} style={{ marginBottom: space.md }} />}
+      {tab !== 'Gradebook' && tab !== 'Enrollment' && can('create') && <Button title={`Add ${tab === 'Lessons' ? 'lesson' : tab === 'Assignments' ? 'assignment' : tab === 'Quizzes' ? 'quiz' : tab === 'Modules' ? 'module' : 'announcement'}`} onPress={() => tab === 'Modules' ? moduleAction() : tab === 'Lessons' ? lessonAction() : tab === 'Assignments' ? assignmentAction() : tab === 'Quizzes' ? quizAction() : courseAction('announcement-create', { label: 'Post course announcement', path: `/lms/courses/${course.id}/announcements`, method: 'POST', fields: [{ key: 'title', label: 'Title', required: true }, { key: 'body', label: 'Message', required: true, multiline: true }], body: (v) => v })} style={{ marginBottom: space.md }} />}
       {busy ? <Loading /> : tab === 'Gradebook' ? <Gradebook data={gradebook} /> : rows.length ? rows.map((row) => <Card key={row.id ?? row.studentId}>
         {tab === 'Enrollment' ? <><Text style={titleStyle}>{row.name}</Text><Muted>{row.admissionNo} · {row.enrolled ? 'Enrolled' : 'Not enrolled'}</Muted><View style={buttonRow}><SmallButton title={row.enrolled ? 'Unenroll' : 'Enroll'} onPress={() => toggleEnroll(row)} /></View></> : null}
         {tab === 'Modules' ? <><Text style={titleStyle}>{row.sequence}. {row.title}</Text><Muted>{row.description} · {row.published ? 'Published' : 'Draft'}</Muted><View style={buttonRow}><SmallButton title="Edit" onPress={() => moduleAction(row)} /><SmallButton title={row.published ? 'Unpublish' : 'Publish'} onPress={async () => { await api(`/lms/courses/${course.id}/modules/${row.id}`, { method: 'PUT', body: { ...row, published: !row.published } }); await reloadContent(); }} /><SmallButton title="Delete" onPress={() => remove(`/lms/courses/${course.id}/modules/${row.id}`, 'Module')} /></View></> : null}
@@ -123,7 +125,12 @@ export default function LmsManageScreen() {
 const titleStyle = { color: color.ink, fontWeight: '800', fontSize: 16 };
 const copyStyle = { color: color.ink, marginTop: 8 };
 const buttonRow = { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 };
-function SmallButton({ title, onPress }) { return <Button title={title} kind="ghost" onPress={onPress} style={{ flexGrow: 1, minWidth: 90 }} />; }
+// the per-row buttons follow the rights on the website's Role Rights page: Delete needs the Delete right; Edit, publish and enrol need the Edit right
+function SmallButton({ title, onPress }) {
+  const can = useCan('lms');
+  const needs = title === 'Delete' ? 'delete' : /^(Edit|Publish|Unpublish|Enroll|Unenroll)$/.test(title) ? 'edit' : null;
+  return can(needs) ? <Button title={title} kind="ghost" onPress={onPress} style={{ flexGrow: 1, minWidth: 90 }} /> : null;
+}
 
 function LessonUpload({ course, row, onDone, path = null, label = 'Lesson resource' }) {
   const [uploading, setUploading] = useState(false); const [error, setError] = useState('');

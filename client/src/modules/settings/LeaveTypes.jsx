@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
@@ -208,15 +209,19 @@ export default function LeaveTypes() {
                     </span>
                   </td>
                   <td className="row-actions">
-                    <button type="button" className="ghost" onClick={() => edit(t)}>
-                      Edit
-                    </button>
+                    <Gate action="edit">
+                      <button type="button" className="ghost" onClick={() => edit(t)}>
+                        Edit
+                      </button>
+                    </Gate>
                     <button type="button" className="ghost" onClick={() => toggle(t)}>
                       {t.active ? 'Switch off' : 'Switch on'}
                     </button>
-                    <button type="button" className="ghost danger" onClick={() => remove(t)}>
-                      Delete
-                    </button>
+                    <Gate action="delete">
+                      <button type="button" className="ghost danger" onClick={() => remove(t)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

@@ -57,6 +57,7 @@ import staffFileRoutes from '../modules/hr/staffFiles.js';
 import schedulingRoutes from '../modules/academics/scheduling.routes.js';
 import loginActivityRoutes from '../modules/platform/loginActivity.js';
 import rolesRoutes from '../modules/platform/roles.routes.js';
+import rightsRoutes from '../modules/platform/rights.routes.js';
 import userGroupRoutes from '../modules/platform/userGroups.routes.js';
 import branchRoutes from '../modules/settings/branches.routes.js';
 import integrationRoutes from '../modules/settings/integrations.routes.js';
@@ -145,6 +146,7 @@ router.use('/staff-files', requireRole('admin'), staffFileRoutes);
 router.use('/scheduling', requireRole('admin'), schedulingRoutes);
 router.use('/login-activity', requireRole('admin'), loginActivityRoutes);
 router.use('/roles', requireRole('admin'), rolesRoutes);
+router.use('/role-rights', rightsRoutes); // /mine is for every signed-in role, the rest is admin only (inside)
 router.use('/user-groups', requireRole('admin'), userGroupRoutes);
 router.use('/branches', branchRoutes); // reads open to staff, writes admin only (inside)
 router.use('/integrations', requireRole('admin'), integrationRoutes);

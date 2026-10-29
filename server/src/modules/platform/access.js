@@ -127,3 +127,10 @@ export function permits(permissions, method, urlPath) {
   if (READ_METHODS.has(method)) return Boolean(level) || SHARED_READS.has(prefix);
   return level === 'write';
 }
+
+/** The module an API address belongs to (for example /api/fees/3 is fees-and-finance), or null when it belongs to none. */
+export function moduleOfPath(urlPath) {
+  const parts = urlPath.split('?')[0].split('/').filter(Boolean);
+  const prefix = parts[1];
+  return (prefix === 'photos' ? PHOTO_MODULE[parts[2]] : MODULE_OF.get(prefix)) ?? null;
+}

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -285,9 +286,11 @@ export default function Users() {
                     <button type="button" className="ghost" onClick={() => resetPassword(u)}>
                       Reset password
                     </button>
-                    <button type="button" className="ghost" onClick={() => remove(u)}>
-                      Delete
-                    </button>
+                    <Gate action="delete">
+                      <button type="button" className="ghost" onClick={() => remove(u)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

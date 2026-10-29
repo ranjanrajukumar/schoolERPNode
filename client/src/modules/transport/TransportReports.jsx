@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 
 const money = (n) =>
@@ -75,9 +76,11 @@ export default function TransportReports() {
           <p className="hint">Riders, vehicles, routes and maintenance at a glance.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export routes
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export routes
+            </button>
+          </Gate>
         </div>
       </div>
 

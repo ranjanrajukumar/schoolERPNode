@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 
 const csvCell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -97,9 +98,11 @@ export default function MeritList() {
         </div>
         <div className="head-actions">
           {data?.rows.length > 0 && (
-            <button type="button" className="ghost" onClick={exportCsv}>
-              ↓ Export
-            </button>
+            <Gate action="export">
+              <button type="button" className="ghost" onClick={exportCsv}>
+                ↓ Export
+              </button>
+            </Gate>
           )}
           {data?.rows.length > 0 && (
             <button type="button" className="big-action" onClick={() => window.print()}>

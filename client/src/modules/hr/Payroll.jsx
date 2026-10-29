@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -157,9 +158,11 @@ export default function Payroll() {
             aria-label="Month"
             style={{ minHeight: 44 }}
           />
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button type="button" className="big-action" onClick={generate} disabled={busy}>
             Generate payslips
           </button>
@@ -293,33 +296,37 @@ export default function Payroll() {
                     </td>
                     <td className="row-actions">
                       {p.status === 'draft' && canApprove && (
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() =>
-                            run(
-                              () => api(`/payroll/payslips/${p.id}/pay`, { method: 'POST' }),
-                              'Marked as paid.',
-                            )
-                          }
-                        >
-                          Approve &amp; pay
-                        </button>
+                        <Gate action="approve">
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() =>
+                              run(
+                                () => api(`/payroll/payslips/${p.id}/pay`, { method: 'POST' }),
+                                'Marked as paid.',
+                              )
+                            }
+                          >
+                            Approve &amp; pay
+                          </button>
+                        </Gate>
                       )}
                       {p.status === 'draft' && (
-                        <button
-                          type="button"
-                          className="ghost danger"
-                          disabled={busy}
-                          onClick={() =>
-                            run(
-                              () => api(`/payroll/payslips/${p.id}`, { method: 'DELETE' }),
-                              'Payslip deleted.',
-                            )
-                          }
-                        >
-                          Delete
-                        </button>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost danger"
+                            disabled={busy}
+                            onClick={() =>
+                              run(
+                                () => api(`/payroll/payslips/${p.id}`, { method: 'DELETE' }),
+                                'Payslip deleted.',
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+                        </Gate>
                       )}
                     </td>
                   </tr>

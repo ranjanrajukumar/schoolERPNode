@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { forgetMasters } from '../../components/MasterSelect.jsx';
@@ -318,16 +319,18 @@ export default function MasterData() {
                         </span>
                       </td>
                       <td className="row-actions">
-                        <button
-                          type="button"
-                          className="ghost"
-                          onClick={() => {
-                            setError('');
-                            setEntry({ id: i.id, name: i.name, required: i.required });
-                          }}
-                        >
-                          Edit
-                        </button>
+                        <Gate action="edit">
+                          <button
+                            type="button"
+                            className="ghost"
+                            onClick={() => {
+                              setError('');
+                              setEntry({ id: i.id, name: i.name, required: i.required });
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </Gate>
                         <button
                           type="button"
                           className="ghost"
@@ -337,13 +340,17 @@ export default function MasterData() {
                         >
                           {i.active ? 'Hide' : 'Show'}
                         </button>
-                        <button
-                          type="button"
-                          className="ghost danger"
-                          onClick={() => run(() => api(`/masters/${i.id}`, { method: 'DELETE' }), 'Deleted.')}
-                        >
-                          Delete
-                        </button>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost danger"
+                            onClick={() =>
+                              run(() => api(`/masters/${i.id}`, { method: 'DELETE' }), 'Deleted.')
+                            }
+                          >
+                            Delete
+                          </button>
+                        </Gate>
                       </td>
                     </tr>
                   );

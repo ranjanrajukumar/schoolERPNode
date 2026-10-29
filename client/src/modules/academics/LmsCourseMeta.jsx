@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 
 const MAX_TAGS = 10;
 const MAX_BANNER_BYTES = 200 * 1024;
@@ -105,9 +106,11 @@ export function BannerPicker({ value, onChange, onError }) {
           {value ? 'Replace image' : 'Upload banner image'}
         </label>
         {value && (
-          <button type="button" className="ghost" onClick={() => onChange('')}>
-            Remove
-          </button>
+          <Gate action="delete">
+            <button type="button" className="ghost" onClick={() => onChange('')}>
+              Remove
+            </button>
+          </Gate>
         )}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Pagination from '../../components/Pagination.jsx';
 
@@ -74,9 +75,11 @@ export default function LeaveBalances({ kind }) {
                 <option key={y}>{y}</option>
               ))}
           </select>
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
         </div>
       </div>
       {error && (

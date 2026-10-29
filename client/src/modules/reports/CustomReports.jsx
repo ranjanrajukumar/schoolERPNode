@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, getToken } from '../../services/api.js';
 import Pagination from '../../components/Pagination.jsx';
 
@@ -121,9 +122,11 @@ export default function CustomReports() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" disabled={!current || !columns.length} onClick={csv}>
-            ↓ Download CSV
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" disabled={!current || !columns.length} onClick={csv}>
+              ↓ Download CSV
+            </button>
+          </Gate>
           <button
             type="button"
             className="big-action"
@@ -233,13 +236,15 @@ export default function CustomReports() {
                           aria-label="Filter value"
                         />
                       )}
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => setFilters(filters.filter((_, j) => j !== i))}
-                      >
-                        Remove
-                      </button>
+                      <Gate action="delete">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => setFilters(filters.filter((_, j) => j !== i))}
+                        >
+                          Remove
+                        </button>
+                      </Gate>
                     </div>
                   ))}
                   <div>

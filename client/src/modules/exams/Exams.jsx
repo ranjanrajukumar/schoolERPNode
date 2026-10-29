@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
@@ -190,9 +191,11 @@ export default function Exams() {
           <p className="hint">Create an exam, enter marks, see results and ranks, then print report cards.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           {canEdit && (
             <button type="button" className="big-action" onClick={openNew}>
               ＋ New exam
@@ -321,14 +324,18 @@ export default function Exams() {
                       Results
                     </Link>
                     {canEdit && (
-                      <button type="button" className="ghost" onClick={() => openEdit(e)}>
-                        Edit
-                      </button>
+                      <Gate action="edit">
+                        <button type="button" className="ghost" onClick={() => openEdit(e)}>
+                          Edit
+                        </button>
+                      </Gate>
                     )}
                     {canEdit && (
-                      <button type="button" className="ghost danger" onClick={() => remove(e)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(e)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

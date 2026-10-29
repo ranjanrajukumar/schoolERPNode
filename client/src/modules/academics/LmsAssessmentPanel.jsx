@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, fetchBlob } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 
@@ -391,9 +392,11 @@ export default function LmsAssessmentPanel({ course, only = null }) {
                       <button type="button" className="ghost" onClick={() => toggleAssignment(a)}>
                         {a.published ? 'Unpublish' : 'Publish'}
                       </button>
-                      <button type="button" className="ghost" onClick={() => removeAssignment(a)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => removeAssignment(a)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   </tr>
                 ))}
@@ -725,16 +728,20 @@ export default function LmsAssessmentPanel({ course, only = null }) {
                         Review attempts
                       </button>
                       {q.attemptCount === 0 && (
-                        <button type="button" className="ghost" onClick={() => editQuiz(q)}>
-                          Edit
-                        </button>
+                        <Gate action="edit">
+                          <button type="button" className="ghost" onClick={() => editQuiz(q)}>
+                            Edit
+                          </button>
+                        </Gate>
                       )}
                       <button type="button" className="ghost" onClick={() => toggleQuiz(q)}>
                         {q.published ? 'Unpublish' : 'Publish'}
                       </button>
-                      <button type="button" className="ghost" onClick={() => removeQuiz(q)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => removeQuiz(q)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   </tr>
                 ))}

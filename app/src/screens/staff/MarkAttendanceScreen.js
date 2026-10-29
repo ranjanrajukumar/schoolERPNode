@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { api } from '../../api';
+import { useCan } from '../../rights';
 import { Badge, Banner, Button, Card, Chips, Empty, Field, Heading, Loading, Muted, Row, Screen, Title, niceDate, shiftDay, todayKey, useLoad } from '../../ui';
 import { useClasses } from './useClasses';
 
@@ -9,6 +10,7 @@ const NEXT = { null: 'present', present: 'absent', absent: 'late', late: 'presen
 
 /** Tap a student to cycle present, absent, late. Saving a past day asks for a reason, as on the web. */
 export default function MarkAttendanceScreen() {
+  const can = useCan('attendance');
   const { options, classId, setClassId, loading: loadingClasses } = useClasses();
   const [date, setDate] = useState(todayKey());
   const [marks, setMarks] = useState({});
@@ -80,7 +82,7 @@ export default function MarkAttendanceScreen() {
                 <Muted style={{ marginTop: 8 }}>Tap a student to change present, absent or late.{unmarked ? ` ${unmarked} not marked yet.` : ''}</Muted>
               </Card>
               {!isToday && <Field label="Reason for changing a past day" value={reason} onChangeText={setReason} placeholder="Needed if a saved mark changes" />}
-              <Button title={dirty ? 'Save attendance' : 'Saved'} onPress={save} busy={busy} disabled={!dirty} />
+              {can('create') && <Button title={dirty ? 'Save attendance' : 'Saved'} onPress={save} busy={busy} disabled={!dirty} />}
             </>
           )}
         </>

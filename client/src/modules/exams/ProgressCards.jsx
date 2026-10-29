@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
@@ -212,14 +213,16 @@ export default function ProgressCards() {
                     {a.name}
                     <small className="block">{a.category}</small>
                     {isAdmin && (
-                      <button
-                        type="button"
-                        className="ghost danger"
-                        onClick={() => removeArea(a)}
-                        aria-label={`Delete ${a.name}`}
-                      >
-                        Remove
-                      </button>
+                      <Gate action="delete">
+                        <button
+                          type="button"
+                          className="ghost danger"
+                          onClick={() => removeArea(a)}
+                          aria-label={`Delete ${a.name}`}
+                        >
+                          Remove
+                        </button>
+                      </Gate>
                     )}
                   </th>
                 ))}

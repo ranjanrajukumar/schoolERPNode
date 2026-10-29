@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -293,9 +294,11 @@ export default function LibraryMembers() {
                     </td>
                     {canWrite && (
                       <td className="row-actions">
-                        <button type="button" className="ghost" onClick={() => openEdit(c)}>
-                          Edit
-                        </button>
+                        <Gate action="edit">
+                          <button type="button" className="ghost" onClick={() => openEdit(c)}>
+                            Edit
+                          </button>
+                        </Gate>
                         <button type="button" className="ghost danger" onClick={() => withdraw(c)}>
                           Withdraw
                         </button>

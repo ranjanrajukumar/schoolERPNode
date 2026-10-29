@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
@@ -426,25 +427,29 @@ export default function Admissions() {
                             Apply
                           </button>
                         )}
-                        <button
-                          type="button"
-                          className="ghost"
-                          title="Edit enquiry"
-                          onClick={() => {
-                            setError('');
-                            setEntry({ kind: 'enquiry', id: r.id });
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="ghost danger"
-                          title="Delete enquiry"
-                          onClick={() => remove(r)}
-                        >
-                          Delete
-                        </button>
+                        <Gate action="edit">
+                          <button
+                            type="button"
+                            className="ghost"
+                            title="Edit enquiry"
+                            onClick={() => {
+                              setError('');
+                              setEntry({ kind: 'enquiry', id: r.id });
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </Gate>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost danger"
+                            title="Delete enquiry"
+                            onClick={() => remove(r)}
+                          >
+                            Delete
+                          </button>
+                        </Gate>
                       </>
                     )}
                     {!r.deletedAt && r.status === 'approved' && (

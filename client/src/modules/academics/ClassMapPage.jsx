@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -228,20 +229,24 @@ export default function ClassMapPage() {
                       <td>{s.takers}</td>
                       {canWrite && (
                         <td className="row-actions">
-                          <button
-                            type="button"
-                            className="ghost"
-                            onClick={() => {
-                              setError('');
-                              setNotice('');
-                              setEntry({ row: s });
-                            }}
-                          >
-                            Edit
-                          </button>
-                          <button type="button" className="ghost danger" onClick={() => remove(s)}>
-                            Remove
-                          </button>
+                          <Gate action="edit">
+                            <button
+                              type="button"
+                              className="ghost"
+                              onClick={() => {
+                                setError('');
+                                setNotice('');
+                                setEntry({ row: s });
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </Gate>
+                          <Gate action="delete">
+                            <button type="button" className="ghost danger" onClick={() => remove(s)}>
+                              Remove
+                            </button>
+                          </Gate>
                         </td>
                       )}
                     </tr>

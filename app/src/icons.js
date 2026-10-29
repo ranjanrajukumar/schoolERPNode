@@ -17,7 +17,7 @@ Object.assign(SCREEN_ICON, {
   'admissions.enquiries': 'help-circle-outline', 'admissions.applications': 'document-text-outline', 'admissions.offers': 'checkmark-circle-outline', 'admissions.summary': 'stats-chart-outline',
   'students.students': 'school-outline', 'students.health': 'medical-outline', 'students.alumni': 'ribbon-outline', 'students.accounts': 'key-outline',
   'academics.classes': 'layers-outline', 'academics.subjects': 'book-outline', 'academics.years': 'calendar-outline', 'academics.homework': 'create-outline', 'academics.materials': 'folder-outline', 'academics.online': 'videocam-outline', 'academics.calendar': 'calendar-outline',
-  'attendance.mark': 'checkbox-outline', 'attendance.myclass': 'people-outline', 'attendance.leaves': 'mail-open-outline',
+  'attendance.mark': 'checkbox-outline', 'attendance.myclass': 'people-outline', 'attendance.myattendance': 'calendar-outline', 'attendance.myleaves': 'mail-outline', 'attendance.myleavebalance': 'bar-chart-outline', 'attendance.leaves': 'mail-open-outline',
   'exams.marks': 'create-outline', 'exams.exams': 'document-text-outline', 'exams.reval': 'clipboard-outline', 'exams.grading': 'trending-up-outline',
   'fees.fees': 'wallet-outline', 'fees.payments': 'receipt-outline', 'fees.structure': 'layers-outline', 'fees.groups': 'pricetag-outline', 'fees.defaulters': 'alert-circle-outline', 'fees.finance': 'cash-outline', 'fees.collection': 'stats-chart-outline',
   'transport.vehicles': 'bus-outline', 'transport.routes': 'map-outline', 'transport.stops': 'location-outline', 'transport.assignments': 'people-outline', 'transport.staff': 'person-outline', 'transport.tracking': 'navigate-outline',

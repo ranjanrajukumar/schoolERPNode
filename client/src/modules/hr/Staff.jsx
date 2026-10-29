@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
@@ -155,9 +156,11 @@ export default function Staff() {
           <p className="hint">Manage staff records, roles and departments.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           {canWrite && (
             <button
               type="button"
@@ -302,19 +305,23 @@ export default function Staff() {
                     </button>
                     {canWrite && (
                       <>
-                        <button
-                          type="button"
-                          className="ghost"
-                          onClick={() => {
-                            setNotice('');
-                            setEntry({ id: r.id });
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button type="button" className="ghost danger" onClick={() => remove(r)}>
-                          Delete
-                        </button>
+                        <Gate action="edit">
+                          <button
+                            type="button"
+                            className="ghost"
+                            onClick={() => {
+                              setNotice('');
+                              setEntry({ id: r.id });
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </Gate>
+                        <Gate action="delete">
+                          <button type="button" className="ghost danger" onClick={() => remove(r)}>
+                            Delete
+                          </button>
+                        </Gate>
                         {r.status === 'active' && (
                           <button
                             type="button"

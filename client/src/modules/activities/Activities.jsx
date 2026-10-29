@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
@@ -274,9 +275,11 @@ export default function Activities() {
                         </button>
                       ))}
                     {canWrite && a.status !== 'completed' && (
-                      <button type="button" className="ghost" onClick={() => remove(a)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(a)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

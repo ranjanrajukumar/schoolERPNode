@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from '../services/api.js';
+import { useCan } from '../hooks/useRights.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import TypeaheadSelect from './TypeaheadSelect.jsx';
 import Modal from './Modal.jsx';
@@ -27,7 +28,11 @@ export default function ResourcePage({
   noEdit = false,
 }) {
   const { user } = useAuth();
-  const canWrite = writeRoles.includes(user?.role);
+  const can = useCan();
+  const roleWrites = writeRoles.includes(user?.role);
+  const canAdd = roleWrites && can('create');
+  const canChange = roleWrites && can('edit');
+  const canRemove = roleWrites && can('delete');
   const [rows, setRows] = useState([]);
   const [form, setForm] = useState({});
   const [editId, setEditId] = useState(null);
@@ -113,7 +118,7 @@ export default function ResourcePage({
             {rows.length} {rows.length === 1 ? 'record' : 'records'}
           </p>
         </div>
-        {canWrite && (
+        {canAdd && (
           <button
             type="button"
             className="big-action"
@@ -175,12 +180,12 @@ export default function ResourcePage({
                   ))}
                   <td className="row-actions">
                     {rowActions?.(r, load)}
-                    {canWrite && !noEdit && (
+                    {canChange && !noEdit && (
                       <button type="button" className="ghost" onClick={() => edit(r)}>
                         Edit
                       </button>
                     )}
-                    {canWrite && (
+                    {canRemove && (
                       <button type="button" className="ghost danger" onClick={() => remove(r.id)}>
                         Delete
                       </button>

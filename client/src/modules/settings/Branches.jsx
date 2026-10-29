@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -182,17 +183,21 @@ export default function Branches() {
                         Make main
                       </button>
                     )}
-                    <button type="button" className="ghost" onClick={() => openEdit(b)}>
-                      Edit
-                    </button>
-                    {!b.isMain && (
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => run(() => api(`/branches/${b.id}`, { method: 'DELETE' }))}
-                      >
-                        Delete
+                    <Gate action="edit">
+                      <button type="button" className="ghost" onClick={() => openEdit(b)}>
+                        Edit
                       </button>
+                    </Gate>
+                    {!b.isMain && (
+                      <Gate action="delete">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => run(() => api(`/branches/${b.id}`, { method: 'DELETE' }))}
+                        >
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

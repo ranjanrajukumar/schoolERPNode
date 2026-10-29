@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -221,29 +222,33 @@ export default function InterviewSchedule() {
                     >
                       ⋯
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setError('');
-                        setForm({
-                          id: a.id,
-                          interviewDate: a.interviewDate,
-                          interviewTime: a.interviewTime ?? '',
-                          interviewPanel: a.interviewPanel ?? '',
-                          interviewResult: a.interviewResult ?? 'pending',
-                        });
-                        setEntry(true);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={() => run(() => api(`/admissions/${a.id}/interview`, { method: 'DELETE' }))}
-                    >
-                      Remove
-                    </button>
+                    <Gate action="edit">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setError('');
+                          setForm({
+                            id: a.id,
+                            interviewDate: a.interviewDate,
+                            interviewTime: a.interviewTime ?? '',
+                            interviewPanel: a.interviewPanel ?? '',
+                            interviewResult: a.interviewResult ?? 'pending',
+                          });
+                          setEntry(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </Gate>
+                    <Gate action="delete">
+                      <button
+                        type="button"
+                        className="ghost"
+                        onClick={() => run(() => api(`/admissions/${a.id}/interview`, { method: 'DELETE' }))}
+                      >
+                        Remove
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

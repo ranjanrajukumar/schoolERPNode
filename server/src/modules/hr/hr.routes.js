@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { Department, Designation, Staff } from '../../models/index.js';
+import { Department, Designation, Staff, StaffAttendance } from '../../models/index.js';
 import { requireRole, writeRoles } from '../../middleware/authMiddleware.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { crudRouter } from '../../utils/crud.js';
+import { Op } from 'sequelize';
 import { badRequest } from '../../utils/httpError.js';
 import { saveStaffMonthly, staffMonthly } from '../attendance/monthly.service.js';
 import {
@@ -18,6 +19,14 @@ import {
 
 const router = Router();
 const admin = requireRole('admin');
+const staffOnly = requireRole('admin', 'teacher');
+
+// A teacher or admin who is also a staff member reaches their own record through the account's staff link.
+const ownStaffId = (req) => {
+  if (!req.user.staffId)
+    throw badRequest('This login is not linked to a staff record. Ask the school office.');
+  return req.user.staffId;
+};
 
 // Departments and designations feed the staff form, so every staff role can read them.
 router.use(
@@ -50,6 +59,21 @@ router.use(
 );
 
 // Staff attendance
+// GET /api/hr/attendance/mine?month=YYYY-MM -> the signed-in staff member's own marks for the month
+router.get(
+  '/attendance/mine',
+  staffOnly,
+  asyncHandler(async (req, res) => {
+    const month = /^d{4}-d{2}$/.test(req.query.month ?? '')
+      ? req.query.month
+      : new Date().toISOString().slice(0, 7);
+    const rows = await StaffAttendance.findAll({
+      where: { staffId: ownStaffId(req), date: { [Op.between]: [`${month}-01`, `${month}-31`] } },
+      order: [['date', 'DESC']],
+    });
+    res.json(rows.map((r) => ({ id: r.id, date: r.date, status: r.status })));
+  }),
+);
 router.get(
   '/attendance',
   admin,
@@ -85,6 +109,17 @@ router.get(
   deciders,
   asyncHandler(async (req, res) => res.json(await listLeaves(req.query, req.user))),
 );
+// The signed-in staff member's own leave requests and balance
+router.get(
+  '/leaves/mine',
+  staffOnly,
+  asyncHandler(async (req, res) => res.json(await listLeaves({ staffId: ownStaffId(req) }))),
+);
+router.get(
+  '/leave-balance/mine',
+  staffOnly,
+  asyncHandler(async (req, res) => res.json(await leaveBalance(ownStaffId(req)))),
+);
 router.get(
   '/leave-balance/:staffId',
   admin,
@@ -94,8 +129,12 @@ router.get(
 );
 router.post(
   '/leaves',
-  admin,
-  asyncHandler(async (req, res) => res.status(201).json(await applyLeave(req.body))),
+  staffOnly,
+  asyncHandler(async (req, res) => {
+    // a teacher can only apply for themselves; the leave type's rules decide approval
+    const body = req.user.role === 'admin' ? req.body : { ...req.body, staffId: ownStaffId(req) };
+    res.status(201).json(await applyLeave(body));
+  }),
 );
 router.post(
   '/leaves/:id/approve',

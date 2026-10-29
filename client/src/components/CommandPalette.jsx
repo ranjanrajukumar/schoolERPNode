@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
-import { MENU } from '../config/menu.js';
+import { useWebMenu } from '../hooks/useWebMenu.js';
 
 const ALWAYS = ['dashboard', 'help-and-support'];
 const THEME_LABEL = { auto: 'Follow device', light: 'Light', dark: 'Dark' };
@@ -21,6 +21,7 @@ export default function CommandPalette({ open, onClose }) {
   const [students, setStudents] = useState([]);
   const [active, setActive] = useState(0);
   const role = user?.role;
+  const MENU = useWebMenu();
 
   const pages = useMemo(() => {
     const seen = new Set();
@@ -31,11 +32,18 @@ export default function CommandPalette({ open, onClose }) {
       for (const i of g.items) {
         if (!i.built || !i.roles.includes(role) || seen.has(i.to)) continue;
         seen.add(i.to);
-        list.push({ kind: 'page', key: `p-${i.to}`, label: i.label, hint: g.label, icon: g.icon, to: i.to });
+        list.push({
+          kind: 'page',
+          key: `p-${i.to}`,
+          label: i.label,
+          hint: g.label,
+          icon: g.icon?.src ? '•' : g.icon,
+          to: i.to,
+        });
       }
     }
     return list;
-  }, [role, user?.permissions]);
+  }, [role, user?.permissions, MENU]);
 
   useEffect(() => {
     if (open) {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
@@ -178,9 +179,11 @@ export default function Documents() {
               </option>
             ))}
           </select>
-          <button type="button" className="big-action" onClick={openNew}>
-            + New request
-          </button>
+          <Gate action="create">
+            <button type="button" className="big-action" onClick={openNew}>
+              + New request
+            </button>
+          </Gate>
         </div>
       </div>
       {notice && <p className="success">{notice}</p>}
@@ -291,15 +294,19 @@ export default function Documents() {
                       </button>
                     )}
                     {r.status === 'requested' && (
-                      <button type="button" className="ghost" onClick={() => rejectRequest(r)}>
-                        Reject
-                      </button>
+                      <Gate action="approve">
+                        <button type="button" className="ghost" onClick={() => rejectRequest(r)}>
+                          Reject
+                        </button>
+                      </Gate>
                     )}
                     {r.status === 'issued' && <Link to={`/documents/${r.id}/print`}>View / print</Link>}
                     {r.status !== 'issued' && (
-                      <button type="button" className="ghost" onClick={() => remove(r)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(r)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

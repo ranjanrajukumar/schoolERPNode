@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import SubjectMapModal from '../../components/SubjectMapModal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -249,12 +250,16 @@ export default function ClassSubjects() {
                     </td>
                     {canWrite && (
                       <td className="row-actions">
-                        <button type="button" className="ghost" onClick={() => openEdit(s)}>
-                          Edit
-                        </button>
-                        <button type="button" className="ghost danger" onClick={() => remove(s)}>
-                          Remove
-                        </button>
+                        <Gate action="edit">
+                          <button type="button" className="ghost" onClick={() => openEdit(s)}>
+                            Edit
+                          </button>
+                        </Gate>
+                        <Gate action="delete">
+                          <button type="button" className="ghost danger" onClick={() => remove(s)}>
+                            Remove
+                          </button>
+                        </Gate>
                       </td>
                     )}
                   </tr>

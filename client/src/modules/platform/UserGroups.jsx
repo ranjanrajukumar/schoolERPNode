@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
@@ -138,15 +139,17 @@ export default function UserGroups() {
                     <td>{m.email}</td>
                     <td>{m.role}</td>
                     <td className="row-actions">
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() =>
-                          run(() => api(`/user-groups/${g.id}/members/${m.id}`, { method: 'DELETE' }))
-                        }
-                      >
-                        Remove
-                      </button>
+                      <Gate action="delete">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() =>
+                            run(() => api(`/user-groups/${g.id}/members/${m.id}`, { method: 'DELETE' }))
+                          }
+                        >
+                          Remove
+                        </button>
+                      </Gate>
                     </td>
                   </tr>
                 ))}

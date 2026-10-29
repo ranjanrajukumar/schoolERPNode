@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -184,9 +185,11 @@ export default function PurchaseOrders() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button type="button" className="big-action" onClick={openNew}>
             ＋ New order
           </button>
@@ -444,14 +447,16 @@ export default function PurchaseOrders() {
                 />
               </label>
               {lines.length > 1 && (
-                <button
-                  type="button"
-                  className="ghost danger"
-                  data-sure="off"
-                  onClick={() => setLines(lines.filter((_, n) => n !== i))}
-                >
-                  Remove
-                </button>
+                <Gate action="delete">
+                  <button
+                    type="button"
+                    className="ghost danger"
+                    data-sure="off"
+                    onClick={() => setLines(lines.filter((_, n) => n !== i))}
+                  >
+                    Remove
+                  </button>
+                </Gate>
               )}
             </div>
           ))}

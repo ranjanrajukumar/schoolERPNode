@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -215,22 +216,26 @@ export default function AcademicCalendar() {
                   <td style={{ textTransform: 'capitalize' }}>{ev.audience}</td>
                   <td className="row-actions">
                     {canWrite && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setError('');
-                          setEditId(ev.id);
-                          setForm({ ...EMPTY, ...ev, description: ev.description ?? '' });
-                          setEntry(true);
-                        }}
-                      >
-                        Edit
-                      </button>
+                      <Gate action="edit">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setError('');
+                            setEditId(ev.id);
+                            setForm({ ...EMPTY, ...ev, description: ev.description ?? '' });
+                            setEntry(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </Gate>
                     )}
                     {canWrite && (
-                      <button type="button" className="ghost" onClick={() => remove(ev)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(ev)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

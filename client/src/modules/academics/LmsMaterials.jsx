@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api, fetchBlob, uploadFile } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 
@@ -262,15 +263,19 @@ export default function LmsMaterials({ course }) {
                         Open
                       </a>
                     )}
-                    <button type="button" className="ghost" onClick={() => edit(m)}>
-                      Edit
-                    </button>
+                    <Gate action="edit">
+                      <button type="button" className="ghost" onClick={() => edit(m)}>
+                        Edit
+                      </button>
+                    </Gate>
                     <button type="button" className="ghost" onClick={() => toggle(m)}>
                       {m.published ? 'Unpublish' : 'Publish'}
                     </button>
-                    <button type="button" className="ghost" onClick={() => remove(m)}>
-                      Delete
-                    </button>
+                    <Gate action="delete">
+                      <button type="button" className="ghost" onClick={() => remove(m)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

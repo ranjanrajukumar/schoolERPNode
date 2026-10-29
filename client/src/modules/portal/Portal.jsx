@@ -5,6 +5,7 @@ import { useSchoolBrand } from '../../hooks/useSchoolBrand.js';
 import { QualificationTable, SiblingsTable } from '../admissions/AdmissionSections.jsx';
 import { api, fetchBlob, uploadFile } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import Gate from '../../components/Gate.jsx';
 import PushToggle from '../../components/PushToggle.jsx';
 import { BusMap, ago } from '../transport/BusTracking.jsx';
 import { GrievanceLadder, Timeline } from '../../components/GrievanceLadder.jsx';
@@ -505,7 +506,9 @@ function Documents({ base, childId, readOnly }) {
             placeholder="e.g. Bank account"
           />
         </label>
-        <button type="submit">Request</button>
+        <Gate module="portal-documents" action="create">
+          <button type="submit">Request</button>
+        </Gate>
       </form>
       {error && <p className="error">{error}</p>}
       <TableCard>
@@ -673,9 +676,11 @@ function Leave({ base, readOnly: isStudent }) {
             required
           />
         </label>
-        <button type="submit" disabled={busy}>
-          {busy ? 'Sending…' : 'Apply for leave'}
-        </button>
+        <Gate module="portal-leave" action="create">
+          <button type="submit" disabled={busy}>
+            {busy ? 'Sending…' : 'Apply for leave'}
+          </button>
+        </Gate>
       </form>
       {error && <p className="error">{error}</p>}
       <TableCard>
@@ -1296,9 +1301,11 @@ function LmsCourses({ base, readOnly }) {
                             />
                             {uploading === a.id && <small>Uploading…</small>}
                           </label>
-                          <button type="button" onClick={() => submitAssignment(a)}>
-                            {a.submission ? 'Update submission' : 'Submit assignment'}
-                          </button>
+                          <Gate module="portal-lms" action="create">
+                            <button type="button" onClick={() => submitAssignment(a)}>
+                              {a.submission ? 'Update submission' : 'Submit assignment'}
+                            </button>
+                          </Gate>
                         </div>
                       )}
                     </article>
@@ -1423,9 +1430,11 @@ function LmsCourses({ base, readOnly }) {
                               );
                             })}
                           </div>
-                          <button type="button" onClick={() => submitQuiz(q)}>
-                            Submit quiz
-                          </button>
+                          <Gate module="portal-lms" action="create">
+                            <button type="button" onClick={() => submitQuiz(q)}>
+                              Submit quiz
+                            </button>
+                          </Gate>
                         </>
                       )}
                       {quizScores[q.id] && (
@@ -1501,11 +1510,17 @@ function Activities({ base }) {
                     <span className={`badge ${consentBadge[a.consent]}`}>{a.consent}</span>
                     {!['completed', 'cancelled'].includes(a.activityStatus) && a.status !== 'attended' && (
                       <>
-                        {a.consent !== 'given' && <button onClick={() => answer(a, 'given')}>I agree</button>}
+                        {a.consent !== 'given' && (
+                          <Gate module="portal-activities" action="edit">
+                            <button onClick={() => answer(a, 'given')}>I agree</button>
+                          </Gate>
+                        )}
                         {a.consent !== 'declined' && (
-                          <button className="danger" onClick={() => answer(a, 'declined')}>
-                            Decline
-                          </button>
+                          <Gate module="portal-activities" action="edit">
+                            <button className="danger" onClick={() => answer(a, 'declined')}>
+                              Decline
+                            </button>
+                          </Gate>
                         )}
                       </>
                     )}
@@ -2192,9 +2207,11 @@ function Feedback({ base }) {
           />{' '}
           Keep my name from the school office
         </label>
-        <button type="submit" disabled={busy}>
-          {busy ? 'Sending…' : 'Send'}
-        </button>
+        <Gate module="portal-feedback" action="create">
+          <button type="submit" disabled={busy}>
+            {busy ? 'Sending…' : 'Send'}
+          </button>
+        </Gate>
       </form>
       {notice && <p className="success">{notice}</p>}
       {error && <p className="error">{error}</p>}

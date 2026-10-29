@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -203,12 +204,16 @@ export default function Holidays() {
                   <td>{AUDIENCE[ev.audience]}</td>
                   {canWrite && (
                     <td className="row-actions">
-                      <button type="button" onClick={() => open(ev)}>
-                        Edit
-                      </button>
-                      <button type="button" className="ghost danger" onClick={() => remove(ev)}>
-                        Delete
-                      </button>
+                      <Gate action="edit">
+                        <button type="button" onClick={() => open(ev)}>
+                          Edit
+                        </button>
+                      </Gate>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(ev)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   )}
                 </tr>

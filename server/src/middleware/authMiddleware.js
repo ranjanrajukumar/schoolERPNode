@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { Role, User } from '../models/index.js';
 import { permits } from '../modules/platform/access.js';
+import { rightsAllow } from '../modules/platform/rights.service.js';
 import { setCurrentUser } from '../utils/requestContext.js';
 
 /**
@@ -40,6 +41,9 @@ export async function requireAuth(req, res, next) {
     if (!permits(req.user.permissions, req.method, req.originalUrl))
       return res.status(403).json({ error: 'Your role does not include this area' });
   }
+  // actions an admin switched off for this role on the Role Rights page (create, edit, delete, approve, export); none by default
+  if (!(await rightsAllow(req.user.role, req.method, req.originalUrl)))
+    return res.status(403).json({ error: 'Your role is not allowed to do this here' });
   next();
 }
 

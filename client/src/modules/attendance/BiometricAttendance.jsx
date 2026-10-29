@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -289,9 +290,11 @@ export default function BiometricAttendance() {
                         <button type="button" className="ghost" onClick={() => rotate(d)}>
                           New key
                         </button>
-                        <button type="button" className="ghost danger" onClick={() => remove(d)}>
-                          Delete
-                        </button>
+                        <Gate action="delete">
+                          <button type="button" className="ghost danger" onClick={() => remove(d)}>
+                            Delete
+                          </button>
+                        </Gate>
                       </td>
                     )}
                   </tr>

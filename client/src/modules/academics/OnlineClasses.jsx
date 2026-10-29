@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -200,12 +201,16 @@ export default function OnlineClasses() {
                     <a className="btn ghost" href={c.link} target="_blank" rel="noopener noreferrer">
                       Open link
                     </a>
-                    <button type="button" onClick={() => open(c)}>
-                      Edit
-                    </button>
-                    <button type="button" className="ghost danger" onClick={() => remove(c)}>
-                      Delete
-                    </button>
+                    <Gate action="edit">
+                      <button type="button" onClick={() => open(c)}>
+                        Edit
+                      </button>
+                    </Gate>
+                    <Gate action="delete">
+                      <button type="button" className="ghost danger" onClick={() => remove(c)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

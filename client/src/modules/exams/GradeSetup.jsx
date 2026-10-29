@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -175,16 +176,18 @@ export default function GradeSetup() {
                     <td>{idx === 0 ? upper : `${upper} (below)`}</td>
                     {canWrite && (
                       <td className="row-actions">
-                        <button
-                          type="button"
-                          className="ghost danger"
-                          onClick={() => {
-                            setDirty(true);
-                            setBands(bands.filter((_, j) => j !== i));
-                          }}
-                        >
-                          Remove
-                        </button>
+                        <Gate action="delete">
+                          <button
+                            type="button"
+                            className="ghost danger"
+                            onClick={() => {
+                              setDirty(true);
+                              setBands(bands.filter((_, j) => j !== i));
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </Gate>
                       </td>
                     )}
                   </tr>

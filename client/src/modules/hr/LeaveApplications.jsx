@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -258,14 +259,18 @@ export default function LeaveApplications() {
                   </td>
                   <td className="row-actions">
                     {l.status === 'pending' && l.canDecide && (
-                      <button type="button" onClick={() => approve(l)}>
-                        Approve
-                      </button>
+                      <Gate action="approve">
+                        <button type="button" onClick={() => approve(l)}>
+                          Approve
+                        </button>
+                      </Gate>
                     )}
                     {l.status === 'pending' && l.canDecide && (
-                      <button type="button" className="ghost" onClick={() => reject(l)}>
-                        Reject
-                      </button>
+                      <Gate action="approve">
+                        <button type="button" className="ghost" onClick={() => reject(l)}>
+                          Reject
+                        </button>
+                      </Gate>
                     )}
                     {l.status === 'pending' && !l.canDecide && (
                       <small className="block">

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -202,12 +203,16 @@ export default function Classes() {
                   <td>{c.studentCount}</td>
                   {canWrite && (
                     <td className="row-actions">
-                      <button type="button" className="ghost" onClick={() => openEdit(c)}>
-                        Edit
-                      </button>
-                      <button type="button" className="ghost" onClick={() => remove(c)}>
-                        Delete
-                      </button>
+                      <Gate action="edit">
+                        <button type="button" className="ghost" onClick={() => openEdit(c)}>
+                          Edit
+                        </button>
+                      </Gate>
+                      <Gate action="delete">
+                        <button type="button" className="ghost" onClick={() => remove(c)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   )}
                 </tr>

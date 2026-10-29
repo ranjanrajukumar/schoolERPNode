@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { api } from '../../api';
+import { useCan } from '../../rights';
 import { color } from '../../theme';
 import { Banner, Button, Card, Chips, Empty, Heading, Loading, Muted, Row, Screen, Title, useLoad } from '../../ui';
 
@@ -10,6 +11,7 @@ const plain = (mark) => (mark === undefined || mark === null || mark === '' ? ''
 
 /** Marks for one exam, one subject at a time, including theory and practical parts. */
 export default function MarksScreen({ route }) {
+  const can = useCan('exams');
   const { examId, title } = route.params;
   const { data, error, loading, reload } = useLoad(() => api(`/exams/${examId}/marks`), [examId]);
   const [subjectId, setSubjectId] = useState(null);
@@ -139,7 +141,7 @@ export default function MarksScreen({ route }) {
               {!data.students.length && <Empty>No students in this class.</Empty>}
             </Card>
           )}
-          {subject?.editable ? <Button title={changed ? 'Save marks' : 'Saved'} onPress={save} busy={busy} disabled={!changed} /> : null}
+          {subject?.editable && can('edit') ? <Button title={changed ? 'Save marks' : 'Saved'} onPress={save} busy={busy} disabled={!changed} /> : null}
         </>
       )}
     </Screen>

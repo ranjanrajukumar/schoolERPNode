@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -229,9 +230,11 @@ export default function Fees() {
           <p className="hint">Bill students, record what is paid and follow up what is still owed.</p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           <button type="button" className="ghost" onClick={() => open('bill', {}, { classId: '' })}>
             Bill a class
           </button>
@@ -407,9 +410,11 @@ export default function Fees() {
                       Fine
                     </button>
                     {Number(f.paidAmount) === 0 && (
-                      <button type="button" className="ghost danger" onClick={() => remove(f)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(f)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

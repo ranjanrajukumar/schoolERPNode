@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import StudentPhoto from '../../components/StudentPhoto.jsx';
 import { SECTIONS } from './StaffForm.jsx';
@@ -71,9 +72,11 @@ export default function StaffDetails({ id, onEdit }) {
         </div>
         {onEdit && (
           <div className="details-actions no-print">
-            <button type="button" onClick={() => onEdit(s.id)}>
-              Edit
-            </button>
+            <Gate action="edit">
+              <button type="button" onClick={() => onEdit(s.id)}>
+                Edit
+              </button>
+            </Gate>
           </div>
         )}
       </div>

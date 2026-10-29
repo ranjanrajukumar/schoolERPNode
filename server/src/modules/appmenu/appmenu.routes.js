@@ -21,7 +21,13 @@ router.get(
   asyncHandler(async (req, res) => res.json(await menuFor(req.user.role))),
 );
 
-// GET /api/app-menu/admin?audience=staff|family -> every item with its settings, for the editor
+// GET /api/app-menu/web -> the website's menu for the signed-in person
+router.get(
+  '/web',
+  asyncHandler(async (req, res) => res.json(await menuFor(req.user.role, 'web'))),
+);
+
+// GET /api/app-menu/admin?audience=staff|family|web -> every item with its settings, for the editor
 router.get(
   '/admin',
   admin,

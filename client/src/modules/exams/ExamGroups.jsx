@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -189,9 +190,11 @@ export default function ExamGroups() {
                       </td>
                       {canWrite && (
                         <td className="row-actions">
-                          <button type="button" className="ghost danger" onClick={() => assign(e.id, null)}>
-                            Remove
-                          </button>
+                          <Gate action="delete">
+                            <button type="button" className="ghost danger" onClick={() => assign(e.id, null)}>
+                              Remove
+                            </button>
+                          </Gate>
                         </td>
                       )}
                     </tr>

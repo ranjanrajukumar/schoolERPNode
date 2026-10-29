@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
@@ -209,9 +210,11 @@ export default function RoomAllocation() {
           </p>
         </div>
         <div className="head-actions">
-          <button type="button" className="ghost" onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
           {canWrite && (
             <button type="button" className="big-action" onClick={openNew}>
               ＋ Allocate a bed
@@ -329,12 +332,16 @@ export default function RoomAllocation() {
                   <td>{date(a.startDate)}</td>
                   {canWrite && (
                     <td className="row-actions">
-                      <button type="button" className="ghost" onClick={() => openEdit(a)}>
-                        Edit
-                      </button>
-                      <button type="button" className="ghost danger" onClick={() => remove(a)}>
-                        Remove
-                      </button>
+                      <Gate action="edit">
+                        <button type="button" className="ghost" onClick={() => openEdit(a)}>
+                          Edit
+                        </button>
+                      </Gate>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(a)}>
+                          Remove
+                        </button>
+                      </Gate>
                     </td>
                   )}
                 </tr>

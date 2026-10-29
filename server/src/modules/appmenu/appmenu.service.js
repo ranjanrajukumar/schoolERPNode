@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { AppMenuItem } from '../../models/index.js';
+import { AppMenuItem, User } from '../../models/index.js';
 import { badRequest, notFound } from '../../utils/httpError.js';
 import { sniff } from '../files/files.service.js';
 
@@ -8,8 +8,12 @@ import { sniff } from '../files/files.service.js';
  * without a new app release. What each page does stays in the app; this table only says how it is presented.
  * defaults.json is generated from the app's registry (npm run gen:menu in app/) and seeds the table.
  */
-const DEFAULTS = JSON.parse(fs.readFileSync(new URL('./defaults.json', import.meta.url), 'utf8'));
-const ROLES = ['admin', 'teacher', 'accountant', 'parent', 'student'];
+const readJson = (name) => JSON.parse(fs.readFileSync(new URL(name, import.meta.url), 'utf8'));
+// the mobile app's menu (generated in app/) and the website's menu (generated in client/)
+const DEFAULTS = [...readJson('./defaults.json'), ...readJson('./webDefaults.json')];
+export const AUDIENCES = ['staff', 'family', 'web'];
+// the roles a login (identity) can have: taken from the user model, so a menu can never name a role that does not exist
+const ROLES = User.getAttributes().role.values;
 export const MAX_ICON_BYTES = 60 * 1024;
 const ICON_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
@@ -50,9 +54,9 @@ export async function ensureAppMenu() {
 }
 
 /** The menu one person sees: active items, in order, whose roles (own, else the parent's) include theirs. */
-export async function menuFor(role) {
+export async function menuFor(role, audience = audienceOf(role)) {
   const rows = await AppMenuItem.findAll({
-    where: { audience: audienceOf(role), active: true },
+    where: { audience, active: true },
     order: [
       ['position', 'ASC'],
       ['id', 'ASC'],
@@ -93,7 +97,7 @@ const shapeAdmin = (r) => ({
 });
 
 export async function listForAdmin(audience) {
-  if (!['staff', 'family'].includes(audience)) throw badRequest('audience must be staff or family');
+  if (!AUDIENCES.includes(audience)) throw badRequest('audience must be staff, family or web');
   const rows = await AppMenuItem.findAll({
     where: { audience },
     order: [
@@ -115,7 +119,10 @@ export async function updateItem(id, body) {
   }
   if (body.icon !== undefined) {
     const icon = String(body.icon).trim();
-    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(icon) || icon.length > 60)
+    // the website shows a symbol (an emoji) as its icon, the app an Ionicons name
+    if (row.audience === 'web') {
+      if (!icon || [...icon].length > 8) throw badRequest('A website icon is one symbol, such as 💰');
+    } else if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(icon) || icon.length > 60)
       throw badRequest('An icon name looks like "wallet-outline"');
     changes.icon = icon;
   }
@@ -132,7 +139,7 @@ export async function updateItem(id, body) {
       if (!Array.isArray(body.roles) || body.roles.some((r) => !ROLES.includes(r)))
         throw badRequest(`Roles must come from: ${ROLES.join(', ')}`);
       const family = row.audience === 'family';
-      if (body.roles.some((r) => ['parent', 'student'].includes(r) !== family))
+      if (row.audience !== 'web' && body.roles.some((r) => ['parent', 'student'].includes(r) !== family))
         throw badRequest(
           family
             ? 'The family menu is for parents and students'
@@ -167,7 +174,7 @@ export async function clearImage(id) {
 
 /** Puts one audience's menu back to the built-in defaults: labels, icons, order, roles, visibility and uploaded pictures. */
 export async function resetMenu(audience) {
-  if (!['staff', 'family'].includes(audience)) throw badRequest('audience must be staff or family');
+  if (!AUDIENCES.includes(audience)) throw badRequest('audience must be staff, family or web');
   const defaults = DEFAULTS.filter((d) => d.audience === audience);
   let restored = 0;
   for (const d of defaults) {

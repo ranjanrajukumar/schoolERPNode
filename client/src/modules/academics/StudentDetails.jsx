@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import StudentPhoto from '../../components/StudentPhoto.jsx';
@@ -183,9 +184,11 @@ export default function StudentDetails({ id, canEdit, canSeeProfile, onEdit }) {
         </div>
         <div className="details-actions no-print">
           {canEdit && (
-            <button type="button" onClick={() => onEdit(s.id)}>
-              Edit
-            </button>
+            <Gate action="edit">
+              <button type="button" onClick={() => onEdit(s.id)}>
+                Edit
+              </button>
+            </Gate>
           )}
           {canSeeProfile && (
             <Link className="btn" to={`/students/${s.id}/profile`}>

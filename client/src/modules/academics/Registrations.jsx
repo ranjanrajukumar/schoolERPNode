@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -184,9 +185,11 @@ export default function Registrations() {
             <h2>Registration data</h2>
             <small>Student enrollment records and current registration status</small>
           </span>
-          <button type="button" className="ghost" style={{ marginLeft: 'auto' }} onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" style={{ marginLeft: 'auto' }} onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
         </header>
         <div className="toolbar" style={{ borderTop: '1px solid var(--border)' }}>
           <label className="search-field">
@@ -278,22 +281,26 @@ export default function Registrations() {
                   </td>
                   <td className="row-actions">
                     {canWrite && (
-                      <button
-                        type="button"
-                        className="ghost"
-                        onClick={() => {
-                          setError('');
-                          setNotice('');
-                          setEntry({ id: s.id });
-                        }}
-                      >
-                        Edit
-                      </button>
+                      <Gate action="edit">
+                        <button
+                          type="button"
+                          className="ghost"
+                          onClick={() => {
+                            setError('');
+                            setNotice('');
+                            setEntry({ id: s.id });
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </Gate>
                     )}
                     {canWrite && (
-                      <button type="button" className="ghost danger" onClick={() => remove(s)}>
-                        Delete
-                      </button>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(s)}>
+                          Delete
+                        </button>
+                      </Gate>
                     )}
                   </td>
                 </tr>

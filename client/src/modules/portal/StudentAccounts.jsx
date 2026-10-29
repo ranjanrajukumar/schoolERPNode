@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import Modal from '../../components/Modal.jsx';
@@ -237,9 +238,11 @@ export default function StudentAccounts() {
                     <button type="button" className="ghost" onClick={() => reset(a)}>
                       Reset password
                     </button>
-                    <button type="button" className="ghost" onClick={() => remove(a)}>
-                      Delete
-                    </button>
+                    <Gate action="delete">
+                      <button type="button" className="ghost" onClick={() => remove(a)}>
+                        Delete
+                      </button>
+                    </Gate>
                   </td>
                 </tr>
               ))}

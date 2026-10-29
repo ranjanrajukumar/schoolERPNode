@@ -4,6 +4,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { File } from 'expo-file-system';
 import ActionModal from '../../components/ActionModal';
 import { useAuth } from '../../auth';
+import { actionOfApp, useCan } from '../../rights';
 import { color, space } from '../../theme';
 import { Badge, Banner, Button, Card, Heading, Muted, Row, Screen, Title } from '../../ui';
 import { autoFields, autoRow, formatValue } from '../../registry/format';
@@ -16,6 +17,7 @@ export default function DetailScreen({ route, navigation }) {
   const { registry, moduleKey, screenKey, row } = route.params;
   const cfg = findScreen(registry, moduleKey, screenKey);
   const { user } = useAuth();
+  const can = useCan(moduleKey, screenKey);
   const kids = useChild();
   const child = cfg.scope === 'child' ? kids?.child ?? null : null;
   const [active, setActive] = useState(null);
@@ -31,7 +33,7 @@ export default function DetailScreen({ route, navigation }) {
     kind: 'action', label: row.viewCount ? 'Record another read' : 'Mark as read', method: 'POST',
     path: (_r, c) => `/portal/children/${c?.id}/lms/lessons/${row.id}/view`, body: () => ({}), done: () => 'Lesson read recorded.',
   }] : [];
-  const actions = [...(cfg.actions ?? []), ...lmsReadAction].filter((a) => (!a.when || a.when(row)) && (!a.roles || a.roles.includes(user?.role)));
+  const actions = [...(cfg.actions ?? []), ...lmsReadAction].filter((a) => (!a.when || a.when(row)) && (!a.roles || a.roles.includes(user?.role)) && can(actionOfApp(a, row, child)));
 
   const run = (a) => {
     if (a.kind === 'file') { openPrivateFile(a.path(row, child), a.name?.(row) ?? 'school-document').catch((e) => setMessage(e.message)); return; }

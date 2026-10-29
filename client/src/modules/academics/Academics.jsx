@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import Gate from '../../components/Gate.jsx';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -212,9 +213,11 @@ export default function Academics() {
             <h2>Classes &amp; sections</h2>
             <small>Class setup and student enrollment overview</small>
           </span>
-          <button type="button" className="ghost" style={{ marginLeft: 'auto' }} onClick={exportCsv}>
-            ↓ Export
-          </button>
+          <Gate action="export">
+            <button type="button" className="ghost" style={{ marginLeft: 'auto' }} onClick={exportCsv}>
+              ↓ Export
+            </button>
+          </Gate>
         </header>
         <div className="tabs-line" role="tablist" style={{ borderTop: '1px solid var(--border)' }}>
           {TABS.map(([k, l]) => (
@@ -296,12 +299,16 @@ export default function Academics() {
                   <td>{r.band}</td>
                   {canWrite && (
                     <td className="row-actions">
-                      <button type="button" className="ghost" onClick={() => openEdit(r)}>
-                        Edit
-                      </button>
-                      <button type="button" className="ghost danger" onClick={() => remove(r)}>
-                        Delete
-                      </button>
+                      <Gate action="edit">
+                        <button type="button" className="ghost" onClick={() => openEdit(r)}>
+                          Edit
+                        </button>
+                      </Gate>
+                      <Gate action="delete">
+                        <button type="button" className="ghost danger" onClick={() => remove(r)}>
+                          Delete
+                        </button>
+                      </Gate>
                     </td>
                   )}
                 </tr>
