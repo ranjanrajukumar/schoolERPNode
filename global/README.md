@@ -1,5 +1,8 @@
 # Global registry
 
+## Summary
+Separate small service (Node.js + Express + Sequelize, port 4100) that maps a mobile number, email or admission number to the right school and role, and issues a one-time, two-minute signed ticket the school server accepts at `POST /api/auth/sso`. It stores only logins (with password hashes) and school addresses; all school data stays in each school's own database. Code lives in `src/` (`routes`, `services`, `models`, `middleware.js`) and `scripts/client.mjs` manages schools.
+
 One small service and database that knows every school (client) and every login, so **one mobile app** can serve all schools. A person types a mobile number (or email) and password; the registry says which school and role they belong to; the app connects to that school's own server and signs in there. It sits next to `server/` (one school's API) and `app/` (the mobile app).
 
 ```

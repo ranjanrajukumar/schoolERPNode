@@ -62,3 +62,13 @@ app/
 ## Build an installable app
 
 Install `eas-cli`, run `eas build` and follow the prompts (an Expo account is needed). Before a real release, point `EXPO_PUBLIC_API_URL` at the school's https address: browsers and phones should not send passwords over plain http outside the school network.
+
+## Summary and process
+Expo app for parents, students and teachers (and admins and accountants) that serves many schools with one install.
+1. **Sign in:** mobile number, email or admission number plus password go to the global registry, which returns the school, role, the school's API address and a one-time two-minute ticket (the app asks which account if there is more than one match).
+2. **Connect:** the app sends the ticket to that school's `POST /api/auth/sso` and receives the school's session token. A temporary password must be changed first.
+3. **Home:** the menu comes from `GET /api/app-menu` (edited on the web under Settings, Mobile App Menu), cached on the phone; tiles depend on role.
+4. **Work:** pages defined in `src/registry/` call the school's API with the token: attendance, marks, leave, fees, certificates, LMS and so on.
+5. **Switch or sign out:** Profile, Switch account clears the session so another person can sign in.
+
+The school processes behind each tile are in [../docs/PROCESS_GUIDE.md](../docs/PROCESS_GUIDE.md); the app's own summary is [../docs/MOBILE_APP_SUMMARY.md](../docs/MOBILE_APP_SUMMARY.md).
