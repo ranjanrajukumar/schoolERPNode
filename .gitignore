@@ -11,3 +11,9 @@ app/LICENSE
 app/AGENTS.md
 
 *.pem
+
+# Editor settings and local debug output
+.vscode/
+err.txt
+out.txt
+.claude/
