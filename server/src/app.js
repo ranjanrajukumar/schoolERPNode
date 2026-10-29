@@ -13,7 +13,7 @@ if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PRO
 app.use(helmet());
 const origins = env.clientOrigins();
 app.use(cors({ origin: origins.length ? origins : true }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' })); // course banner images arrive inline, up to 200 KB
 
 app.use('/api', routes);
 app.use('/api', notFound);

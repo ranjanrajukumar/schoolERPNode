@@ -1,5 +1,6 @@
 import { Setting } from '../../models/index.js';
 import { badRequest } from '../../utils/httpError.js';
+import { NUMBERING_SETTINGS } from './numbering.settings.js';
 
 /**
  * Every school-wide setting: its group, label, type, limits and default. The default is what the system did
@@ -45,6 +46,7 @@ export const DEFINITIONS = [
   { key: 'notify.reminderCooldownHours', group: 'Notifications', label: 'Hours before the same family can be reminded again', type: 'integer', min: 1, max: 720, default: 24 },
 
   { key: 'payment.receiptPrefix', group: 'Payments', label: 'Receipt number prefix', type: 'text', max: 8, required: true, pattern: /^[A-Za-z0-9-]{1,8}$/, patternHelp: 'letters, digits and dashes only', default: 'RCT', help: 'New receipts are numbered like RCT-000123. Receipts already issued keep their numbers.' },
+  ...NUMBERING_SETTINGS,
   { key: 'payment.allowPartial', group: 'Payments', label: 'Allow part payments (1 = yes, 0 = pay in full only)', type: 'integer', min: 0, max: 1, default: 1 },
   { key: 'payment.allowCash', group: 'Payments', label: 'Accept cash (1 = yes, 0 = no)', type: 'integer', min: 0, max: 1, default: 1 },
   { key: 'payment.allowCard', group: 'Payments', label: 'Accept card (1 = yes, 0 = no)', type: 'integer', min: 0, max: 1, default: 1 },

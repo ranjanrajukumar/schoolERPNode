@@ -1,5 +1,7 @@
 import { Admission, FeeStructure, SchoolClass, Student, sequelize } from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
+import { nextNumber } from '../../utils/numbering.js';
+import { getSetting } from '../settings/settings.service.js';
 import { ADMISSION_DETAIL_KEYS } from '../academics/studentFields.js';
 import { STUDENT_EXTRA_KEYS } from './enquiryFields.js';
 import { loadExtras, saveExtras } from './recordExtras.js';
@@ -87,10 +89,9 @@ export async function changeStatus(id, status) {
   await admission.update({ status, ...(status === 'approved' && !admission.offerExpiry && { offerExpiry: plusDays(OFFER_DAYS) }) });
 }
 
-/** Next admission number for the year, e.g. ADM-2026-0007, derived from the latest student id. */
+/** Next admission number from the school's formula (default ADM-2026-0007). */
 async function nextAdmissionNo(transaction) {
-  const last = await Student.max('id', { transaction });
-  return `ADM-${new Date().getFullYear()}-${String((last || 0) + 1).padStart(4, '0')}`;
+  return nextNumber({ model: Student, field: 'admissionNo', formula: await getSetting('numbering.admission'), transaction });
 }
 
 /**

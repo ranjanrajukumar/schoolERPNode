@@ -84,7 +84,7 @@ export default function Admissions() {
   const enroll = (row) => {
     act(() => api(`/admissions/${row.id}/enroll`, { method: 'POST', body: {} }), (r) => `Enrolled as ${r.admissionNo}; ${r.feesBilled} fee item(s) billed.${r.studentLogin ? ` Student login: username ${r.studentLogin.username}, starting password ${r.studentLogin.password}${r.studentLogin.isDefault ? ' (the school default)' : ''}. Note it down now; it is shown only once and the student must change it at first sign-in.` : ''}${r.followUps ? ` To do: ${r.followUps.join(' ')}` : ''}`);
   };
-  const remove = (row) => act(() => api(`/admissions/${row.id}`, { method: 'DELETE' }), 'Enquiry deleted. You can restore it from the Deleted tab.');
+  const remove = (row) => act(() => api(`/admissions/${row.id}`, { method: 'DELETE' }), 'Enquiry deleted.');
   const restore = (row) => act(() => api(`/admissions/enquiries/${row.id}/restore`, { method: 'POST' }), 'Enquiry restored.');
   const purge = (row) => act(() => api(`/admissions/${row.id}?permanent=1`, { method: 'DELETE' }), 'Enquiry permanently deleted.');
 
@@ -98,7 +98,7 @@ export default function Admissions() {
     } catch (err) { setError(err.message); } finally { setBusy(false); }
   };
 
-  const tabs = [['all', 'All enquiries'], ['new', 'New'], ['followup', 'Follow-up'], ['converted', 'Converted'], ['deleted', 'Deleted']];
+  const tabs = [['all', 'All enquiries'], ['new', 'New'], ['followup', 'Follow-up'], ['converted', 'Converted']];
 
   return (
     <>

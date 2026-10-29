@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Department, Payslip, Photo, Staff } from '../../models/index.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
+import { nextStaffNo } from './staffNumber.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { STAFF_DETAILS, STAFF_DETAIL_KEYS, visibleDetailKeys } from './staffFields.js';
 
@@ -48,12 +49,6 @@ export function problems(body, { partial = false } = {}) {
 }
 
 const pick = (body) => Object.fromEntries(WRITABLE.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]));
-
-/** Next staff number for the year, e.g. STF-2026-0007, from the latest staff id. */
-async function nextStaffNo() {
-  const last = await Staff.max('id');
-  return `STF-${new Date().getFullYear()}-${String((last || 0) + 1).padStart(4, '0')}`;
-}
 
 router.get('/', asyncHandler(async (req, res) => {
   const rows = await Staff.findAll({ include, order: [['id', 'DESC']] });

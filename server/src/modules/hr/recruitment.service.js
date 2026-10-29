@@ -87,11 +87,7 @@ export async function deleteApplicant(id) {
   await applicant.destroy();
 }
 
-/** Next staff number for the year, e.g. STF-2026-0007, from the latest staff id. */
-async function nextStaffNo(transaction) {
-  const last = await Staff.max('id', { transaction });
-  return `STF-${new Date().getFullYear()}-${String((last || 0) + 1).padStart(4, '0')}`;
-}
+import { nextStaffNo } from './staffNumber.js';
 
 /** Turns an offered applicant into an active staff member, within the opening's vacancies, all in one transaction. */
 export async function hire(id, { staffNo, joinDate } = {}) {

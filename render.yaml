@@ -1,0 +1,66 @@
+# Render Blueprint: Render dashboard > New > Blueprint > pick this repo.
+# Three services: the school API, the global registry and the web app (static site that forwards /api to the API).
+# Values marked `sync: false` are asked for on first deploy and kept secret. Never commit them.
+services:
+  - type: web
+    name: school-erp-api
+    runtime: node
+    rootDir: server
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - { key: NODE_VERSION, value: 22 }
+      - { key: NODE_ENV, value: production }
+      - { key: TRUST_PROXY, value: 1 }
+      - { key: JWT_SECRET, generateValue: true }
+      - { key: DB_SSL, value: "true" }
+      - { key: DB_SSL_CA_PEM, sync: false }   # Aiven CA certificate text (newlines as \n are fine)
+      - { key: DB_HOST, sync: false }
+      - { key: DB_PORT, sync: false }
+      - { key: DB_USER, sync: false }
+      - { key: DB_PASSWORD, sync: false }
+      - { key: DB_NAME, value: school_erp }
+      - { key: ADMIN_EMAIL, sync: false }
+      - { key: ADMIN_PASSWORD, sync: false }     # at least 12 characters; used only while there are no users
+      - { key: CLIENT_ORIGIN, sync: false }      # the web app's address, e.g. https://school-erp-web.onrender.com
+      - { key: GLOBAL_URL, sync: false }         # e.g. https://school-erp-global.onrender.com/api
+      - { key: GLOBAL_CLIENT_CODE, sync: false }
+      - { key: GLOBAL_CLIENT_KEY, sync: false }
+      - { key: LMS_STORAGE_DIR, value: /var/data/lms }
+    # Uploads (LMS files, photos) need a disk or they vanish on every deploy.
+    disk:
+      name: school-erp-files
+      mountPath: /var/data
+      sizeGB: 5
+
+  - type: web
+    name: school-erp-global
+    runtime: node
+    rootDir: global
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - { key: NODE_VERSION, value: 22 }
+      - { key: NODE_ENV, value: production }
+      - { key: GLOBAL_ADMIN_KEY, generateValue: true }
+      - { key: DB_SSL, value: "true" }
+      - { key: DB_SSL_CA_PEM, sync: false }
+      - { key: DB_HOST, sync: false }
+      - { key: DB_PORT, sync: false }
+      - { key: DB_USER, sync: false }
+      - { key: DB_PASSWORD, sync: false }
+      - { key: DB_NAME, value: school_erp_global }
+
+  - type: web
+    name: school-erp-web
+    runtime: static
+    rootDir: client
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      # the browser talks to one address; /api goes to the school API, everything else is the single-page app
+      - { type: rewrite, source: /api/*, destination: https://school-erp-api.onrender.com/api/* }
+      - { type: rewrite, source: /*, destination: /index.html }

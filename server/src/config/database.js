@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
+import { dbSsl } from './dbSsl.js';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ export const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT || 3306),
     dialect: 'mysql',
+    dialectOptions: dbSsl(),
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     pool: { max: 10, min: 0, idle: 10_000, acquire: 30_000 },
     define: { underscored: true, timestamps: false },

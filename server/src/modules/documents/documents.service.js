@@ -7,7 +7,8 @@ import { familyUserIds } from '../attendance/studentLeave.service.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { fromCents, toCents, today } from '../../utils/money.js';
 import { customBody } from './templates.service.js';
-import { schoolProfile } from '../settings/settings.service.js';
+import { getSetting, schoolProfile } from '../settings/settings.service.js';
+import { formatNumber } from '../../utils/numbering.js';
 
 const PREFIX = { bonafide: 'BON', transfer: 'TC', character: 'CHR', fee: 'FEE' };
 export const TYPE_LABEL = {
@@ -138,7 +139,8 @@ export async function issue(id, input, decider) {
       decidedOn: new Date(),
       certificateNo: `TMP-${crypto.randomUUID().replaceAll('-', '').slice(0, 20)}`,
     }, { transaction });
-    await request.update({ certificateNo: `${PREFIX[request.type]}-${new Date().getFullYear()}-${String(request.id).padStart(5, '0')}` }, { transaction });
+    const formula = await getSetting('numbering.certificate');
+    await request.update({ certificateNo: formatNumber(formula, { seq: request.id, type: PREFIX[request.type] }) }, { transaction });
 
     if (request.type === 'transfer') await student.update({ status: 'inactive' }, { transaction });
     return { certificateNo: request.certificateNo, studentId: request.studentId, type: request.type, requestedBy: request.requestedBy };

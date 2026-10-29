@@ -78,11 +78,16 @@ Before the first course:
 | Choose class, subject and title | All three required. The subject must be mapped to the class. Title up to 160 characters, description up to 1000 |
 | Duplicate check | The same title cannot exist twice for one class and subject (409) |
 | Authorisation | A teacher can create only where they teach |
+| Tags | The create form asks for at least 1 tag (up to 10, each up to 30 characters, typed and confirmed with Enter, with suggestions). A leading `#` is dropped and repeats are ignored in any case. The server itself keeps tags optional so older courses and API calls still work |
+| Banner image | Optional PNG, JPG or WebP up to 200 KB (800×400 recommended), sent with the course and shown on course cards. Anything else is refused (400) |
+| Certificate | A switch, off by default: when on, a student who completes every published lesson can view and print a completion certificate (see section 8) |
 | On create | The course starts as a **draft**. Every active student of the class is enrolled automatically, in one transaction |
 | Edit roster | The **Enrollment** screen (choose the course first; also reachable from Courses & Lessons → Manage enrollment) lists active students of the class with a switch each. Saving replaces the roster. Every student must be active and in the course's class (400 otherwise) |
 | Unenrol | Sets the enrolment inactive; history is kept, and re-enrolling reactivates it |
 
 Students who join the class later are not enrolled automatically: open the roster and switch them on.
+
+Course fields beyond the title: `tags` (list), `bannerImage` (data URL) and `certificateEnabled` (true or false), sent on create and edit.
 
 **Endpoints:** `GET/POST /lms/courses`, `PUT/DELETE /lms/courses/:id`, `GET/PUT /lms/courses/:id/enrollments`.
 
@@ -173,6 +178,8 @@ Learning Management → **Announcements** (choose the course first): title and m
 | Resources | Links open in a new tab; the attachment downloads through the portal |
 | Mark complete | Records the completion time. Completing without a prior view also counts as viewed |
 | Progress | Completed lessons ÷ published lessons the student can see |
+| Outline | Each course has an outline on the left: sections with their lessons and a green **Done** mark on each completed lesson, then an **Assessments** group listing assignments (marks, due date) and quizzes (question count, best score). Clicking an entry scrolls to it. On a narrow screen the outline sits above the content |
+| Certificate | If the course has the certificate switch on, the course shows how many lessons remain. Once every published lesson is complete, **View certificate** opens a certificate with the student's name, course, subject, class, completion date and the school name from Settings, with **Print or save as PDF**. It is built live and not stored, so switching the course switch off hides it. Assignments and quizzes do not affect it |
 
 Parents see the same course list for their child and cannot read-track or complete: those calls are blocked in the portal.
 
@@ -298,6 +305,7 @@ Web push to the student's and linked parents' devices that opted in. Events: cou
 
 ## 18. Not included yet
 
+- Badges, discussion boards, blog and event management, and per-quiz duration and pass percentage (planned, not built).
 - Self-service password recovery.
 - In-app notification inbox, email or SMS for LMS events.
 - Timed quizzes, question randomisation, proctoring.

@@ -1,3 +1,5 @@
+import { TagList } from './LmsCourseMeta.jsx';
+
 // Small pieces shared by the LMS dashboards: banner colours, progress bar, avatar initials and short dates.
 export const BANNERS = [
   'linear-gradient(135deg, #8b7cf0 0%, #6a5ae0 100%)',
@@ -19,11 +21,12 @@ export function Progress({ value, label }) {
 
 export function CourseCard({ course, index, meta, progress, progressLabel, action, onOpen }) {
   return <article className="lms-course">
-    <div className="lms-course-banner" style={{ background: banner(index) }}><small>{(course.subjectName || 'COURSE').toUpperCase()}</small><h3>{course.title}</h3><span className="lms-star" aria-hidden="true">✳</span></div>
+    <div className="lms-course-banner" style={{ background: course.bannerImage ? `linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.45)), center / cover url(${course.bannerImage})` : banner(index) }}><small>{(course.subjectName || 'COURSE').toUpperCase()}</small><h3>{course.title}</h3><span className="lms-star" aria-hidden="true">✳</span></div>
     <div className="lms-course-body">
       <div className="lms-course-meta">{meta.map((m) => <small key={m}>{m}</small>)}</div>
       <h3>{course.title}</h3>
       {course.description && <p className="hint">{course.description}</p>}
+      <TagList tags={course.tags} />
       <Progress value={progress} label={`${course.title} ${progressLabel}`} />
       <button type="button" className="lms-open" onClick={onOpen}><span>{action}</span><span aria-hidden="true">→</span></button>
     </div>

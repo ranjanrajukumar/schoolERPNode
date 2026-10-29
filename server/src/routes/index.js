@@ -73,6 +73,7 @@ import hostelRoutes from '../modules/hostel/hostel.routes.js';
 import appMenuRoutes from '../modules/appmenu/appmenu.routes.js';
 import globalSyncRoutes from '../modules/globalauth/globalSync.routes.js';
 import lmsRoutes from '../modules/academics/lms.routes.js';
+import lmsTagsRoutes from '../modules/academics/lmsTags.routes.js';
 
 const router = Router();
 
@@ -128,6 +129,7 @@ router.use('/homework', writeRoles('admin', 'teacher'), homeworkRoutes);
 router.use('/online-classes', writeRoles('admin', 'teacher'), onlineClassesRoutes);
 router.use('/syllabus', writeRoles('admin', 'teacher'), syllabusRoutes);
 router.use('/study-materials', writeRoles('admin', 'teacher'), materialsRoutes);
+router.use('/lms-tags', writeRoles('admin'), lmsTagsRoutes);
 router.use('/lms', writeRoles('admin', 'teacher'), lmsRoutes);
 router.use('/documents', requireRole('admin'), documentsRoutes);
 router.use('/transport', transportRoutes); // roles are set per route inside

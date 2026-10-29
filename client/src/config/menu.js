@@ -85,7 +85,7 @@ export const MENU = [
   ]),
   module('Learning Management', TEACHING, [
     ['Dashboard', '/lms-dashboard'], ['Courses & Lessons', '/lms'], ['Content Library', '/lms-materials'], ['Enrollment', '/lms-enrollment'], ['Announcements', '/lms-announcements'],
-    ['Assignments', '/lms-assignments'], ['Quizzes & Tests', '/lms-quizzes'], ['Student Progress', '/lms-progress'],
+    ['Assignments', '/lms-assignments'], ['Quizzes & Tests', '/lms-quizzes'], ['Student Progress', '/lms-progress'], ['LMS Tags', '/lms-tags', ADMIN],
   ]),
   module('Timetable', ALL, [
     ['Class Timetable', '/timetable'], ['Teacher Timetable', '/teacher-timetable'],
@@ -161,7 +161,7 @@ export const MENU = [
   module('Settings', ADMIN, [
     ['School Profile', '/school-profile'], ['Leave Types & Approval', '/leave-types'], ['Public Links', '/public-links'], ['Branches / Campuses', '/branches'], ['Academic Years', '/academic-years'], ['Classes & Sections', '/classes'],
     ['Master Data', '/master-data'], ['Grade Setup', '/grade-setup'], ['ID Card Design', '/id-card-design'],
-    ['Notification Settings', '/settings?group=Notifications'], ['Student Login Settings', '/settings?group=Student login'], ['Payment Settings', '/settings?group=Payments'], ['Integrations', '/integrations'],
+    ['Notification Settings', '/settings?group=Notifications'], ['Student Login Settings', '/settings?group=Student login'], ['Payment Settings', '/settings?group=Payments'], ['Auto Numbering', '/settings?group=Auto numbering'], ['Integrations', '/integrations'],
     ['Data Import / Export', '/data-tools'], ['Backup & Restore', '/backup-restore'], ['Mobile App Menu', '/app-menu'], ['System Preferences', '/settings'],
   ]),
   module('Help & Support', ALL, [

@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 import { Department, Feedback, FeedbackLog, SchoolClass, Staff, Student, User } from '../../models/index.js';
 import { FEEDBACK_CATEGORIES, FEEDBACK_KINDS, FEEDBACK_STATUSES } from '../../models/feedback.model.js';
 import { badRequest, conflict, forbidden, notFound } from '../../utils/httpError.js';
+import { nextNumber } from '../../utils/numbering.js';
 import { getSetting } from '../settings/settings.service.js';
 import { notifyUsers } from '../push/push.service.js';
 
@@ -82,8 +83,7 @@ async function shape(f, user, { own }) {
 }
 
 async function nextTicket() {
-  const last = await Feedback.max('id');
-  return `FG-${new Date().getFullYear()}-${String((last || 0) + 1).padStart(4, '0')}`;
+  return nextNumber({ model: Feedback, field: 'ticketNo', formula: await getSetting('numbering.grievance') });
 }
 
 const log = (feedbackId, action, level, note, byName) => FeedbackLog.create({ feedbackId, action, level, note: note ? String(note).slice(0, 500) : null, byName: byName ?? null });

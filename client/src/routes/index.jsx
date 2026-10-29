@@ -66,6 +66,7 @@ import ClassMapPage from '../modules/academics/ClassMapPage.jsx';
 import Registrations from '../modules/academics/Registrations.jsx';
 import Classes from '../modules/academics/Classes.jsx';
 import Subjects from '../modules/academics/Subjects.jsx';
+import LmsTags from '../modules/academics/LmsTags.jsx';
 import ClassSubjects from '../modules/academics/ClassSubjects.jsx';
 import Timetable from '../modules/academics/Timetable.jsx';
 import Attendance from '../modules/academics/Attendance.jsx';
@@ -319,6 +320,7 @@ export default function AppRoutes() {
           <Route path="lms-dashboard" element={<LmsDashboard />} />
           <Route path="lms" element={<Lms />} />
           <Route path="lms-progress" element={<LmsProgress />} />
+          <Route path="lms-tags" element={<LmsTags />} />
           <Route path="lms-materials" element={<LmsCourseScreen kind="materials" />} />
           <Route path="lms-enrollment" element={<LmsCourseScreen kind="enrollment" />} />
           <Route path="lms-announcements" element={<LmsCourseScreen kind="announcements" />} />

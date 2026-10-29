@@ -45,6 +45,43 @@ before(async () => {
 
 after(async () => { for (const remove of cleanup) await remove().catch(() => {}); });
 
+test('course tags come from the tag master; the banner image is validated and returned', async () => {
+  const ai = await create('/lms-tags', { name: `AI${RUN}` }, '/lms-tags'); const py = await create('/lms-tags', { name: `Py${RUN}` }, '/lms-tags');
+  assert.equal((await teacher('POST', '/lms-tags', { body: { name: 'Sneaky' } })).status, 403, 'only an admin edits the master');
+  const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+  const made = await teacher('POST', '/lms/courses', { body: { classId, subjectId, title: `Tagged ${RUN}`, tags: [`#${ai.name ?? `AI${RUN}`}`, ` py${RUN} `, `ai${RUN}`, ''], bannerImage: png } });
+  assert.equal(made.status, 201, JSON.stringify(made.data));
+  const id = made.data.id; cleanup.unshift(() => admin('DELETE', `/lms/courses/${id}`));
+  const row = (await teacher('GET', '/lms/courses')).data.find((c) => c.id === id);
+  assert.deepEqual(row.tags, [`AI${RUN}`, `Py${RUN}`], 'tags take the master spelling; the #, spaces and repeats are dropped');
+  assert.equal(row.bannerImage, png);
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { tags: [] , bannerImage: null } })).status, 200);
+  const cleared = (await teacher('GET', '/lms/courses')).data.find((c) => c.id === id);
+  assert.deepEqual(cleared.tags, []); assert.equal(cleared.bannerImage, null);
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { bannerImage: 'data:text/html;base64,PGI+' } })).status, 400, 'only PNG, JPG or WebP');
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { bannerImage: `data:image/png;base64,${'A'.repeat(300000)}` } })).status, 400, 'over 200 KB');
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { tags: ['NotInMaster'] } })).status, 400, 'a tag outside the master is refused');
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { tags: Array.from({ length: 11 }, (_, i) => `t${i}`) } })).status, 400, 'at most 10 tags');
+});
+
+test('a completion certificate is earned only when the course allows it and every lesson is complete', async () => {
+  const made = await teacher('POST', '/lms/courses', { body: { classId, subjectId, title: `Certified ${RUN}`, certificateEnabled: true } });
+  assert.equal(made.status, 201, JSON.stringify(made.data));
+  const id = made.data.id; cleanup.unshift(() => admin('DELETE', `/lms/courses/${id}`));
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { published: true } })).status, 200);
+  const lesson = await teacher('POST', `/lms/courses/${id}/lessons`, { body: { title: 'Only lesson', sequence: 1, content: 'Notes', published: true } }); assert.equal(lesson.status, 201);
+  const mine = async () => (await student('GET', `/portal/children/${studentId}/lms`)).data.find((c) => c.id === id);
+  const before = await mine();
+  assert.equal(before.certificate.earned, false); assert.equal(before.certificate.issuedOn, null);
+  assert.equal((await student('POST', `/portal/children/${studentId}/lms/lessons/${lesson.data.id}/complete`, { body: {} })).status, 200);
+  const after = await mine();
+  assert.equal(after.certificate.earned, true); assert.match(after.certificate.issuedOn, /^\d{4}-\d{2}-\d{2}$/);
+  assert.ok(after.certificate.studentName.includes('LMS') && after.certificate.schoolName);
+  assert.equal((await teacher('PUT', `/lms/courses/${id}`, { body: { certificateEnabled: false } })).status, 200);
+  assert.equal((await mine()).certificate, null, 'switching it off hides the certificate');
+  assert.equal((await admin('DELETE', `/lms/courses/${id}`)).status, 200, 'removed so later tests see only their own course');
+});
+
 test('teacher creates course, module, lesson and assignment; student completes and submits; teacher grades', async () => {
   const course = await teacher('POST', '/lms/courses', { body: { classId, subjectId, title: `Workflow ${RUN}`, description: 'LMS end-to-end' } });
   assert.equal(course.status, 201, JSON.stringify(course.data)); courseId = course.data.id;

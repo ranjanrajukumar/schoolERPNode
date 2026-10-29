@@ -3,6 +3,8 @@ import { photoIds } from '../../utils/photoFlags.js';
 import { Admission, DocumentRequest, FeeStructure, Staff, Student, SchoolClass, StudentAccount, User, sequelize } from '../../models/index.js';
 import { billStudents } from '../finance/fees.service.js';
 import { badRequest, conflict } from '../../utils/httpError.js';
+import { nextNumber } from '../../utils/numbering.js';
+import { getSetting } from '../settings/settings.service.js';
 import { DETAIL_KEYS } from './studentFields.js';
 import { STUDENT_EXTRA_KEYS, cleanEnquiryExtras } from '../admissions/enquiryFields.js';
 import { loadExtras, saveExtras } from '../admissions/recordExtras.js';
@@ -107,15 +109,9 @@ export async function getStudent(id) {
   return student ? { ...shape(student), ...(await loadExtras('student', student.id)) } : null;
 }
 
-/** Next admission number for the year, e.g. ADM-2026-0007, from the latest student id. */
+/** Next admission number from the school's formula (default ADM-2026-0007); numbers already taken are skipped. */
 export async function nextAdmissionNo(transaction) {
-  let n = ((await Student.max('id', { transaction })) || 0) + 1;
-  // Skip numbers already taken (typed by hand, or left by deleted students) so the generated one is always free.
-  for (;;) {
-    const candidate = `ADM-${new Date().getFullYear()}-${String(n).padStart(4, '0')}`;
-    if (!(await Student.findOne({ where: { admissionNo: candidate }, attributes: ['id'], transaction }))) return candidate;
-    n += 1;
-  }
+  return nextNumber({ model: Student, field: 'admissionNo', formula: await getSetting('numbering.admission'), transaction });
 }
 
 /** A student with the same name and date of birth is almost always a double entry. */

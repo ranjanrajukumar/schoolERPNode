@@ -1,17 +1,13 @@
 import { BookIssue, LibraryMembership, Student } from '../../models/index.js';
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { fromCents, toCents, today } from '../../utils/money.js';
+import { nextNumber } from '../../utils/numbering.js';
 import { getSetting } from '../settings/settings.service.js';
 
 const student = [{ model: Student, attributes: ['firstName', 'lastName', 'admissionNo', 'status'] }];
 
 async function nextCardNo() {
-  let n = ((await LibraryMembership.max('id')) || 0) + 1;
-  for (;;) {
-    const candidate = `LIB-${String(n).padStart(5, '0')}`;
-    if (!(await LibraryMembership.findOne({ where: { cardNo: candidate }, attributes: ['id'] }))) return candidate;
-    n += 1;
-  }
+  return nextNumber({ model: LibraryMembership, field: 'cardNo', formula: await getSetting('numbering.library') });
 }
 
 /** Library cards with what each holder has out now and has been fined, expired cards flagged. */

@@ -9,3 +9,5 @@ server/backups/
 app/.claude/
 app/LICENSE
 app/AGENTS.md
+
+*.pem

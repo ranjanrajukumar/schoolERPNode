@@ -7,7 +7,8 @@ import { saveExtras } from '../modules/admissions/recordExtras.js';
 import { AUDIT_COLUMNS } from '../models/auditSoftDelete.js';
 import bcrypt from 'bcryptjs';
 import { Sequelize } from 'sequelize';
-import { LeaveType, LmsCourse, LmsEnrollment, LmsLesson, LmsSubmission, Setting, Student, sequelize, User } from '../models/index.js';
+import { dbSsl } from './dbSsl.js';
+import { LeaveType, LmsCourse, LmsTag, LmsEnrollment, LmsLesson, LmsSubmission, Setting, Student, sequelize, User } from '../models/index.js';
 import { migrateLegacyLmsFiles } from '../modules/academics/lmsFiles.service.js';
 import { env } from './env.js';
 import { ensureForeignKeys } from './integrity.js';
@@ -18,6 +19,7 @@ async function ensureDatabase() {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT || 3306),
     dialect: 'mysql',
+    dialectOptions: dbSsl(),
     logging: false,
   });
   try {
@@ -56,6 +58,9 @@ async function ensureAdmissionStatuses() {
 
 /** Columns added to a model after its table already existed; sync() will not add them. */
 const ADDED_COLUMNS = [
+  { table: 'lms_courses', column: 'tags', definition: 'TEXT NULL' },
+  { table: 'lms_courses', column: 'certificate_enabled', definition: 'TINYINT(1) NOT NULL DEFAULT 0' },
+  { table: 'lms_courses', column: 'banner_image', definition: 'MEDIUMTEXT NULL' },
   { table: 'lms_progress', column: 'viewed_at', definition: 'DATETIME NULL' },
   { table: 'lms_progress', column: 'view_count', definition: 'INT NOT NULL DEFAULT 0' },
   { table: 'lms_quizzes', column: 'due_on', definition: 'DATE NULL' },
@@ -234,6 +239,12 @@ async function enforceRelationships() {
  * Leave types replaced the fixed casual / sick / earned / unpaid list. Widen the old ENUM column, create the starting
  * types (using any yearly allowances already set under Settings) the first time, and link existing requests to them.
  */
+/** The first time, give the tag master a few starting tags so a teacher can tag a course straight away. */
+async function ensureLmsTags() {
+  if (await LmsTag.count()) return;
+  await LmsTag.bulkCreate(['Maths', 'Science', 'English', 'Reading', 'Revision', 'Homework', 'Exam prep', 'Project'].map((name) => ({ name })));
+}
+
 async function ensureLeaveTypes() {
   await sequelize.query('ALTER TABLE leave_requests MODIFY COLUMN type VARCHAR(60) NOT NULL');
   // half days and timely leave need fractions
@@ -282,6 +293,7 @@ export async function migrateDatabase() {
   await ensureFilesInDatabase();
   await ensureAppMenuItems();
   await ensureLeaveTypes();
+  await ensureLmsTags();
   await enforceRelationships();
   await seedAdmin();
   await seedMasters();

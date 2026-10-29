@@ -1,11 +1,12 @@
 import { Op } from 'sequelize';
-import { ClassSubject, LmsAnnouncement, LmsAssignment, LmsCourse, LmsEnrollment, LmsLesson, LmsLessonPart, LmsMaterial, LmsModule, LmsProgress, LmsQuiz, LmsQuizAttempt, LmsSubmission, SchoolClass, Student, Subject, sequelize } from '../../models/index.js';
+import { ClassSubject, LmsTag, LmsAnnouncement, LmsAssignment, LmsCourse, LmsEnrollment, LmsLesson, LmsLessonPart, LmsMaterial, LmsModule, LmsProgress, LmsQuiz, LmsQuizAttempt, LmsSubmission, SchoolClass, Student, Subject, sequelize } from '../../models/index.js';
 import { badRequest, conflict, forbidden, notFound } from '../../utils/httpError.js';
 import { today } from '../../utils/money.js';
 import { MAX_BYTES, sniff } from '../files/files.service.js';
 import { getLmsFile, putLmsFile, removeLmsFile } from './lmsFiles.service.js';
 import { familyUserIds } from '../attendance/studentLeave.service.js';
 import { notifyUsers } from '../push/push.service.js';
+import { getSetting } from '../settings/settings.service.js';
 
 const courseInclude = [{ model: SchoolClass, attributes: ['name', 'section'] }, { model: Subject, attributes: ['name'] }];
 const safeUrl = (value, label) => {
@@ -51,8 +52,38 @@ export async function listCourses(user) {
   return Promise.all(rows.map(async (c) => ({ ...shapeCourse(c), lessonCount: await LmsLesson.count({ where: { courseId: c.id } }), studentCount: await LmsEnrollment.count({ where: { courseId: c.id, active: true } }) })));
 }
 
+const MAX_TAGS = 10;
+const MAX_BANNER_CHARS = 280000; // about 200 KB of image once base64 is undone
+/**
+ * Tags arrive as an array of names and must come from the LMS tag master (spelling follows the master). Tags the course already
+ * carries are kept even if the master dropped them since, so an old course can still be saved. Stored as JSON text.
+ */
+async function cleanTags(value, current = []) {
+  if (!Array.isArray(value)) throw badRequest('Tags must be a list');
+  const master = new Map((await LmsTag.findAll({ attributes: ['name'], raw: true })).map((t) => [t.name.toLowerCase(), t.name]));
+  const keep = new Map(current.map((t) => [t.toLowerCase(), t]));
+  const seen = new Set();
+  const tags = [];
+  for (const raw of value) {
+    const key = String(raw).replace(/^#/, '').trim().toLowerCase();
+    if (!key || seen.has(key)) continue;
+    const name = master.get(key) ?? keep.get(key);
+    if (!name) throw badRequest(`"${String(raw).trim()}" is not in the tag master. Ask an admin to add it under LMS Tags.`);
+    seen.add(key); tags.push(name);
+  }
+  if (tags.length > MAX_TAGS) throw badRequest(`Use at most ${MAX_TAGS} tags`);
+  return tags.length ? JSON.stringify(tags) : null;
+}
+function cleanBanner(value) {
+  if (!value) return null;
+  if (typeof value !== 'string' || !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(value)) throw badRequest('The banner must be a PNG, JPG or WebP image');
+  if (value.length > MAX_BANNER_CHARS) throw badRequest('The banner image must be 200 KB or smaller');
+  return value;
+}
+const readTags = (c) => { try { return JSON.parse(c.tags ?? '[]'); } catch { return []; } };
+
 function shapeCourse(c) {
-  return { id: c.id, classId: c.classId, subjectId: c.subjectId, title: c.title, description: c.description, published: c.published,
+  return { id: c.id, classId: c.classId, subjectId: c.subjectId, title: c.title, description: c.description, tags: readTags(c), certificateEnabled: Boolean(c.certificateEnabled), bannerImage: c.bannerImage ?? null, published: c.published,
     className: c.SchoolClass ? `${c.SchoolClass.name}-${c.SchoolClass.section}` : null, subjectName: c.Subject?.name ?? null, createdByName: c.createdByName };
 }
 function shapeLesson(l) { return { id: l.id, courseId: l.courseId, moduleId: l.moduleId ?? null, moduleTitle: l.LmsModule?.title ?? null, moduleSequence: l.LmsModule?.sequence ?? null, title: l.title, content: l.content, videoUrl: l.videoUrl, resourceUrl: l.resourceUrl, sequence: l.sequence, published: l.published, attachmentName: l.attachmentName, attachmentMime: l.attachmentMime, attachmentSize: l.attachmentSize, hasAttachment: Boolean(l.attachmentData || l.attachmentName) }; }
@@ -67,7 +98,7 @@ export async function createCourse(body, user) {
   const classId = Number(body.classId); const subjectId = Number(body.subjectId);
   if (!classId || !subjectId || !String(body.title ?? '').trim()) throw badRequest('Class, subject and course title are required');
   if (!await ClassSubject.findOne({ where: { classId, subjectId } })) throw badRequest('Choose a subject assigned to this class');
-  const course = { classId, subjectId, title: String(body.title).trim().slice(0, 160), description: String(body.description ?? '').trim().slice(0, 1000) || null };
+  const course = { classId, subjectId, title: String(body.title).trim().slice(0, 160), description: String(body.description ?? '').trim().slice(0, 1000) || null, tags: await cleanTags(body.tags ?? []), bannerImage: cleanBanner(body.bannerImage), certificateEnabled: Boolean(body.certificateEnabled) };
   if (user.role === 'teacher' && !await mayManage(course, user)) throw forbidden('You can only create courses for your classes and subjects');
   const existing = await LmsCourse.findOne({ where: { classId, subjectId, title: course.title } });
   if (existing) throw conflict('A course with this title already exists for the class and subject');
@@ -118,6 +149,9 @@ export async function updateCourse(id, body, user) {
     if (await LmsCourse.findOne({ where: { id: { [Op.ne]: course.id }, classId: course.classId, subjectId: course.subjectId, title: update.title } })) throw conflict('A course with this title already exists for the class and subject');
   }
   if (body.description !== undefined) update.description = String(body.description).trim().slice(0, 1000) || null;
+  if (body.tags !== undefined) update.tags = await cleanTags(body.tags, readTags(course));
+  if (body.certificateEnabled !== undefined) update.certificateEnabled = Boolean(body.certificateEnabled);
+  if (body.bannerImage !== undefined) update.bannerImage = cleanBanner(body.bannerImage);
   if (body.published !== undefined) update.published = Boolean(body.published);
   const wasPublished = course.published; await course.update(update);
   if (!wasPublished && course.published) await notifyCourseStudents(course.id, { title: 'LMS course published', body: course.title, url: '/portal?tab=LMS' });
@@ -454,6 +488,7 @@ export async function studentCourses(student, { markProgress = false } = {}) {
   if (!enrollmentRows.length) return [];
   const courses = await LmsCourse.findAll({ where: { id: enrollmentRows.map((row) => row.courseId), classId: student.classId, published: true }, include: courseInclude, order: [['id', 'ASC']] });
   const out = [];
+  const schoolName = courses.some((c) => c.certificateEnabled) ? await getSetting('school.name') : null;
   for (const course of courses) {
     const publishedModules = await LmsModule.findAll({ where: { courseId: course.id, published: true }, attributes: ['id'], raw: true });
     const lessons = await LmsLesson.findAll({ where: { courseId: course.id, published: true, [Op.or]: [{ moduleId: null }, { moduleId: publishedModules.map((m) => m.id) }] }, attributes: { exclude: ['attachmentData'] }, include: [{ model: LmsModule, attributes: ['title', 'sequence'], required: false }], order: [['sequence', 'ASC'], ['id', 'ASC']] });
@@ -470,7 +505,10 @@ export async function studentCourses(student, { markProgress = false } = {}) {
     const announcements = await LmsAnnouncement.findAll({ where: { courseId: course.id, published: true }, order: [['createdAt', 'DESC']] });
     const attempts = await LmsQuizAttempt.findAll({ where: { studentId: student.id, quizId: quizzes.map((q) => q.id) }, order: [['attemptNo', 'DESC']] });
     const completed = lessonRows.filter((l) => l.completedAt).length;
-    out.push({ ...shapeCourse(course), lessons: lessonRows, materials: materialRows, completed, total: lessonRows.length, status: !lessonRows.length || !lessonRows.some((l) => l.viewedAt || l.completedAt) ? 'Not started' : completed === lessonRows.length ? 'Completed' : 'In progress', completionPercent: lessonRows.length ? Math.round(completed * 100 / lessonRows.length) : 0,
+    const earned = lessonRows.length > 0 && completed === lessonRows.length;
+    const finishedAt = earned ? new Date(Math.max(...lessonRows.map((l) => new Date(l.completedAt).getTime()))) : null;
+    const certificate = course.certificateEnabled ? { earned, issuedOn: finishedAt ? finishedAt.toISOString().slice(0, 10) : null, studentName: `${student.firstName} ${student.lastName}`, admissionNo: student.admissionNo, schoolName } : null;
+    out.push({ ...shapeCourse(course), certificate, lessons: lessonRows, materials: materialRows, completed, total: lessonRows.length, status: !lessonRows.length || !lessonRows.some((l) => l.viewedAt || l.completedAt) ? 'Not started' : completed === lessonRows.length ? 'Completed' : 'In progress', completionPercent: lessonRows.length ? Math.round(completed * 100 / lessonRows.length) : 0,
       assignments: assignments.map((a) => { const s = submissionById.get(a.id); const submittedDay = s?.submittedAt ? new Date(s.submittedAt).toISOString().slice(0, 10) : null; return { id: a.id, title: a.title, instructions: a.instructions, dueOn: a.dueOn, maxScore: a.maxScore, overdue: Boolean(!s && a.dueOn && a.dueOn < today()), submission: s ? { response: s.response, resourceUrl: s.resourceUrl, attachmentName: s.attachmentName, attachmentSize: s.attachmentSize, submittedAt: s.submittedAt, isLate: Boolean(a.dueOn && submittedDay > a.dueOn), score: s.score, feedback: s.feedback, gradedAt: s.gradedAt } : null }; }),
       quizzes: quizzes.map((q) => { const mine = attempts.filter((a) => a.quizId === q.id); const latest = mine[0]; const results = latest ? q.questions.map((question) => { const answer = latest.answers[question.id]; const type = question.type || 'single_choice'; const correct = type === 'short_answer' ? null : type === 'multiple_choice' ? JSON.stringify(answer) === JSON.stringify(question.correctIndexes) : Number(answer) === Number(question.correctIndex); return { id: question.id, type, prompt: question.prompt, answer, points: Number(question.points ?? 1), correctAnswer: type === 'short_answer' ? null : type === 'multiple_choice' ? question.correctIndexes : question.correctIndex, correct, awarded: Number(latest.questionScores?.[question.id] ?? (correct ? question.points ?? 1 : 0)) }; }) : null; return { id: q.id, title: q.title, description: q.description, dueOn: q.dueOn, overdue: Boolean(q.dueOn && q.dueOn < today() && mine.length < q.maxAttempts), maxAttempts: q.maxAttempts, attemptCount: mine.length, bestScore: mine.length ? Math.max(...mine.map((a) => Number(a.score))) : null, maxScore: quizMaxScore(q), questions: q.questions.map(({ id, type, prompt, choices }) => ({ id, type: type || 'single_choice', prompt, choices })), latestAttempt: latest ? { score: Number(latest.score), maxScore: Number(latest.maxScore), reviewStatus: latest.reviewStatus, feedback: latest.feedback, completedAt: latest.completedAt, questions: results } : null }; }), announcements,
     });
