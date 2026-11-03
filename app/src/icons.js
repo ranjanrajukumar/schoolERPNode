@@ -29,6 +29,7 @@ Object.assign(SCREEN_ICON, {
   'documents.requests': 'document-attach-outline',
   'communication.notices': 'megaphone-outline', 'communication.history': 'chatbubbles-outline', 'communication.feedback': 'heart-outline',
   'hostel.details': 'bed-outline', 'hostel.meals': 'restaurant-outline', 'hostel.attendance': 'moon-outline', 'hostel.visitors': 'walk-outline',
+  'academic.lms': 'play-circle-outline', 'academic.lmsannouncements': 'megaphone-outline', 'academic.lmsassignments': 'clipboard-outline', 'academic.lmsquizzes': 'help-circle-outline',
   'academic.attendance': 'checkbox-outline', 'exam.results': 'document-text-outline', 'other.password': 'key-outline',
   'portal.parents': 'people-circle-outline', 'portal.users': 'person-outline', 'portal.logins': 'shield-checkmark-outline',
 });
