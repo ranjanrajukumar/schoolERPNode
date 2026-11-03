@@ -58,6 +58,27 @@ export const STAFF_MODULES = [
     ],
   },
   {
+    key: 'office', title: 'Office and boards', icon: '🏢', roles: ['admin'],
+    screens: [
+      {
+        key: 'visitors', title: 'Visitor records', kind: 'list', path: '/visitors?show=today',
+        filters: [{ label: 'Inside now', test: (r) => !r.checkOut }],
+        row: (r) => ({ title: r.visitorName, sub: dot(r.purpose, r.whomToMeet && `to meet ${r.whomToMeet}`, r.organisation), badge: r.checkOut ? { text: 'Left', tone: 'grey' } : { text: 'Inside', tone: 'green' } }),
+        create: { label: '＋ Check in a visitor', path: '/visitors', fields: [
+          { key: 'visitorName', label: 'Visitor name', required: true }, { key: 'purpose', label: 'Purpose of visit', required: true },
+          { key: 'phone', label: 'Phone', keyboard: 'phone-pad' }, { key: 'organisation', label: 'Organisation' }, { key: 'whomToMeet', label: 'Whom to meet' },
+          { key: 'idProof', label: 'ID shown' }, { key: 'badgeNo', label: 'Badge number' }, { key: 'note', label: 'Note', multiline: true },
+        ], done: () => 'Visitor checked in.' },
+        actions: [{ label: 'Check out', when: (r) => !r.checkOut, path: (r) => `/visitors/${r.id}/checkout`, method: 'PUT', body: () => ({}), confirm: 'Record that this visitor has left?', done: () => 'Checked out.' }],
+      },
+      {
+        key: 'boards', title: 'Boards and affiliation', kind: 'list', path: '/boards',
+        row: (r) => ({ title: r.name, sub: dot(r.code, `${r.classes} classes`, r.isEnabled ? 'in use' : 'not in use'), badge: badgeFor(r.affiliation) }),
+        detail: [['Board', 'name'], ['Code', 'code'], ['Classes', 'classes'], ['Affiliation', 'affiliation']],
+      },
+    ],
+  },
+  {
     key: 'students', title: 'Students', icon: '\u{1F393}', roles: ['admin', 'teacher'],
     screens: [
       { key: 'students', title: 'Students', kind: 'list', path: '/students', row: (r) => ({ title: `${r.firstName} ${r.lastName}`, sub: dot(r.admissionNo, r.guardianName), badge: badgeFor(r.status) }) },

@@ -134,6 +134,38 @@
     "audience": "staff",
     "parentKey": null,
     "roles": [
+      "admin"
+    ],
+    "key": "office",
+    "label": "Office and boards",
+    "icon": "apps-outline",
+    "kind": "module",
+    "position": 50
+  },
+  {
+    "audience": "staff",
+    "parentKey": "office",
+    "roles": null,
+    "key": "office.visitors",
+    "label": "Visitor records",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 10
+  },
+  {
+    "audience": "staff",
+    "parentKey": "office",
+    "roles": null,
+    "key": "office.boards",
+    "label": "Boards and affiliation",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 20
+  },
+  {
+    "audience": "staff",
+    "parentKey": null,
+    "roles": [
       "admin",
       "teacher"
     ],
@@ -141,7 +173,7 @@
     "label": "Students",
     "icon": "school-outline",
     "kind": "module",
-    "position": 50
+    "position": 60
   },
   {
     "audience": "staff",
@@ -216,7 +248,7 @@
     "label": "Academics",
     "icon": "book-outline",
     "kind": "module",
-    "position": 60
+    "position": 70
   },
   {
     "audience": "staff",
@@ -309,7 +341,7 @@
     "label": "Learning Management",
     "icon": "apps-outline",
     "kind": "module",
-    "position": 70
+    "position": 80
   },
   {
     "audience": "staff",
@@ -332,7 +364,7 @@
     "label": "Attendance and leave",
     "icon": "checkbox-outline",
     "kind": "module",
-    "position": 80
+    "position": 90
   },
   {
     "audience": "staff",
@@ -405,7 +437,7 @@
     "label": "Examinations",
     "icon": "create-outline",
     "kind": "module",
-    "position": 90
+    "position": 100
   },
   {
     "audience": "staff",
@@ -458,7 +490,7 @@
     "label": "Fees and finance",
     "icon": "wallet-outline",
     "kind": "module",
-    "position": 100
+    "position": 110
   },
   {
     "audience": "staff",
@@ -541,7 +573,7 @@
     "label": "Transport",
     "icon": "bus-outline",
     "kind": "module",
-    "position": 110
+    "position": 120
   },
   {
     "audience": "staff",
@@ -624,7 +656,7 @@
     "label": "Hostel",
     "icon": "bed-outline",
     "kind": "module",
-    "position": 120
+    "position": 130
   },
   {
     "audience": "staff",
@@ -697,7 +729,7 @@
     "label": "Library",
     "icon": "library-outline",
     "kind": "module",
-    "position": 130
+    "position": 140
   },
   {
     "audience": "staff",
@@ -770,7 +802,7 @@
     "label": "Inventory",
     "icon": "cube-outline",
     "kind": "module",
-    "position": 140
+    "position": 150
   },
   {
     "audience": "staff",
@@ -902,7 +934,7 @@
     "label": "Staff and HR",
     "icon": "people-outline",
     "kind": "module",
-    "position": 150
+    "position": 160
   },
   {
     "audience": "staff",
@@ -991,7 +1023,7 @@
     "label": "Health and safety",
     "icon": "medkit-outline",
     "kind": "module",
-    "position": 160
+    "position": 170
   },
   {
     "audience": "staff",
@@ -1024,7 +1056,7 @@
     "label": "Events and activities",
     "icon": "ribbon-outline",
     "kind": "module",
-    "position": 170
+    "position": 180
   },
   {
     "audience": "staff",
@@ -1056,7 +1088,7 @@
     "label": "Certificates",
     "icon": "document-attach-outline",
     "kind": "module",
-    "position": 180
+    "position": 190
   },
   {
     "audience": "staff",
@@ -1080,7 +1112,7 @@
     "label": "Communication",
     "icon": "chatbubbles-outline",
     "kind": "module",
-    "position": 190
+    "position": 200
   },
   {
     "audience": "staff",
@@ -1126,7 +1158,7 @@
     "label": "Parents and logins",
     "icon": "people-circle-outline",
     "kind": "module",
-    "position": 200
+    "position": 210
   },
   {
     "audience": "staff",
@@ -1166,7 +1198,7 @@
     "label": "Change Password",
     "icon": "key-outline",
     "kind": "quick",
-    "position": 210
+    "position": 220
   },
   {
     "audience": "family",
