@@ -72,6 +72,12 @@ export const STAFF_MODULES = [
         actions: [{ label: 'Check out', when: (r) => !r.checkOut, path: (r) => `/visitors/${r.id}/checkout`, method: 'PUT', body: () => ({}), confirm: 'Record that this visitor has left?', done: () => 'Checked out.' }],
       },
       {
+        key: 'savedreports', title: 'Saved reports', kind: 'list', path: '/report-designer/templates', empty: 'No saved reports yet. Build them on the website.',
+        row: (r) => ({ title: r.name, sub: dot(r.kind, r.board, r.description) }),
+        detail: [['Report', 'name'], ['Type', 'kind'], ['Board', 'board'], ['Description', 'description'], ['Created by', 'createdByName']],
+        actions: [{ label: 'Run report', path: (r) => `/report-designer/templates/${r.id}/run`, body: () => ({}), done: (res) => `${res.name}: ${res.rows?.length ?? res.total ?? 0} rows. Open the website to view or export it.` }],
+      },
+      {
         key: 'boards', title: 'Boards and affiliation', kind: 'list', path: '/boards',
         row: (r) => ({ title: r.name, sub: dot(r.code, `${r.classes} classes`, r.isEnabled ? 'in use' : 'not in use'), badge: badgeFor(r.affiliation) }),
         detail: [['Board', 'name'], ['Code', 'code'], ['Classes', 'classes'], ['Affiliation', 'affiliation']],
@@ -81,7 +87,18 @@ export const STAFF_MODULES = [
   {
     key: 'students', title: 'Students', icon: '\u{1F393}', roles: ['admin', 'teacher'],
     screens: [
-      { key: 'students', title: 'Students', kind: 'list', path: '/students', row: (r) => ({ title: `${r.firstName} ${r.lastName}`, sub: dot(r.admissionNo, r.guardianName), badge: badgeFor(r.status) }) },
+      { key: 'students', title: 'Students', kind: 'list', path: '/students', row: (r) => ({ title: `${r.firstName} ${r.lastName}`, sub: dot(r.admissionNo, r.guardianName), badge: badgeFor(r.status) }),
+        actions: [
+          { label: 'Verify a document', roles: ['admin'], path: () => '/document-checks', method: 'PUT', fields: [
+            { key: 'title', label: 'Document', required: true, optionsPath: '/masters?type=student_document', mapOption: (x) => ({ value: x.name, label: x.name }) },
+            { key: 'status', label: 'Decision', options: ['verified', 'rejected', 'pending'], default: 'verified' },
+            { key: 'note', label: 'Note (required if sent back)', multiline: true },
+          ], body: (v, r) => ({ studentId: r.id, title: v.title, status: v.status, note: v.note }), submit: 'Save', done: () => 'Document check saved.' },
+          { label: 'Board registration', roles: ['admin'], path: (r) => `/board-registration/${r.id}`, method: 'PUT', fields: [
+            { key: 'registrationNo', label: 'Registration number' }, { key: 'rollNo', label: 'Roll number' },
+            { key: 'examYear', label: 'Exam year', keyboard: 'number-pad' }, { key: 'status', label: 'Status', options: ['pending', 'submitted', 'registered'], default: 'pending' },
+          ], submit: 'Save', done: () => 'Board registration saved.' },
+        ] },
       { key: 'summary', title: 'Student summary', kind: 'stats', path: '/students/summary', tiles: (d) => [{ label: 'Students', value: d.total }, { label: 'Active', value: d.active, tone: 'green' }, { label: 'Inactive', value: d.inactive, tone: 'red' }, { label: 'Awaiting enrolment', value: d.pendingEnrollment, tone: 'amber' }] },
       { key: 'health', title: 'Health records', kind: 'list', path: '/student-health', row: (r) => ({ title: r.name, sub: dot(r.className, r.bloodGroup, r.allergies ? `allergy: ${r.allergies}` : null) }) },
       { key: 'behavior', title: 'Behaviour', kind: 'list', path: '/behavior', empty: 'No behaviour notes recorded.' },

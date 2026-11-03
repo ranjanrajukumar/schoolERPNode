@@ -156,11 +156,21 @@
     "audience": "staff",
     "parentKey": "office",
     "roles": null,
+    "key": "office.savedreports",
+    "label": "Saved reports",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 20
+  },
+  {
+    "audience": "staff",
+    "parentKey": "office",
+    "roles": null,
     "key": "office.boards",
     "label": "Boards and affiliation",
     "icon": "list-outline",
     "kind": "list",
-    "position": 20
+    "position": 30
   },
   {
     "audience": "staff",
