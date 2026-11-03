@@ -6,9 +6,10 @@ import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 25;
-const EMPTY = { name: '', section: 'A', room: '', branchId: '', classTeacherId: '' };
+const EMPTY = { name: '', section: 'A', board: 'CBSE', room: '', branchId: '', classTeacherId: '' };
 const TABS = [
   ['all', 'All classes'],
   ['noTeacher', 'No class teacher'],
@@ -35,9 +36,11 @@ export default function Classes() {
   const canWrite = useAuth().user?.role === 'admin';
   const [rows, setRows] = useState([]);
   const [branches, setBranches] = useState([]);
+  const [boards, setBoards] = useState([]);
   const [form, setForm] = useState(EMPTY);
   const [editId, setEditId] = useState(null);
   const [entry, setEntry] = useState(false);
+  const [notice, setNotice] = useState('');
   const [tab, setTab] = useState('all');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
@@ -51,6 +54,9 @@ export default function Classes() {
   }, []);
   useEffect(load, [load]);
   useEffect(() => {
+    api('/boards')
+      .then(setBoards)
+      .catch(() => {});
     api('/branches')
       .then(setBranches)
       .catch(() => {});
@@ -68,6 +74,7 @@ export default function Classes() {
     setForm({
       name: c.name,
       section: c.section,
+      board: c.board ?? 'CBSE',
       room: c.room ?? '',
       branchId: c.branchId ?? '',
       classTeacherId: c.classTeacherId ?? '',
@@ -124,12 +131,36 @@ export default function Classes() {
         </div>
         {canWrite && (
           <div className="head-actions">
+            <PageReports page="classes" />
+            <button
+              type="button"
+              className="ghost"
+              onClick={async () => {
+                if (
+                  !window.confirm(
+                    "Give every class its board's default subjects and periods per week? Anything already set is kept.",
+                  )
+                )
+                  return;
+                try {
+                  const r = await api('/class-subjects/apply-template', { method: 'POST', body: {} });
+                  setNotice(
+                    `Added ${r.added} subject(s) and filled ${r.filled} periods-per-week value(s) across ${r.classes} classes.${r.noTemplate.length ? ` No template for: ${r.noTemplate.join(', ')}.` : ''}`,
+                  );
+                } catch (err) {
+                  setError(err.message);
+                }
+              }}
+            >
+              Apply default subjects
+            </button>
             <button type="button" className="big-action" onClick={openNew}>
               + Add class
             </button>
           </div>
         )}
       </div>
+      {notice && <p className="success">{notice}</p>}
       {error && !entry && (
         <p className="error" role="alert">
           {error}
@@ -183,6 +214,7 @@ export default function Classes() {
               <tr>
                 <th>Class</th>
                 <th>Section</th>
+                <th>Board</th>
                 <th>Class teacher</th>
                 <th>Room</th>
                 {branches.length > 0 && <th>Campus</th>}
@@ -197,6 +229,7 @@ export default function Classes() {
                     <b>{c.name}</b>
                   </td>
                   <td>{c.section}</td>
+                  <td>{c.board}</td>
                   <td>{c.classTeacherName ?? <span className="badge partial">not set</span>}</td>
                   <td>{c.room ?? '—'}</td>
                   {branches.length > 0 && <td>{branches.find((b) => b.id === c.branchId)?.name ?? '—'}</td>}
@@ -261,6 +294,16 @@ export default function Classes() {
                 required
                 maxLength={10}
               />
+            </label>
+            <label>
+              <span>Board *</span>
+              <select value={form.board} onChange={(e) => setForm({ ...form, board: e.target.value })}>
+                {boards
+                  .filter((b) => b.isEnabled || b.name === form.board)
+                  .map((b) => (
+                    <option key={b.id}>{b.name}</option>
+                  ))}
+              </select>
             </label>
             <label className="wide">
               <span>Class teacher</span>

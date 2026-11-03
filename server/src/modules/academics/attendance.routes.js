@@ -3,6 +3,7 @@ import { requireRole } from '../../middleware/authMiddleware.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { saveStudentMonthly, studentMonthly } from '../attendance/monthly.service.js';
 import { getRoster, listCorrections, saveRecords } from './attendance.service.js';
+import { assertTeacherMayView } from './teacherScope.js';
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const { date, classId } = req.query;
     if (!date) return res.status(400).json({ error: 'date is required' });
+    await assertTeacherMayView(req.user, classId, { date });
     res.json(await getRoster(date, classId || null));
   }),
 );
@@ -20,9 +22,10 @@ router.get(
 router.get(
   '/monthly',
   requireRole('admin', 'teacher'),
-  asyncHandler(async (req, res) =>
-    res.json(await studentMonthly(req.query.month, req.query.classId || null)),
-  ),
+  asyncHandler(async (req, res) => {
+    await assertTeacherMayView(req.user, req.query.classId, { month: req.query.month });
+    res.json(await studentMonthly(req.query.month, req.query.classId || null));
+  }),
 );
 
 // POST /api/attendance/monthly { month, changes: [{ id, date, status }], reason? } -> saves edits made on the monthly register

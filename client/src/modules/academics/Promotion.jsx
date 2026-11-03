@@ -30,6 +30,7 @@ export default function Promotion() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [busy, setBusy] = useState(false);
+  const [check, setCheck] = useState(null); // the board's promotion rule and each student's standing against it
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
@@ -46,6 +47,11 @@ export default function Promotion() {
       setSelected(new Set());
       return;
     }
+    api(`/promotion/eligibility?classId=${from}`)
+      .then((e) =>
+        setCheck({ rule: e.rule, board: e.board, byId: new Map(e.rows.map((r) => [r.studentId, r])) }),
+      )
+      .catch(() => setCheck(null));
     api(`/students?classId=${from}&status=active`)
       .then((r) => {
         const rows = Array.isArray(r) ? r : (r.rows ?? []);
@@ -54,6 +60,11 @@ export default function Promotion() {
       })
       .catch((e) => setError(e.message));
   }, [from]);
+
+  const tickEligible = () =>
+    setSelected(
+      new Set(students.filter((s) => check?.byId.get(s.id)?.status === 'eligible').map((s) => s.id)),
+    );
 
   const toggle = (id) =>
     setSelected((cur) => {
@@ -178,6 +189,11 @@ export default function Promotion() {
               disabled={!from}
             />
           </label>
+          {check?.rule && (
+            <button type="button" className="ghost" onClick={tickEligible}>
+              Tick only those who meet the {check.board} rule
+            </button>
+          )}
           <span className="showing">{from ? `${shown.length} students` : 'Choose a class'}</span>
         </div>
         <div className="table-scroll">
@@ -195,6 +211,7 @@ export default function Promotion() {
                 </th>
                 <th>Admission no</th>
                 <th>Student</th>
+                <th>Promotion rule</th>
                 <th>Outcome</th>
               </tr>
             </thead>
@@ -216,6 +233,27 @@ export default function Promotion() {
                     </b>
                   </td>
                   <td>
+                    {(() => {
+                      const c = check?.byId.get(s.id);
+                      if (!c) return '—';
+                      const tone =
+                        c.status === 'eligible' ? 'paid' : c.status === 'unknown' ? 'partial' : 'unpaid';
+                      const text = {
+                        eligible: 'Meets the rule',
+                        unknown: 'Cannot tell',
+                        'not-eligible': 'Does not meet',
+                      }[c.status];
+                      return (
+                        <span className={`badge ${tone}`} title={c.reasons.join('; ')}>
+                          {text}
+                          {c.reasons.length > 0 && (
+                            <small style={{ display: 'block' }}>{c.reasons.join('; ')}</small>
+                          )}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                  <td>
                     {selected.has(s.id) ? (
                       <span className="badge paid">● {target ? `To ${label(target)}` : 'Graduates'}</span>
                     ) : (
@@ -226,7 +264,7 @@ export default function Promotion() {
               ))}
               {!pageRows.length && (
                 <tr>
-                  <td colSpan={4} className="empty-row">
+                  <td colSpan={5} className="empty-row">
                     {!from
                       ? 'Choose the class to promote.'
                       : needle

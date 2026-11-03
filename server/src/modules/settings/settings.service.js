@@ -52,7 +52,7 @@ const DEFINITIONS = [
     label: 'Board / curriculum',
     type: 'text',
     max: 40,
-    options: ['CBSE', 'ICSE', 'ISC', 'State board', 'IB', 'Cambridge (IGCSE)', 'Other'],
+    options: ['CBSE', 'UP Board', 'ICSE', 'ISC', 'State board', 'IB', 'Cambridge (IGCSE)', 'Other'],
     default: '',
   },
   {

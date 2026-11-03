@@ -9,6 +9,21 @@ const decide = (base) => [
   { label: 'Reject', tone: 'danger', path: (r) => `${base}/${r.id}/reject`, fields: [{ key: 'remarks', label: 'Reason', required: true, multiline: true }], submit: 'Reject', done: () => 'Rejected.' },
 ];
 
+/** How an application looks and what can be done to it, on the Applications screen and on each flow-stage screen. */
+const APPLICATION_VIEW = {
+  row: (r) => ({ title: r.applicantName, sub: dot(r.applicationId, r.className, r.guardianName), badge: badgeFor(r.status, r.stageLabel) }),
+  detail: [['Application', 'applicationId'], ['Student', 'applicantName'], ['Grade', 'className'], ['Parent / guardian', 'guardianName'], ['Phone', 'guardianPhone'], ['Date of birth', 'dob'], ['Gender', 'gender'], ['Academic year', 'academicYear'], ['Submitted', 'submitted'], ['Stage', 'stageLabel'], ['Test date', 'testDate'], ['Interview date', 'interviewDate'], ['Offer valid until', 'offerExpiry'],
+    ['Still missing', (r) => [['classId', 'grade'], ['guardianName', 'guardian'], ['guardianPhone', 'phone'], ['dob', 'date of birth'], ['gender', 'gender'], ['academicYear', 'academic year']].filter(([k]) => !r[k]).map(([, l]) => l).join(', ') || null]],
+  actions: [
+    { label: 'Schedule entrance test', when: (r) => r.stage === 'review' || r.stage === 'assessment', path: (r) => `/admissions/${r.id}/test`, method: 'PUT', fields: [{ key: 'testDate', label: 'Test date (YYYY-MM-DD)', required: true, default: (r) => r.testDate ?? today() }, { key: 'testMaxMarks', label: 'Maximum marks', keyboard: 'decimal-pad', default: '100' }], submit: 'Save test', done: () => 'Test scheduled. The application is now in Assessment.' },
+    { label: 'Schedule interview', when: (r) => r.stage === 'review' || r.stage === 'assessment', path: (r) => `/admissions/${r.id}/interview`, method: 'PUT', fields: [{ key: 'interviewDate', label: 'Interview date (YYYY-MM-DD)', required: true, default: (r) => r.interviewDate ?? today() }, { key: 'interviewTime', label: 'Time (HH:MM)', required: true, default: '10:00' }, { key: 'interviewPanel', label: 'Panel', required: true }], submit: 'Save interview', done: () => 'Interview scheduled. The application is now in Assessment.' },
+    { label: 'Make offer', when: (r) => r.stage === 'review' || r.stage === 'assessment', path: (r) => `/admissions/${r.id}/status`, body: () => ({ status: 'approved' }), confirm: 'Send an offer? The family gets 14 days to confirm unless you change the date afterwards.', submit: 'Make offer', done: () => 'Offer sent.' },
+    { label: 'Change offer date', when: (r) => r.stage === 'offer', path: (r) => `/admissions/${r.id}/offer`, method: 'PUT', fields: [{ key: 'offerExpiry', label: 'Confirm by (YYYY-MM-DD)', required: true, default: (r) => r.offerExpiry ?? '' }], submit: 'Save date', done: () => 'Offer date updated.' },
+    { label: 'Enroll as student', when: (r) => r.stage === 'offer', path: (r) => `/admissions/${r.id}/enroll`, body: () => ({}), confirm: 'Enrol this applicant? The class fees are billed and a student login is created.', submit: 'Enroll', done: (res) => `Enrolled as ${res.admissionNo}. Student login: ${res.studentLogin?.username ?? ''} / ${res.studentLogin?.password ?? ''}. Write the password down now, it is shown only once.` },
+    { label: 'Reject application', tone: 'danger', when: (r) => ['review', 'assessment', 'offer'].includes(r.stage), path: (r) => `/admissions/${r.id}/status`, body: () => ({ status: 'rejected' }), confirm: 'Close this application?', submit: 'Reject', done: () => 'Application closed.' },
+  ],
+};
+
 /**
  * What the mobile app offers staff, grouped like the web menu. The API still decides who may do what; `roles` only hides what would be refused.
  * A screen is a list (rows from the API, tap for detail and actions), a stats page (tiles and lists), or a custom screen.
@@ -18,7 +33,14 @@ export const STAFF_MODULES = [
     key: 'admissions', title: 'Admissions', icon: '\u{1F4DD}', roles: ['admin'],
     screens: [
       { key: 'enquiries', title: 'Enquiries', kind: 'list', path: '/admissions/enquiries?pageSize=200', pick: (d) => d.rows, row: (r) => ({ title: r.applicantName, sub: dot(r.className, r.guardianName, r.guardianPhone), badge: badgeFor(r.status, r.stageLabel) }) },
-      { key: 'applications', title: 'Applications', kind: 'list', path: '/admissions/applications?pageSize=200', pick: (d) => d.rows, row: (r) => ({ title: r.applicantName, sub: dot(r.applicationId, r.className), badge: badgeFor(r.status, r.stageLabel) }) },
+      // The admission flow, stage by stage: under review -> assessment -> offer sent -> enrolled. The same steps as the website's Admission page.
+      {
+        key: 'applications', title: 'Applications', kind: 'list', path: '/admissions/applications?pageSize=200', pick: (d) => d.rows,
+        ...APPLICATION_VIEW,
+      },
+      ...[['review', 'Under review'], ['assessment', 'Assessment'], ['offer', 'Offer sent'], ['enrolled', 'Enrolled']].map(([tab, title]) => (
+        { key: `stage-${tab}`, title: `Flow: ${title}`, kind: 'list', path: `/admissions/applications?pageSize=200&tab=${tab}`, pick: (d) => d.rows, ...APPLICATION_VIEW }
+      )),
       {
         key: 'offers', title: 'Offers and enrolment', kind: 'list', path: '/admissions/offers',
         row: (r) => ({ title: r.applicantName, sub: dot(r.className, r.offerExpiry ? `offer until ${niceDate(r.offerExpiry)}` : null), badge: r.expired ? { text: 'Expired', tone: 'red' } : badgeFor(r.status, r.status === 'approved' ? 'Offered' : undefined) }),

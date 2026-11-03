@@ -74,11 +74,51 @@
     "audience": "staff",
     "parentKey": "admissions",
     "roles": null,
+    "key": "admissions.stage-review",
+    "label": "Flow: Under review",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 30
+  },
+  {
+    "audience": "staff",
+    "parentKey": "admissions",
+    "roles": null,
+    "key": "admissions.stage-assessment",
+    "label": "Flow: Assessment",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 40
+  },
+  {
+    "audience": "staff",
+    "parentKey": "admissions",
+    "roles": null,
+    "key": "admissions.stage-offer",
+    "label": "Flow: Offer sent",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 50
+  },
+  {
+    "audience": "staff",
+    "parentKey": "admissions",
+    "roles": null,
+    "key": "admissions.stage-enrolled",
+    "label": "Flow: Enrolled",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 60
+  },
+  {
+    "audience": "staff",
+    "parentKey": "admissions",
+    "roles": null,
     "key": "admissions.offers",
     "label": "Offers and enrolment",
     "icon": "checkmark-circle-outline",
     "kind": "list",
-    "position": 30
+    "position": 70
   },
   {
     "audience": "staff",
@@ -88,7 +128,7 @@
     "label": "Admissions summary",
     "icon": "stats-chart-outline",
     "kind": "stats",
-    "position": 40
+    "position": 80
   },
   {
     "audience": "staff",

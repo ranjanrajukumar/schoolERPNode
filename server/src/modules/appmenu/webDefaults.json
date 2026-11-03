@@ -83,13 +83,23 @@
   },
   {
     "audience": "web",
+    "key": "my-children.syllabus",
+    "parentKey": "my-children",
+    "kind": "page",
+    "label": "Syllabus",
+    "icon": "👪",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
     "key": "my-children.courses-and-lessons",
     "parentKey": "my-children",
     "kind": "page",
     "label": "Courses & Lessons",
     "icon": "👪",
     "roles": null,
-    "position": 80
+    "position": 90
   },
   {
     "audience": "web",
@@ -99,7 +109,7 @@
     "label": "Exams & Results",
     "icon": "👪",
     "roles": null,
-    "position": 90
+    "position": 100
   },
   {
     "audience": "web",
@@ -109,7 +119,7 @@
     "label": "Fees & Payments",
     "icon": "👪",
     "roles": null,
-    "position": 100
+    "position": 110
   },
   {
     "audience": "web",
@@ -119,7 +129,7 @@
     "label": "Library",
     "icon": "👪",
     "roles": null,
-    "position": 110
+    "position": 120
   },
   {
     "audience": "web",
@@ -129,7 +139,7 @@
     "label": "Activities",
     "icon": "👪",
     "roles": null,
-    "position": 120
+    "position": 130
   },
   {
     "audience": "web",
@@ -139,7 +149,7 @@
     "label": "Notices & Announcements",
     "icon": "👪",
     "roles": null,
-    "position": 130
+    "position": 140
   },
   {
     "audience": "web",
@@ -149,7 +159,7 @@
     "label": "Messages",
     "icon": "👪",
     "roles": null,
-    "position": 140
+    "position": 150
   },
   {
     "audience": "web",
@@ -159,7 +169,7 @@
     "label": "Events & Calendar",
     "icon": "👪",
     "roles": null,
-    "position": 150
+    "position": 160
   },
   {
     "audience": "web",
@@ -169,7 +179,7 @@
     "label": "Transport Tracking",
     "icon": "👪",
     "roles": null,
-    "position": 160
+    "position": 170
   },
   {
     "audience": "web",
@@ -179,7 +189,7 @@
     "label": "Feedback & Grievance",
     "icon": "👪",
     "roles": null,
-    "position": 170
+    "position": 180
   },
   {
     "audience": "web",
@@ -189,7 +199,7 @@
     "label": "Apply for Leave",
     "icon": "👪",
     "roles": null,
-    "position": 180
+    "position": 190
   },
   {
     "audience": "web",
@@ -199,7 +209,7 @@
     "label": "Certificates & Documents",
     "icon": "👪",
     "roles": null,
-    "position": 190
+    "position": 200
   },
   {
     "audience": "web",
@@ -209,7 +219,7 @@
     "label": "Help & Support",
     "icon": "👪",
     "roles": null,
-    "position": 200
+    "position": 210
   },
   {
     "audience": "web",
@@ -219,7 +229,7 @@
     "label": "Settings & Change Password",
     "icon": "👪",
     "roles": null,
-    "position": 210
+    "position": 220
   },
   {
     "audience": "web",
@@ -305,13 +315,23 @@
   },
   {
     "audience": "web",
+    "key": "my-school.syllabus",
+    "parentKey": "my-school",
+    "kind": "page",
+    "label": "Syllabus",
+    "icon": "🏫",
+    "roles": null,
+    "position": 80
+  },
+  {
+    "audience": "web",
     "key": "my-school.courses-and-lessons",
     "parentKey": "my-school",
     "kind": "page",
     "label": "Courses & Lessons",
     "icon": "🏫",
     "roles": null,
-    "position": 80
+    "position": 90
   },
   {
     "audience": "web",
@@ -321,7 +341,7 @@
     "label": "Exams & Results",
     "icon": "🏫",
     "roles": null,
-    "position": 90
+    "position": 100
   },
   {
     "audience": "web",
@@ -331,7 +351,7 @@
     "label": "Fees & Payments",
     "icon": "🏫",
     "roles": null,
-    "position": 100
+    "position": 110
   },
   {
     "audience": "web",
@@ -341,7 +361,7 @@
     "label": "Library",
     "icon": "🏫",
     "roles": null,
-    "position": 110
+    "position": 120
   },
   {
     "audience": "web",
@@ -351,7 +371,7 @@
     "label": "Notices & Announcements",
     "icon": "🏫",
     "roles": null,
-    "position": 120
+    "position": 130
   },
   {
     "audience": "web",
@@ -361,7 +381,7 @@
     "label": "Messages",
     "icon": "🏫",
     "roles": null,
-    "position": 130
+    "position": 140
   },
   {
     "audience": "web",
@@ -371,7 +391,7 @@
     "label": "Events & Calendar",
     "icon": "🏫",
     "roles": null,
-    "position": 140
+    "position": 150
   },
   {
     "audience": "web",
@@ -381,7 +401,7 @@
     "label": "Transport Tracking",
     "icon": "🏫",
     "roles": null,
-    "position": 150
+    "position": 160
   },
   {
     "audience": "web",
@@ -391,7 +411,7 @@
     "label": "Feedback & Grievance",
     "icon": "🏫",
     "roles": null,
-    "position": 160
+    "position": 170
   },
   {
     "audience": "web",
@@ -401,7 +421,7 @@
     "label": "Leave Requests",
     "icon": "🏫",
     "roles": null,
-    "position": 170
+    "position": 180
   },
   {
     "audience": "web",
@@ -411,7 +431,7 @@
     "label": "Certificates & Documents",
     "icon": "🏫",
     "roles": null,
-    "position": 180
+    "position": 190
   },
   {
     "audience": "web",
@@ -421,7 +441,7 @@
     "label": "Help & Support",
     "icon": "🏫",
     "roles": null,
-    "position": 190
+    "position": 200
   },
   {
     "audience": "web",
@@ -431,7 +451,7 @@
     "label": "Settings & Change Password",
     "icon": "🏫",
     "roles": null,
-    "position": 200
+    "position": 210
   },
   {
     "audience": "web",
@@ -472,49 +492,35 @@
   },
   {
     "audience": "web",
-    "key": "dashboard.today-s-attendance",
-    "parentKey": "dashboard",
-    "kind": "page",
-    "label": "Today’s Attendance",
-    "icon": "🏠",
+    "key": "board-management",
+    "parentKey": null,
+    "kind": "module",
+    "label": "Board Management",
+    "icon": "🏛️",
     "roles": [
-      "admin",
-      "teacher"
-    ],
-    "position": 30
-  },
-  {
-    "audience": "web",
-    "key": "dashboard.fee-summary",
-    "parentKey": "dashboard",
-    "kind": "page",
-    "label": "Fee Summary",
-    "icon": "🏠",
-    "roles": [
-      "admin",
-      "accountant"
+      "admin"
     ],
     "position": 40
   },
   {
     "audience": "web",
-    "key": "dashboard.upcoming-events",
-    "parentKey": "dashboard",
+    "key": "board-management.board-rules",
+    "parentKey": "board-management",
     "kind": "page",
-    "label": "Upcoming Events",
-    "icon": "🏠",
+    "label": "Board Rules",
+    "icon": "🏛️",
     "roles": null,
-    "position": 50
+    "position": 10
   },
   {
     "audience": "web",
-    "key": "dashboard.notices",
-    "parentKey": "dashboard",
+    "key": "board-management.board-registration",
+    "parentKey": "board-management",
     "kind": "page",
-    "label": "Notices",
-    "icon": "🏠",
+    "label": "Board Registration",
+    "icon": "🏛️",
     "roles": null,
-    "position": 60
+    "position": 20
   },
   {
     "audience": "web",
@@ -526,7 +532,7 @@
     "roles": [
       "admin"
     ],
-    "position": 40
+    "position": 50
   },
   {
     "audience": "web",
@@ -580,20 +586,20 @@
   },
   {
     "audience": "web",
-    "key": "admissions.waiting-list",
+    "key": "admissions.admission-reports",
     "parentKey": "admissions",
     "kind": "page",
-    "label": "Waiting List",
+    "label": "Admission Reports",
     "icon": "📝",
     "roles": null,
     "position": 60
   },
   {
     "audience": "web",
-    "key": "admissions.admission-reports",
+    "key": "admissions.visitor-records",
     "parentKey": "admissions",
     "kind": "page",
-    "label": "Admission Reports",
+    "label": "Visitor Records",
     "icon": "📝",
     "roles": null,
     "position": 70
@@ -610,7 +616,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 50
+    "position": 60
   },
   {
     "audience": "web",
@@ -648,29 +654,6 @@
   },
   {
     "audience": "web",
-    "key": "students.student-attendance",
-    "parentKey": "students",
-    "kind": "page",
-    "label": "Student Attendance",
-    "icon": "🎓",
-    "roles": null,
-    "position": 40
-  },
-  {
-    "audience": "web",
-    "key": "students.student-health-records",
-    "parentKey": "students",
-    "kind": "page",
-    "label": "Student Health Records",
-    "icon": "🎓",
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "position": 50
-  },
-  {
-    "audience": "web",
     "key": "students.student-behavior",
     "parentKey": "students",
     "kind": "page",
@@ -680,7 +663,7 @@
       "admin",
       "teacher"
     ],
-    "position": 60
+    "position": 40
   },
   {
     "audience": "web",
@@ -692,19 +675,7 @@
     "roles": [
       "admin"
     ],
-    "position": 70
-  },
-  {
-    "audience": "web",
-    "key": "students.transfer-leaving-certificate",
-    "parentKey": "students",
-    "kind": "page",
-    "label": "Transfer / Leaving Certificate",
-    "icon": "🎓",
-    "roles": [
-      "admin"
-    ],
-    "position": 80
+    "position": 50
   },
   {
     "audience": "web",
@@ -714,10 +685,9 @@
     "label": "Alumni",
     "icon": "🎓",
     "roles": [
-      "admin",
-      "teacher"
+      "admin"
     ],
-    "position": 90
+    "position": 60
   },
   {
     "audience": "web",
@@ -728,10 +698,9 @@
     "icon": "📚",
     "roles": [
       "admin",
-      "teacher",
-      "accountant"
+      "teacher"
     ],
-    "position": 60
+    "position": 70
   },
   {
     "audience": "web",
@@ -797,33 +766,13 @@
   },
   {
     "audience": "web",
-    "key": "academics.class-timetable",
-    "parentKey": "academics",
-    "kind": "page",
-    "label": "Class Timetable",
-    "icon": "📚",
-    "roles": null,
-    "position": 70
-  },
-  {
-    "audience": "web",
-    "key": "academics.teacher-timetable",
-    "parentKey": "academics",
-    "kind": "page",
-    "label": "Teacher Timetable",
-    "icon": "📚",
-    "roles": null,
-    "position": 80
-  },
-  {
-    "audience": "web",
     "key": "academics.syllabus-and-lesson-plans",
     "parentKey": "academics",
     "kind": "page",
     "label": "Syllabus & Lesson Plans",
     "icon": "📚",
     "roles": null,
-    "position": 90
+    "position": 70
   },
   {
     "audience": "web",
@@ -833,7 +782,7 @@
     "label": "Homework & Assignments",
     "icon": "📚",
     "roles": null,
-    "position": 100
+    "position": 80
   },
   {
     "audience": "web",
@@ -842,11 +791,8 @@
     "kind": "page",
     "label": "Online Classes",
     "icon": "📚",
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "position": 110
+    "roles": null,
+    "position": 90
   },
   {
     "audience": "web",
@@ -856,7 +802,7 @@
     "label": "Study Materials",
     "icon": "📚",
     "roles": null,
-    "position": 120
+    "position": 100
   },
   {
     "audience": "web",
@@ -866,7 +812,7 @@
     "label": "Academic Calendar",
     "icon": "📚",
     "roles": null,
-    "position": 130
+    "position": 110
   },
   {
     "audience": "web",
@@ -876,7 +822,7 @@
     "label": "List of Holidays",
     "icon": "📚",
     "roles": null,
-    "position": 140
+    "position": 120
   },
   {
     "audience": "web",
@@ -884,12 +830,12 @@
     "parentKey": null,
     "kind": "module",
     "label": "Learning Management",
-    "icon": "•",
+    "icon": "💻",
     "roles": [
       "admin",
       "teacher"
     ],
-    "position": 70
+    "position": 80
   },
   {
     "audience": "web",
@@ -897,7 +843,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Dashboard",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 10
   },
@@ -907,7 +853,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Courses & Lessons",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 20
   },
@@ -917,7 +863,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Content Library",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 30
   },
@@ -927,7 +873,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Enrollment",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 40
   },
@@ -937,7 +883,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Announcements",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 50
   },
@@ -947,7 +893,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Assignments",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 60
   },
@@ -957,7 +903,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Quizzes & Tests",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 70
   },
@@ -967,7 +913,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "Student Progress",
-    "icon": "•",
+    "icon": "💻",
     "roles": null,
     "position": 80
   },
@@ -977,7 +923,7 @@
     "parentKey": "learning-management",
     "kind": "page",
     "label": "LMS Tags",
-    "icon": "•",
+    "icon": "💻",
     "roles": [
       "admin"
     ],
@@ -992,17 +938,16 @@
     "icon": "🗓️",
     "roles": [
       "admin",
-      "teacher",
-      "accountant"
+      "teacher"
     ],
-    "position": 80
+    "position": 90
   },
   {
     "audience": "web",
-    "key": "timetable.class-timetable",
+    "key": "timetable.timetable",
     "parentKey": "timetable",
     "kind": "page",
-    "label": "Class Timetable",
+    "label": "Timetable",
     "icon": "🗓️",
     "roles": null,
     "position": 10
@@ -1064,7 +1009,7 @@
       "admin",
       "teacher"
     ],
-    "position": 90
+    "position": 100
   },
   {
     "audience": "web",
@@ -1148,20 +1093,6 @@
   },
   {
     "audience": "web",
-    "key": "attendance.attendance-reports",
-    "parentKey": "attendance",
-    "kind": "page",
-    "label": "Attendance Reports",
-    "icon": "✅",
-    "roles": [
-      "admin",
-      "teacher",
-      "accountant"
-    ],
-    "position": 90
-  },
-  {
-    "audience": "web",
     "key": "examinations",
     "parentKey": null,
     "kind": "module",
@@ -1169,10 +1100,9 @@
     "icon": "🧪",
     "roles": [
       "admin",
-      "teacher",
-      "accountant"
+      "teacher"
     ],
-    "position": 100
+    "position": 110
   },
   {
     "audience": "web",
@@ -1186,23 +1116,13 @@
   },
   {
     "audience": "web",
-    "key": "examinations.subject-map",
-    "parentKey": "examinations",
-    "kind": "page",
-    "label": "Subject Map",
-    "icon": "🧪",
-    "roles": null,
-    "position": 20
-  },
-  {
-    "audience": "web",
     "key": "examinations.grade-setup",
     "parentKey": "examinations",
     "kind": "page",
     "label": "Grade Setup",
     "icon": "🧪",
     "roles": null,
-    "position": 30
+    "position": 20
   },
   {
     "audience": "web",
@@ -1212,7 +1132,7 @@
     "label": "Exams, Marks & Results",
     "icon": "🧪",
     "roles": null,
-    "position": 40
+    "position": 30
   },
   {
     "audience": "web",
@@ -1221,11 +1141,8 @@
     "kind": "page",
     "label": "Holistic Progress Card",
     "icon": "🧪",
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "position": 50
+    "roles": null,
+    "position": 40
   },
   {
     "audience": "web",
@@ -1235,7 +1152,7 @@
     "label": "Merit List",
     "icon": "🧪",
     "roles": null,
-    "position": 60
+    "position": 50
   },
   {
     "audience": "web",
@@ -1244,11 +1161,8 @@
     "kind": "page",
     "label": "Revaluation Requests",
     "icon": "🧪",
-    "roles": [
-      "admin",
-      "teacher"
-    ],
-    "position": 70
+    "roles": null,
+    "position": 60
   },
   {
     "audience": "web",
@@ -1261,7 +1175,7 @@
       "admin",
       "accountant"
     ],
-    "position": 110
+    "position": 120
   },
   {
     "audience": "web",
@@ -1345,16 +1259,6 @@
   },
   {
     "audience": "web",
-    "key": "fees-and-finance.financial-reports",
-    "parentKey": "fees-and-finance",
-    "kind": "page",
-    "label": "Financial Reports",
-    "icon": "💰",
-    "roles": null,
-    "position": 90
-  },
-  {
-    "audience": "web",
     "key": "transport",
     "parentKey": null,
     "kind": "module",
@@ -1365,7 +1269,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 120
+    "position": 130
   },
   {
     "audience": "web",
@@ -1374,7 +1278,9 @@
     "kind": "page",
     "label": "Vehicles",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 10
   },
   {
@@ -1384,7 +1290,9 @@
     "kind": "page",
     "label": "Drivers & Attendants",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 20
   },
   {
@@ -1394,7 +1302,9 @@
     "kind": "page",
     "label": "Routes",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 30
   },
   {
@@ -1404,7 +1314,9 @@
     "kind": "page",
     "label": "Stops",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 40
   },
   {
@@ -1414,7 +1326,9 @@
     "kind": "page",
     "label": "Student Route Assignment",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 50
   },
   {
@@ -1450,7 +1364,9 @@
     "kind": "page",
     "label": "Bus Tracking (Live GPS)",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 80
   },
   {
@@ -1460,7 +1376,9 @@
     "kind": "page",
     "label": "Vehicle Maintenance",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 90
   },
   {
@@ -1470,7 +1388,9 @@
     "kind": "page",
     "label": "Transport Reports",
     "icon": "🚌",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 100
   },
   {
@@ -1485,7 +1405,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 130
+    "position": 140
   },
   {
     "audience": "web",
@@ -1595,11 +1515,9 @@
     "label": "Library",
     "icon": "📖",
     "roles": [
-      "admin",
-      "teacher",
-      "accountant"
+      "admin"
     ],
-    "position": 140
+    "position": 150
   },
   {
     "audience": "web",
@@ -1662,7 +1580,7 @@
       "admin",
       "teacher"
     ],
-    "position": 150
+    "position": 160
   },
   {
     "audience": "web",
@@ -1794,7 +1712,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 160
+    "position": 170
   },
   {
     "audience": "web",
@@ -1803,7 +1721,9 @@
     "kind": "page",
     "label": "Departments",
     "icon": "👥",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 10
   },
   {
@@ -1813,7 +1733,9 @@
     "kind": "page",
     "label": "Designations",
     "icon": "👥",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 20
   },
   {
@@ -1823,7 +1745,9 @@
     "kind": "page",
     "label": "Staff Directory",
     "icon": "👥",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 30
   },
   {
@@ -1946,7 +1870,7 @@
     "roles": [
       "admin"
     ],
-    "position": 170
+    "position": 180
   },
   {
     "audience": "web",
@@ -2010,67 +1934,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 180
-  },
-  {
-    "audience": "web",
-    "key": "events-and-activities.school-events",
-    "parentKey": "events-and-activities",
-    "kind": "page",
-    "label": "School Events",
-    "icon": "🎉",
-    "roles": null,
-    "position": 10
-  },
-  {
-    "audience": "web",
-    "key": "events-and-activities.celebrations",
-    "parentKey": "events-and-activities",
-    "kind": "page",
-    "label": "Celebrations",
-    "icon": "🎉",
-    "roles": null,
-    "position": 20
-  },
-  {
-    "audience": "web",
-    "key": "events-and-activities.competitions",
-    "parentKey": "events-and-activities",
-    "kind": "page",
-    "label": "Competitions",
-    "icon": "🎉",
-    "roles": null,
-    "position": 30
-  },
-  {
-    "audience": "web",
-    "key": "events-and-activities.clubs",
-    "parentKey": "events-and-activities",
-    "kind": "page",
-    "label": "Clubs",
-    "icon": "🎉",
-    "roles": null,
-    "position": 40
-  },
-  {
-    "audience": "web",
-    "key": "events-and-activities.sports",
-    "parentKey": "events-and-activities",
-    "kind": "page",
-    "label": "Sports",
-    "icon": "🎉",
-    "roles": null,
-    "position": 50
-  },
-  {
-    "audience": "web",
-    "key": "events-and-activities.field-trips",
-    "parentKey": "events-and-activities",
-    "kind": "page",
-    "label": "Field Trips",
-    "icon": "🎉",
-    "roles": null,
-    "position": 60
+    "position": 190
   },
   {
     "audience": "web",
@@ -2083,7 +1947,7 @@
       "admin",
       "teacher"
     ],
-    "position": 70
+    "position": 10
   },
   {
     "audience": "web",
@@ -2096,7 +1960,7 @@
       "admin",
       "teacher"
     ],
-    "position": 80
+    "position": 20
   },
   {
     "audience": "web",
@@ -2108,7 +1972,17 @@
     "roles": [
       "admin"
     ],
-    "position": 190
+    "position": 200
+  },
+  {
+    "audience": "web",
+    "key": "documents-and-certificates.document-verification",
+    "parentKey": "documents-and-certificates",
+    "kind": "page",
+    "label": "Document Verification",
+    "icon": "📄",
+    "roles": null,
+    "position": 10
   },
   {
     "audience": "web",
@@ -2118,7 +1992,7 @@
     "label": "Document Templates",
     "icon": "📄",
     "roles": null,
-    "position": 10
+    "position": 20
   },
   {
     "audience": "web",
@@ -2128,7 +2002,7 @@
     "label": "ID Cards",
     "icon": "📄",
     "roles": null,
-    "position": 20
+    "position": 30
   },
   {
     "audience": "web",
@@ -2138,47 +2012,7 @@
     "label": "Requests & Issued Register",
     "icon": "📄",
     "roles": null,
-    "position": 30
-  },
-  {
-    "audience": "web",
-    "key": "documents-and-certificates.bonafide-certificates",
-    "parentKey": "documents-and-certificates",
-    "kind": "page",
-    "label": "Bonafide Certificates",
-    "icon": "📄",
-    "roles": null,
     "position": 40
-  },
-  {
-    "audience": "web",
-    "key": "documents-and-certificates.transfer-certificates",
-    "parentKey": "documents-and-certificates",
-    "kind": "page",
-    "label": "Transfer Certificates",
-    "icon": "📄",
-    "roles": null,
-    "position": 50
-  },
-  {
-    "audience": "web",
-    "key": "documents-and-certificates.character-certificates",
-    "parentKey": "documents-and-certificates",
-    "kind": "page",
-    "label": "Character Certificates",
-    "icon": "📄",
-    "roles": null,
-    "position": 60
-  },
-  {
-    "audience": "web",
-    "key": "documents-and-certificates.fee-certificates",
-    "parentKey": "documents-and-certificates",
-    "kind": "page",
-    "label": "Fee Certificates",
-    "icon": "📄",
-    "roles": null,
-    "position": 70
   },
   {
     "audience": "web",
@@ -2192,7 +2026,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 200
+    "position": 210
   },
   {
     "audience": "web",
@@ -2216,37 +2050,13 @@
   },
   {
     "audience": "web",
-    "key": "communication.send-email",
-    "parentKey": "communication",
-    "kind": "page",
-    "label": "Send Email",
-    "icon": "💬",
-    "roles": [
-      "admin"
-    ],
-    "position": 30
-  },
-  {
-    "audience": "web",
-    "key": "communication.send-sms",
-    "parentKey": "communication",
-    "kind": "page",
-    "label": "Send SMS",
-    "icon": "💬",
-    "roles": [
-      "admin"
-    ],
-    "position": 40
-  },
-  {
-    "audience": "web",
     "key": "communication.push-notifications",
     "parentKey": "communication",
     "kind": "page",
     "label": "Push Notifications",
     "icon": "💬",
     "roles": null,
-    "position": 50
+    "position": 30
   },
   {
     "audience": "web",
@@ -2258,7 +2068,7 @@
     "roles": [
       "admin"
     ],
-    "position": 60
+    "position": 40
   },
   {
     "audience": "web",
@@ -2270,7 +2080,7 @@
     "roles": [
       "admin"
     ],
-    "position": 70
+    "position": 50
   },
   {
     "audience": "web",
@@ -2282,7 +2092,7 @@
     "roles": [
       "admin"
     ],
-    "position": 80
+    "position": 60
   },
   {
     "audience": "web",
@@ -2294,7 +2104,7 @@
     "roles": [
       "admin"
     ],
-    "position": 90
+    "position": 70
   },
   {
     "audience": "web",
@@ -2306,7 +2116,7 @@
     "roles": [
       "admin"
     ],
-    "position": 210
+    "position": 220
   },
   {
     "audience": "web",
@@ -2350,7 +2160,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 220
+    "position": 230
   },
   {
     "audience": "web",
@@ -2364,57 +2174,37 @@
   },
   {
     "audience": "web",
-    "key": "reports.academic-and-exam-reports",
+    "key": "reports.saved-reports",
     "parentKey": "reports",
     "kind": "page",
-    "label": "Academic & Exam Reports",
+    "label": "Saved Reports",
     "icon": "📊",
     "roles": null,
     "position": 20
   },
   {
     "audience": "web",
-    "key": "reports.transport-reports",
+    "key": "reports.quick-reports",
     "parentKey": "reports",
     "kind": "page",
-    "label": "Transport Reports",
+    "label": "Quick Reports",
     "icon": "📊",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 30
   },
   {
     "audience": "web",
-    "key": "reports.library-reports",
+    "key": "reports.report-designer",
     "parentKey": "reports",
     "kind": "page",
-    "label": "Library Reports",
+    "label": "Report Designer",
     "icon": "📊",
-    "roles": null,
+    "roles": [
+      "admin"
+    ],
     "position": 40
-  },
-  {
-    "audience": "web",
-    "key": "reports.stock-reports",
-    "parentKey": "reports",
-    "kind": "page",
-    "label": "Stock Reports",
-    "icon": "📊",
-    "roles": [
-      "admin"
-    ],
-    "position": 50
-  },
-  {
-    "audience": "web",
-    "key": "reports.custom-reports",
-    "parentKey": "reports",
-    "kind": "page",
-    "label": "Custom Reports",
-    "icon": "📊",
-    "roles": [
-      "admin"
-    ],
-    "position": 60
   },
   {
     "audience": "web",
@@ -2426,7 +2216,7 @@
     "roles": [
       "admin"
     ],
-    "position": 230
+    "position": 240
   },
   {
     "audience": "web",
@@ -2508,7 +2298,7 @@
     "roles": [
       "admin"
     ],
-    "position": 240
+    "position": 250
   },
   {
     "audience": "web",
@@ -2552,43 +2342,13 @@
   },
   {
     "audience": "web",
-    "key": "settings.academic-years",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Academic Years",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 50
-  },
-  {
-    "audience": "web",
-    "key": "settings.classes-and-sections",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Classes & Sections",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 60
-  },
-  {
-    "audience": "web",
     "key": "settings.master-data",
     "parentKey": "settings",
     "kind": "page",
     "label": "Master Data",
     "icon": "⚙️",
     "roles": null,
-    "position": 70
-  },
-  {
-    "audience": "web",
-    "key": "settings.grade-setup",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Grade Setup",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 80
+    "position": 50
   },
   {
     "audience": "web",
@@ -2598,47 +2358,7 @@
     "label": "ID Card Design",
     "icon": "⚙️",
     "roles": null,
-    "position": 90
-  },
-  {
-    "audience": "web",
-    "key": "settings.notification-settings",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Notification Settings",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 100
-  },
-  {
-    "audience": "web",
-    "key": "settings.student-login-settings",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Student Login Settings",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 110
-  },
-  {
-    "audience": "web",
-    "key": "settings.payment-settings",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Payment Settings",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 120
-  },
-  {
-    "audience": "web",
-    "key": "settings.auto-numbering",
-    "parentKey": "settings",
-    "kind": "page",
-    "label": "Auto Numbering",
-    "icon": "⚙️",
-    "roles": null,
-    "position": 130
+    "position": 60
   },
   {
     "audience": "web",
@@ -2648,7 +2368,7 @@
     "label": "Integrations",
     "icon": "⚙️",
     "roles": null,
-    "position": 140
+    "position": 70
   },
   {
     "audience": "web",
@@ -2658,7 +2378,7 @@
     "label": "Data Import / Export",
     "icon": "⚙️",
     "roles": null,
-    "position": 150
+    "position": 80
   },
   {
     "audience": "web",
@@ -2668,7 +2388,7 @@
     "label": "Backup & Restore",
     "icon": "⚙️",
     "roles": null,
-    "position": 160
+    "position": 90
   },
   {
     "audience": "web",
@@ -2678,7 +2398,7 @@
     "label": "Mobile App Menu",
     "icon": "⚙️",
     "roles": null,
-    "position": 170
+    "position": 100
   },
   {
     "audience": "web",
@@ -2688,7 +2408,7 @@
     "label": "System Preferences",
     "icon": "⚙️",
     "roles": null,
-    "position": 180
+    "position": 110
   },
   {
     "audience": "web",
@@ -2702,7 +2422,7 @@
       "teacher",
       "accountant"
     ],
-    "position": 250
+    "position": 260
   },
   {
     "audience": "web",

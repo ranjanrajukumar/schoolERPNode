@@ -72,6 +72,8 @@ const shape = (a) => {
     applicantName: a.applicantName,
     className: a.SchoolClass ? `${a.SchoolClass.name}-${a.SchoolClass.section}` : null,
     classId: a.classId,
+    dob: a.dob ?? null,
+    gender: a.gender ?? null,
     guardianName: a.guardianName || a.fatherName || a.motherName || null,
     guardianPhone: a.guardianPhone || a.fatherPhone || a.motherPhone || null,
     submitted,

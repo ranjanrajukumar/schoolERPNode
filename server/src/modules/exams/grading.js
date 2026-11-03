@@ -1,39 +1,27 @@
-import { GradeBand, GradingSetting } from '../../models/index.js';
+import { SchoolClass } from '../../models/index.js';
+import { boardOfClass, findBoard, requireRule } from '../boards/boardRules.service.js';
 
 /**
- * Fallback grade scale (percentage -> grade) used until the school saves its own under Grade setup.
- * Ordered from the highest threshold down.
- */
-const DEFAULT_BANDS = [
-  { min: 90, grade: 'A+' },
-  { min: 80, grade: 'A' },
-  { min: 70, grade: 'B' },
-  { min: 60, grade: 'C' },
-  { min: 50, grade: 'D' },
-  { min: 40, grade: 'E' },
-  { min: 0, grade: 'F' },
-];
-
-/** Fallback: a subject is failed below this percentage. */
-const DEFAULT_PASS_PERCENT = 40;
-
-/**
- * The school's grading policy: the saved bands and pass mark, or the defaults when none are saved.
+ * The grading policy of a board in an academic session (default: the current one), read from the board's grading rule.
  * Returns the policy plus gradeFor(percent), so callers load it once per request.
  */
-export async function loadGrading() {
-  const [rows, setting] = await Promise.all([
-    GradeBand.findAll({ order: [['minPercent', 'DESC']] }),
-    GradingSetting.findByPk(1),
-  ]);
-  const bands = rows.length
-    ? rows.map((b) => ({ min: Number(b.minPercent), grade: b.grade }))
-    : DEFAULT_BANDS;
-  const passPercent = setting ? Number(setting.passPercent) : DEFAULT_PASS_PERCENT;
+export async function loadGrading(board = 'CBSE', yearId = null) {
+  const boardRow = typeof board === 'object' && board ? board : await findBoard(board);
+  const rule = await requireRule(boardRow ?? board, 'grading', 'default', yearId);
+  const bands = [...rule.payload.bands].sort((a, b) => b.min - a.min);
   return {
+    board: boardRow?.name ?? board,
     bands,
-    passPercent,
-    isDefault: !rows.length && !setting,
+    passPercent: Number(rule.payload.passPercent),
+    isDefault: !rule.verified, // a starter or unverified scale
+    version: rule.version,
+    sourceRef: rule.sourceRef,
     gradeFor: (percent) => (bands.find((b) => percent >= b.min) ?? bands[bands.length - 1]).grade,
   };
+}
+
+/** The grading policy of the board a class follows. */
+export async function gradingForClass(classId) {
+  const cls = classId ? await SchoolClass.findByPk(classId) : null;
+  return loadGrading(await boardOfClass(cls));
 }

@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { AppMenuItem, User } from '../../models/index.js';
+import { AppMenuItem, Setting, User } from '../../models/index.js';
 import { badRequest, notFound } from '../../utils/httpError.js';
 import { sniff } from '../files/files.service.js';
 
@@ -11,7 +11,7 @@ import { sniff } from '../files/files.service.js';
 const readJson = (name) => JSON.parse(fs.readFileSync(new URL(name, import.meta.url), 'utf8'));
 // the mobile app's menu (generated in app/) and the website's menu (generated in client/)
 const DEFAULTS = [...readJson('./defaults.json'), ...readJson('./webDefaults.json')];
-export const AUDIENCES = ['staff', 'family', 'web'];
+const AUDIENCES = ['staff', 'family', 'web'];
 // the roles a login (identity) can have: taken from the user model, so a menu can never name a role that does not exist
 const ROLES = User.getAttributes().role.values;
 export const MAX_ICON_BYTES = 60 * 1024;
@@ -51,6 +51,50 @@ export async function ensureAppMenu() {
   const missing = DEFAULTS.filter((d) => !have.has(`${d.audience}|${d.key}`)).map(seedRow);
   if (missing.length) await AppMenuItem.bulkCreate(missing);
   return missing.length + stale.length;
+}
+
+/**
+ * One-time tightening of who sees which website menu entry (teachers lose transport, library and the staff directory, accountants lose
+ * academics and exams, and so on). ensureAppMenu leaves existing rows alone, so these rows are brought in line with the defaults once,
+ * and a flag records it: an admin who later changes them is not overwritten.
+ */
+const ROLE_FIX_FLAG = 'menu.roleFix.2026-10';
+const ROLE_FIX_KEYS = [
+  'students.alumni',
+  'academics',
+  'academics.online-classes',
+  'timetable',
+  'examinations',
+  'examinations.holistic-progress-card',
+  'examinations.revaluation-requests',
+  'transport.vehicles',
+  'transport.drivers-and-attendants',
+  'transport.routes',
+  'transport.stops',
+  'transport.student-route-assignment',
+  'transport.bus-tracking-live-gps',
+  'transport.vehicle-maintenance',
+  'transport.transport-reports',
+  'library',
+  'staff-and-hr.departments',
+  'staff-and-hr.designations',
+  'staff-and-hr.staff-directory',
+];
+
+export async function applyMenuRoleFix() {
+  if (await Setting.findByPk(ROLE_FIX_FLAG)) return 0;
+  let changed = 0;
+  for (const key of ROLE_FIX_KEYS) {
+    const d = DEFAULTS.find((x) => x.audience === 'web' && x.key === key);
+    if (!d) continue;
+    const [n] = await AppMenuItem.update(
+      { roles: d.roles?.length ? d.roles.join(',') : null },
+      { where: { audience: 'web', key } },
+    );
+    changed += n;
+  }
+  await Setting.create({ key: ROLE_FIX_FLAG, value: JSON.stringify('done'), updatedByName: 'system' });
+  return changed;
 }
 
 /** The menu one person sees: active items, in order, whose roles (own, else the parent's) include theirs. */

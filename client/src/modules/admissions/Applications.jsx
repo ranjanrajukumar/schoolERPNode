@@ -8,6 +8,8 @@ import Modal from '../../components/Modal.jsx';
 import PersonThumb from '../../components/PersonThumb.jsx';
 import ApplicationForm from './ApplicationForm.jsx';
 import AdmissionDetails from './AdmissionDetails.jsx';
+import ApplicationProcess from './ApplicationProcess.jsx';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 10;
 const TABS = [
@@ -20,6 +22,12 @@ const TABS = [
 ];
 const PIPELINE = [
   ['all', 'Applications'],
+  ['review', 'Under review'],
+  ['assessment', 'Assessment'],
+  ['offer', 'Offer sent'],
+  ['enrolled', 'Enrolled'],
+];
+const FLOW = [
   ['review', 'Under review'],
   ['assessment', 'Assessment'],
   ['offer', 'Offer sent'],
@@ -76,6 +84,9 @@ export default function Applications() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [details, setDetails] = useState(null); // the grid row whose full details are open
+  const [view, setView] = useState('list'); // list | board (one column per stage of the flow)
+  const [board, setBoard] = useState({});
+  const [process, setProcess] = useState(null); // the row whose step-by-step process is open
   const [entry, setEntry] = useState(null); // null | { id? }: the application popup
   const location = useLocation();
   useOpenNew(() => setEntry({}), true);
@@ -95,7 +106,14 @@ export default function Applications() {
     api('/admissions/applications/summary')
       .then(setSummary)
       .catch(() => {});
-  }, [page, tab, filters]);
+    if (view === 'board') {
+      const f = new URLSearchParams({ page: 1, pageSize: 50 });
+      Object.entries(filters).forEach(([k, v]) => v && f.set(k, v));
+      Promise.all(FLOW.map(([k]) => api(`/admissions/applications?${f}&tab=${k}`)))
+        .then((rs) => setBoard(Object.fromEntries(FLOW.map(([k], i) => [k, rs[i]]))))
+        .catch((e) => setError(e.message));
+    }
+  }, [page, tab, filters, view]);
   useEffect(load, [load]);
   useEffect(() => {
     api('/classes')
@@ -133,11 +151,6 @@ export default function Applications() {
       setError(err.message);
     }
   };
-  const offer = (r) =>
-    act(
-      () => api(`/admissions/${r.id}/status`, { method: 'POST', body: { status: 'approved' } }),
-      'Offer sent.',
-    );
   const enroll = (r) =>
     act(
       () => api(`/admissions/${r.id}/enroll`, { method: 'POST', body: {} }),
@@ -205,6 +218,7 @@ export default function Applications() {
           <p className="hint">Manage applications and guide students through the admission process.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="admissions" />
           <Gate action="export">
             <button type="button" className="ghost" onClick={exportCsv}>
               ↓ Export
@@ -279,7 +293,17 @@ export default function Applications() {
       </section>
 
       <section className="card enquiry-card">
-        <div className="tabs-line" role="tablist">
+        <div className="view-switch" role="group" aria-label="View">
+          {[
+            ['list', 'List'],
+            ['board', 'Flow board'],
+          ].map(([k, l]) => (
+            <button key={k} type="button" className={view === k ? 'on' : ''} onClick={() => setView(k)}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <div className="tabs-line" role="tablist" hidden={view === 'board'}>
           {TABS.map(([k, l]) => (
             <button
               key={k}
@@ -324,7 +348,7 @@ export default function Applications() {
               </option>
             ))}
           </select>
-          <span className="showing">
+          <span className="showing" hidden={view === 'board'}>
             Showing{' '}
             <b>
               {from}–{Math.min(page * PAGE_SIZE, data.total)}
@@ -332,7 +356,46 @@ export default function Applications() {
             of <b>{data.total}</b>
           </span>
         </div>
-        <div className="table-scroll">
+        {view === 'board' && (
+          <div className="flow-board">
+            {FLOW.map(([k, l]) => (
+              <div key={k} className="flow-col">
+                <h3>
+                  {l} <span className="count">{board[k]?.total ?? 0}</span>
+                </h3>
+                {(board[k]?.rows ?? []).map((r) => (
+                  <div key={r.id} className="flow-card">
+                    <button type="button" className="id-link" onClick={() => setDetails(r)}>
+                      {r.applicationId}
+                    </button>
+                    <b>{r.applicantName}</b>
+                    <small>
+                      {r.className ?? 'Grade not chosen'} · {date(r.submitted)}
+                    </small>
+                    {r.guardianName && <small>{r.guardianName}</small>}
+                    <div className="flow-actions">
+                      {(k === 'review' || k === 'assessment') && (
+                        <button type="button" onClick={() => setProcess(r)}>
+                          Process steps →
+                        </button>
+                      )}
+                      {k === 'offer' && (
+                        <button type="button" onClick={() => enroll(r)}>
+                          Enroll →
+                        </button>
+                      )}
+                      <button type="button" className="ghost" onClick={() => setEntry({ id: r.id })}>
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {!(board[k]?.rows ?? []).length && <p className="hint">None</p>}
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="table-scroll" hidden={view === 'board'}>
           <table className="enquiry-table">
             <thead>
               <tr>
@@ -378,8 +441,8 @@ export default function Applications() {
                   <td className="row-actions">
                     {r.stage === 'draft' && <small className="hint">Not submitted</small>}
                     {(r.stage === 'review' || r.stage === 'assessment') && (
-                      <button type="button" onClick={() => offer(r)}>
-                        Make offer
+                      <button type="button" onClick={() => setProcess(r)}>
+                        Process steps
                       </button>
                     )}
                     {r.stage === 'offer' && (
@@ -418,8 +481,27 @@ export default function Applications() {
             </tbody>
           </table>
         </div>
-        <Pagination page={page} pageSize={PAGE_SIZE} total={data.total} onChange={setPage} />
+        {view === 'list' && (
+          <Pagination page={page} pageSize={PAGE_SIZE} total={data.total} onChange={setPage} />
+        )}
       </section>
+
+      <Modal open={Boolean(process)} title="Admission process" onClose={() => setProcess(null)}>
+        {process && (
+          <ApplicationProcess
+            row={process}
+            onEdit={(id) => {
+              setProcess(null);
+              setEntry({ id });
+            }}
+            onDone={(message) => {
+              setProcess(null);
+              setNotice(message);
+              load();
+            }}
+          />
+        )}
+      </Modal>
 
       <Modal open={Boolean(details)} title="Admission details" onClose={() => setDetails(null)}>
         {details && (

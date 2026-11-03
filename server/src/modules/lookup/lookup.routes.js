@@ -25,6 +25,13 @@ router.get(
     include: [{ model: SchoolClass, attributes: ['name', 'section'] }],
     label: (s) => `${s.admissionNo} · ${name(s)}`,
     sub: (s) => (s.SchoolClass ? `Class ${s.SchoolClass.name}-${s.SchoolClass.section}` : 'No class'),
+    details: (s) => [
+      ['Adm no', s.admissionNo],
+      ['Name', name(s)],
+      ['Class', s.SchoolClass ? `${s.SchoolClass.name}-${s.SchoolClass.section}` : null],
+      ['Roll', s.rollNo],
+      ['Phone', s.guardianPhone || s.fatherPhone || s.motherPhone],
+    ],
   }),
 );
 
@@ -36,6 +43,12 @@ router.get(
     filters: ['status', 'departmentId'],
     label: (s) => `${name(s)} (${s.staffNo})`,
     sub: (s) => s.designation,
+    details: (s) => [
+      ['Staff no', s.staffNo],
+      ['Name', name(s)],
+      ['Designation', s.designation],
+      ['Phone', s.phone],
+    ],
   }),
 );
 
@@ -47,6 +60,12 @@ router.get(
     order: [['title', 'ASC']],
     label: (b) => b.title,
     sub: (b) => `${b.author ? `${b.author} · ` : ''}${b.available} of ${b.copies} available`,
+    details: (b) => [
+      ['Title', b.title],
+      ['Author', b.author],
+      ['ISBN', b.isbn],
+      ['Available', `${b.available} of ${b.copies}`],
+    ],
   }),
 );
 
@@ -59,6 +78,11 @@ router.get(
     order: [['name', 'ASC']],
     label: (p) => p.name,
     sub: (p) => p.User?.email,
+    details: (p) => [
+      ['Name', p.name],
+      ['Phone', p.phone],
+      ['Email', p.User?.email],
+    ],
   }),
 );
 

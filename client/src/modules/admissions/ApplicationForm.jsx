@@ -13,6 +13,8 @@ import {
   LocalGuardianSection,
   OfficialSection,
   SiblingsSection,
+  SignaturesSection,
+  SIGNATURES,
   ParentDetailsSection,
   PersonalSection,
   SECTION_EMPTY,
@@ -101,6 +103,7 @@ export default function ApplicationForm({ id: openId, onClose, onDone }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
+  const [extraPhotos, setExtraPhotos] = useState({}); // signatures and parent photos, saved with the draft
   const [photo, setPhoto] = useState(null); // picked before the draft exists; saved right after
   const formEl = useRef(null);
   const [options, setOptions] = useState({
@@ -242,6 +245,15 @@ export default function ApplicationForm({ id: openId, onClose, onDone }) {
         setPhoto(null);
       } catch (err) {
         setError(`The photo was not saved (${err.message}); choose it again.`);
+      }
+    }
+    for (const [key, label] of SIGNATURES) {
+      if (!extraPhotos[key]) continue;
+      try {
+        await savePhoto(`adm_${key}`, savedId, extraPhotos[key]);
+        setExtraPhotos((p) => ({ ...p, [key]: null }));
+      } catch (err) {
+        setError(`The ${label.toLowerCase()} was not saved (${err.message}); choose it again.`);
       }
     }
     if (!quiet) setNotice('Draft saved. You can come back and finish it later.');
@@ -520,6 +532,12 @@ export default function ApplicationForm({ id: openId, onClose, onDone }) {
                 <ContactDetailsSection form={form} set={setField} />
                 <LocalGuardianSection form={form} set={setField} />
                 <SiblingsSection form={form} set={setField} />
+                <SignaturesSection
+                  id={id}
+                  prefix="adm_"
+                  picked={extraPhotos}
+                  onPick={(k, file) => setExtraPhotos((p) => ({ ...p, [k]: file }))}
+                />
                 <AddressSections form={form} set={setField} setForm={setForm} skipAddress />
               </>
             )}

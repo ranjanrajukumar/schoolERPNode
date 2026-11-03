@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { assertSameBoard } from '../boards/boardRules.service.js';
 import { photoIds } from '../../utils/photoFlags.js';
 import {
   Admission,
@@ -219,7 +220,10 @@ export async function updateStudent(id, body) {
   if (!student) return false;
   const before = student.classId;
   const extras = extrasOf(body);
-  await student.update(pick(body));
+  const next = pick(body);
+  if (next.classId && before && Number(next.classId) !== before)
+    await assertSameBoard(before, next.classId, body.allowCrossBoard === true);
+  await student.update(next);
   await saveExtras('student', student.id, extras);
   if (student.classId !== before) await pruneElectives([student.id]);
   return true;

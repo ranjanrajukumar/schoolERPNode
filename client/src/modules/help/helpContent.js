@@ -99,7 +99,7 @@ export const GUIDE = [
     title: 'Reports, import/export and backup',
     roles: 'admin',
     steps: [
-      'Reports has ready-made reports; Custom Reports lets you choose a dataset, columns and filters and download the result as CSV.',
+      'Reports has ready-made reports. Report Designer lets an administrator choose a dataset, columns, filters and a date range, save the design in a folder, and say which roles may run it. Saved Reports is where everyone runs the reports shared with them, downloads them as CSV or prints them.',
       'Settings → Data Import / Export downloads tables as CSV and imports students from a CSV (all rows are checked first; nothing is imported if any row is wrong).',
       'Settings → Backup & Restore downloads everything as one file. Uploaded photos and documents are not in it: copy the server/uploads folder too.',
     ],

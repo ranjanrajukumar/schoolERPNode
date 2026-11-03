@@ -21,6 +21,7 @@ import {
   Subject,
   TransportRoute,
   TransportStop,
+  SyllabusTopic,
 } from '../../models/index.js';
 import { loadExtras } from '../admissions/recordExtras.js';
 import { attendanceOf as hostelAttendanceOf, hostelOf, mealsOf, visitorsOf } from './hostelPortal.service.js';
@@ -613,11 +614,9 @@ router.post(
   ownChild,
   asyncHandler(async (req, res) => {
     const { examId, subjectId, reason } = req.body;
-    res
-      .status(201)
-      .json({
-        id: await requestRevaluation({ examId, subjectId, reason, studentId: req.student.id }, req.user.id),
-      });
+    res.status(201).json({
+      id: await requestRevaluation({ examId, subjectId, reason, studentId: req.student.id }, req.user.id),
+    });
   }),
 );
 
@@ -694,15 +693,13 @@ router.post(
   ownChild,
   asyncHandler(async (req, res) => {
     const { leaveTypeId, fromDate, toDate, reason } = req.body;
-    res
-      .status(201)
-      .json({
-        id: await applyStudentLeave(
-          { studentId: req.student.id, leaveTypeId, fromDate, toDate, reason },
-          req.user.id,
-          req.user.role,
-        ),
-      });
+    res.status(201).json({
+      id: await applyStudentLeave(
+        { studentId: req.student.id, leaveTypeId, fromDate, toDate, reason },
+        req.user.id,
+        req.user.role,
+      ),
+    });
   }),
 );
 
@@ -734,6 +731,53 @@ router.get(
       order: [['id', 'DESC']],
     });
     res.json(rows.map(shapeMaterial));
+  }),
+);
+
+// The syllabus of the child's class, subject by subject, with how far each subject has been taught. Read-only.
+router.get(
+  '/children/:studentId/syllabus',
+  ownChild,
+  asyncHandler(async (req, res) => {
+    if (!req.student.classId) return res.json([]);
+    const [topics, subjects] = await Promise.all([
+      SyllabusTopic.findAll({
+        where: { classId: req.student.classId },
+        order: [
+          ['subjectId', 'ASC'],
+          ['sequence', 'ASC'],
+          ['id', 'ASC'],
+        ],
+      }),
+      Subject.findAll({ attributes: ['id', 'name'] }),
+    ]);
+    const names = new Map(subjects.map((x) => [x.id, x.name]));
+    const bySubject = new Map();
+    for (const t of topics) {
+      if (!bySubject.has(t.subjectId)) bySubject.set(t.subjectId, []);
+      bySubject.get(t.subjectId).push(t);
+    }
+    res.json(
+      [...bySubject].map(([subjectId, list]) => {
+        const done = list.filter((t) => t.status === 'completed').length;
+        return {
+          subjectId,
+          subjectName: names.get(subjectId) ?? 'Subject',
+          total: list.length,
+          completed: done,
+          percent: Math.round((done / list.length) * 100),
+          topics: list.map((t) => ({
+            id: t.id,
+            sequence: t.sequence,
+            title: t.title,
+            objective: t.objective,
+            status: t.status,
+            plannedDate: t.plannedDate,
+            completedOn: t.completedOn,
+          })),
+        };
+      }),
+    );
   }),
 );
 
@@ -960,11 +1004,9 @@ router.post(
     const { type, purpose } = req.body;
     if (req.user.role === 'student' && type === 'transfer')
       throw forbidden('A transfer certificate is requested by your parent or at the school office.');
-    res
-      .status(201)
-      .json({
-        id: await createRequest({ studentId: req.student.id, type, purpose }, req.user.id, req.user.role),
-      });
+    res.status(201).json({
+      id: await createRequest({ studentId: req.student.id, type, purpose }, req.user.id, req.user.role),
+    });
   }),
 );
 

@@ -321,6 +321,11 @@ img.id-photo { object-fit: cover; border-style: solid; }
 .typeahead-list li { padding: 8px 10px; border-radius: 6px; cursor: pointer; color: var(--text); font-weight: 400; font-size: 14px; }
 .typeahead-list li small { display: block; color: var(--muted); font-size: 12px; }
 .typeahead-list li.on { background: var(--primary-soft); }
+.typeahead-list li mark { background: var(--primary-soft); color: inherit; border-radius: 3px; padding: 0 1px; font-weight: 600; }
+.typeahead-cols { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.typeahead-cols > span { white-space: nowrap; display: flex; flex-direction: column; min-width: 70px; }
+.typeahead-cols em { font-style: normal; font-size: 11px; color: var(--muted); }
+.typeahead-list li.on mark { background: var(--surface); }
 .typeahead-list li.typeahead-note { cursor: default; color: var(--muted); }
 td .typeahead { min-width: 200px; }
 @media (max-width: 640px) { .typeahead { min-width: 0; width: 100%; flex: 1 1 100%; } }
@@ -1287,3 +1292,71 @@ button[data-armed][data-armed][data-armed][data-armed][data-armed][data-armed]:h
 }
 button[data-armed]::after { content: 'Sure?'; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .02em; }
 button[data-armed] > * { visibility: hidden; }
+
+/* =====================================================================
+   Modern light refinement: flatter buttons, layered soft shadows, calmer
+   tables and a clearer sidebar. Only overrides tokens and finishes; no layout changes.
+===================================================================== */
+:root:not([data-theme='dark']) {
+  --bg: #f4f6fa;
+  --text: #0f172a;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 8px 24px -12px rgba(15, 23, 42, .08);
+  --glow: 0 1px 2px rgba(37, 99, 235, .25), 0 6px 14px -6px rgba(37, 99, 235, .45);
+}
+body { background: var(--bg); }
+h1 { font-weight: 700; letter-spacing: -.03em; }
+
+/* Cards: hairline border, soft layered shadow */
+.card { border-color: var(--border); box-shadow: var(--shadow); }
+a.card:hover { box-shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 14px 30px -14px rgba(15, 23, 42, .18); }
+
+/* Tables: quiet header, no heavy dividers */
+table.card th { background: var(--surface-2); color: var(--muted); border-bottom: 1px solid var(--border); }
+table.card td { border-bottom-color: color-mix(in srgb, var(--border) 70%, transparent); }
+tbody tr:hover td { background: color-mix(in srgb, var(--primary-soft) 45%, var(--surface)); }
+
+/* Fields: calm resting state, clear focus */
+input, select, textarea { border-color: var(--border-strong); box-shadow: 0 1px 0 rgba(15, 23, 42, .02); }
+input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); }
+input:hover:not(:disabled):not(:focus), select:hover:not(:disabled):not(:focus), textarea:hover:not(:disabled):not(:focus) { border-color: color-mix(in srgb, var(--primary) 45%, var(--border-strong)); }
+
+/* Sidebar: accent bar on the current page, roomier groups */
+aside { padding: 20px 14px 14px; }
+aside .nav-item { position: relative; border-radius: 10px; }
+aside .nav-item.active::before { content: ''; position: absolute; left: -10px; top: 8px; bottom: 8px; width: 3px; border-radius: 3px; background: var(--primary); }
+aside .nav-head { border-radius: 10px; }
+.brand-mark { border-radius: 12px; }
+
+/* Badges and tabs */
+.badge { letter-spacing: .01em; }
+.tabs .tab:not(.active) { background: var(--surface); border-color: var(--border); color: var(--muted); }
+.tabs .tab:not(.active):hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); }
+
+/* Scrollbars */
+* { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+
+/* Timetable: a period is a button-like cell that opens the popup */
+td.slot-cell { cursor: pointer; transition: background .12s; }
+td.slot-cell:hover { background: var(--primary-soft); }
+.slot-add { color: var(--muted); opacity: 0; font-size: 13px; transition: opacity .12s; }
+td.slot-cell:hover .slot-add { opacity: 1; }
+.tabs .tab[aria-selected='true'] { font-weight: 700; }
+.slot-time { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: none; letter-spacing: 0; white-space: nowrap; }
+tr.break-row th, tr.break-row td { background: var(--surface-2); color: var(--muted); text-align: center; font-weight: 600; letter-spacing: .04em; }
+.view-switch { display: flex; gap: 6px; padding: 14px 22px 0; }
+.view-switch button { margin: 0; min-height: 34px; padding: 0 14px; border-radius: 999px; background: var(--surface-2) !important; color: var(--muted) !important; box-shadow: none !important; font-weight: 600; }
+.view-switch button.on { background: var(--primary-soft) !important; color: var(--primary) !important; }
+.flow-board { display: grid; grid-template-columns: repeat(4, minmax(220px, 1fr)); gap: 14px; padding: 16px 22px 22px; overflow-x: auto; }
+.flow-col { background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 160px; }
+.flow-col h3 { margin: 0; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+.flow-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.flow-card small { color: var(--muted); }
+.flow-actions { display: flex; gap: 6px; margin-top: 6px; }
+.proc-steps { list-style: none; margin: 12px 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.proc-step { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; color: var(--muted); }
+.proc-step.active { border-color: var(--primary); color: var(--text); }
+.proc-step.done h3 { color: var(--text); }
+.proc-step h3 { margin: 0; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+.proc-n { width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
+.proc-step.done .proc-n { background: var(--primary-soft); color: var(--primary); }
+.proc-body { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }

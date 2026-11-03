@@ -202,11 +202,18 @@ export async function carryOverToStudent(admissionId, studentId, byName) {
       problems.push(`${d.originalName}: ${err.message}`);
     }
   }
-  const photo = await Photo.findOne({ where: { entity: 'enquiry', entityId: admissionId } });
-  if (photo) {
-    await Photo.destroy({ where: { entity: 'student', entityId: studentId } });
+  const pairs = [
+    ['enquiry', 'student'],
+    ...['student_sign', 'father_photo', 'father_sign', 'mother_photo', 'mother_sign', 'student_thumb'].map(
+      (k) => [`adm_${k}`, k],
+    ),
+  ];
+  for (const [from, to] of pairs) {
+    const photo = await Photo.findOne({ where: { entity: from, entityId: admissionId } });
+    if (!photo) continue;
+    await Photo.destroy({ where: { entity: to, entityId: studentId } });
     await Photo.create({
-      entity: 'student',
+      entity: to,
       entityId: studentId,
       mimeType: photo.mimeType,
       size: photo.size,

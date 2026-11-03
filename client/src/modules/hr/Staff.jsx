@@ -10,6 +10,7 @@ import StaffDetails from './StaffDetails.jsx';
 import PersonThumb from '../../components/PersonThumb.jsx';
 import { usePhotoSet } from '../../hooks/usePhotoSet.js';
 import IdCardsPopup from '../../components/IdCardsPopup.jsx';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 10;
 const TYPE = { permanent: 'Permanent', contract: 'Contract', part_time: 'Part time', visiting: 'Visiting' };
@@ -156,6 +157,7 @@ export default function Staff() {
           <p className="hint">Manage staff records, roles and departments.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="staff" />
           <Gate action="export">
             <button type="button" className="ghost" onClick={exportCsv}>
               ↓ Export

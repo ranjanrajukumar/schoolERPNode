@@ -7,6 +7,7 @@ import Pagination from '../../components/Pagination.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
 import { localDate } from '../../utils/dates.js';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 10;
 const EMPTY = { name: '', classId: '', startDate: '', endDate: '', maxMarks: 100 };
@@ -191,6 +192,7 @@ export default function Exams() {
           <p className="hint">Create an exam, enter marks, see results and ranks, then print report cards.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="exams" />
           <Gate action="export">
             <button type="button" className="ghost" onClick={exportCsv}>
               ↓ Export

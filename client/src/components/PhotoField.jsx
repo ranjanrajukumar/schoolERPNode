@@ -3,6 +3,27 @@ import { api, fetchBlob, uploadFile } from '../services/api.js';
 
 const MAX = 1024 * 1024;
 
+/** Shrinks a large photo (longest side 1280 px, JPEG) so a phone picture fits the 1 MB limit. Small ones are kept as they are. */
+async function fit(file) {
+  if (file.size <= 300 * 1024) return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((ok) => canvas.toBlob(ok, 'image/jpeg', 0.85));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch {
+    return file;
+  }
+}
+
 /** Saves a picked photo for a record that now exists. Forms call this after their own save returns the new id. */
 export const savePhoto = (entity, id, file) =>
   uploadFile(`/photos/${entity}/${id}?name=${encodeURIComponent(file.name)}`, file, 'PUT');
@@ -52,13 +73,15 @@ export default function PhotoField({ entity, id, label = 'Photo', picked, onPick
   }, [picked]);
 
   const choose = async (e) => {
-    const file = e.target.files?.[0];
+    const picked0 = e.target.files?.[0];
     e.target.value = '';
-    if (!file) return;
+    if (!picked0) return;
     setError('');
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type))
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(picked0.type))
       return setError('Choose a JPEG, PNG or WebP image.');
-    if (file.size > MAX) return setError('The photo must be 1 MB or smaller.');
+    const file = await fit(picked0);
+    if (file.size > MAX)
+      return setError('The photo is still over 1 MB after shrinking; choose a smaller one.');
     if (!id && id !== 0) return onPick?.(file);
     setBusy(true);
     try {
@@ -96,7 +119,7 @@ export default function PhotoField({ entity, id, label = 'Photo', picked, onPick
       )}
       <div className="photo-field-actions">
         <strong>{label}</strong>
-        <small>JPEG, PNG or WebP, up to 1 MB. Saved in the database.</small>
+        <small>JPEG, PNG or WebP. Large photos are shrunk automatically. Saved in the database.</small>
         {canEdit && (
           <span>
             <button type="button" className="ghost" onClick={() => input.current?.click()} disabled={busy}>

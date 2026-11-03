@@ -22,6 +22,13 @@ import {
 } from '../models/index.js';
 import { migrateLegacyLmsFiles } from '../modules/academics/lmsFiles.service.js';
 import { env } from './env.js';
+import {
+  ensureBoardDesigns,
+  ensureReportStarters,
+  ensureStarterPages,
+} from '../modules/reports/starters/index.js';
+import { ensureRolePresets } from '../modules/platform/rolePresets.js';
+import { ensureBoardData } from '../modules/boards/boardRules.service.js';
 import { ensureForeignKeys } from './integrity.js';
 
 /** The target database may not exist yet, so connect without one to create it. */
@@ -69,6 +76,11 @@ async function ensureAdmissionStatuses() {
 
 /** Columns added to a model after its table already existed; sync() will not add them. */
 const ADDED_COLUMNS = [
+  { table: 'report_templates', column: 'pages', definition: 'VARCHAR(255) NULL' },
+  { table: 'report_templates', column: 'board', definition: 'VARCHAR(20) NULL' },
+  { table: 'classes', column: 'board_id', definition: 'INT NULL' },
+  { table: 'grade_bands', column: 'board', definition: "VARCHAR(20) NOT NULL DEFAULT 'CBSE'" },
+  { table: 'classes', column: 'board', definition: "VARCHAR(20) NOT NULL DEFAULT 'CBSE'" },
   { table: 'lms_courses', column: 'tags', definition: 'TEXT NULL' },
   { table: 'lms_courses', column: 'certificate_enabled', definition: 'TINYINT(1) NOT NULL DEFAULT 0' },
   { table: 'lms_courses', column: 'banner_image', definition: 'MEDIUMTEXT NULL' },
@@ -225,6 +237,15 @@ async function ensureColumns() {
     if (!existing[column])
       await sequelize.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
   }
+  await sequelize.query(
+    "ALTER TABLE board_rules MODIFY COLUMN rule_type ENUM('subject_template','exam_pattern','grading','bell_schedule','promotion','report_card') NOT NULL",
+  );
+  // grade scales are per board now: the old unique index on the percentage alone must become (board, percentage)
+  const [oldIdx] = await sequelize.query("SHOW INDEX FROM grade_bands WHERE Key_name = 'min_percent'");
+  if (oldIdx.length) await sequelize.query('ALTER TABLE grade_bands DROP INDEX min_percent');
+  const [newIdx] = await sequelize.query("SHOW INDEX FROM grade_bands WHERE Key_name = 'uq_grade_board_min'");
+  if (!newIdx.length)
+    await sequelize.query('ALTER TABLE grade_bands ADD UNIQUE INDEX uq_grade_board_min (board, min_percent)');
   await sequelize.query('ALTER TABLE lms_progress MODIFY COLUMN completed_at DATETIME NULL');
   await sequelize.query('ALTER TABLE lms_quiz_attempts MODIFY COLUMN score DECIMAL(8,2) NOT NULL');
   await sequelize.query('ALTER TABLE lms_quiz_attempts MODIFY COLUMN max_score DECIMAL(8,2) NOT NULL');
@@ -335,8 +356,8 @@ async function ensureFilesInDatabase() {
 
 /** The mobile app's menu lives in the database; add any default tile or page the table does not have yet. */
 async function ensureAppMenuItems() {
-  const { ensureAppMenu } = await import('../modules/appmenu/appmenu.service.js');
-  const added = await ensureAppMenu();
+  const { ensureAppMenu, applyMenuRoleFix } = await import('../modules/appmenu/appmenu.service.js');
+  const added = (await ensureAppMenu()) + (await applyMenuRoleFix());
   if (added) console.log(`App menu: added ${added} item(s)`);
 }
 
@@ -346,6 +367,15 @@ export async function migrateDatabase() {
   await ensureUserRoles();
   await ensureAdmissionStatuses();
   await ensureColumns();
+  await ensureBoardData();
+  const roles = await ensureRolePresets();
+  if (roles) console.log(`Roles: added ${roles} ready-made role(s)`);
+  const starters = await ensureReportStarters();
+  if (starters) console.log(`Reports: added ${starters} ready-made report(s) in folders`);
+  const boardDesigns = await ensureBoardDesigns();
+  if (boardDesigns) console.log(`Reports: added ${boardDesigns} board-specific design(s)`);
+  const onPages = await ensureStarterPages();
+  if (onPages) console.log(`Reports: attached ${onPages} ready-made report(s) to their screens`);
   await ensureFilesInDatabase();
   await ensureAppMenuItems();
   await ensureLeaveTypes();

@@ -4,23 +4,78 @@
  */
 export const FLOWS = [
   {
+    id: 'board-setup',
+    title: 'Setting up the boards (CBSE and UP Board)',
+    blurb:
+      'Do this once, before the classes. One application runs both boards; each class follows its own board’s rules. Running a board in the software is separate from the school’s affiliation to it.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Switch on the boards the school runs',
+        note: 'CBSE and UP Board are both available',
+        to: '/board-rules',
+      },
+      {
+        who: 'admin',
+        title: 'Record the affiliation (only with proof)',
+        note: 'Number, validity and the document. Until verified, nothing printed claims affiliation',
+        to: '/board-rules',
+      },
+      {
+        who: 'admin',
+        title: 'Review the starter rules',
+        note: 'Subject lists, exam pattern, grading, promotion, report card. They are placeholders, not official',
+        to: '/board-rules',
+      },
+      {
+        who: 'admin',
+        title: 'Check each rule against the board and verify it',
+        note: 'Edit as needed, record the circular or page it came from, then verify. Old versions are kept',
+        to: '/board-rules',
+      },
+      {
+        who: 'admin',
+        title: 'Set the bell times of each board',
+        note: 'Time slots on the Timetable page has a CBSE and a UP Board starting pattern',
+        to: '/timetable',
+      },
+    ],
+  },
+  {
     id: 'class-setup',
     title: 'Setting up a class',
     blurb:
       'Do this once per class and section, before the first student is admitted. Class Readiness shows what is still missing.',
     steps: [
-      { who: 'admin', title: 'Create the class', note: 'Name and section, e.g. 5-A', to: '/classes' },
+      {
+        who: 'admin',
+        title: 'Create the class and choose its board',
+        note: 'Name, section and CBSE or UP Board, e.g. 5-A. A class with exams keeps its board',
+        to: '/classes',
+      },
       { who: 'admin', title: 'Name a class teacher', note: 'The one person parents go to', to: '/classes' },
       {
         who: 'admin',
-        title: 'Assign subjects and teachers',
-        note: 'Decides who may enter marks',
+        title: 'Load the board’s default subjects',
+        note: 'Apply default subjects on the Classes page: the board’s list and periods per week',
+        to: '/classes',
+      },
+      {
+        who: 'admin',
+        title: 'Assign a teacher to each subject',
+        note: 'Decides who may enter marks and who is timetabled',
         to: '/class-subjects',
       },
       {
         who: 'admin',
-        title: 'Build the timetable',
-        note: 'Teacher and room clashes are blocked',
+        title: 'Mark when part-time teachers are unavailable',
+        note: 'Kept free by Auto-generate and manual entry',
+        to: '/timetable',
+      },
+      {
+        who: 'admin',
+        title: 'Generate the timetable, then adjust',
+        note: 'Auto-generate: no teacher, class or lab clashes. Export CSV or Print for each class',
         to: '/timetable',
       },
       {
@@ -95,6 +150,12 @@ export const FLOWS = [
         note: 'Only free teachers are offered',
         to: '/substitutions',
       },
+      {
+        who: 'office',
+        title: 'Log visitors at the gate',
+        note: 'Check in and out, with the ID seen',
+        to: '/visitors',
+      },
       { who: 'teacher', title: 'Set homework', note: 'Parents see it in the portal', to: '/homework' },
       { who: 'teacher', title: 'Record behaviour', note: 'Merits and concerns with points', to: '/behavior' },
       {
@@ -112,7 +173,19 @@ export const FLOWS = [
     steps: [
       {
         who: 'admin',
-        title: 'Create the exam',
+        title: 'Apply the board exam pattern',
+        note: 'Creates each class’s exams and its result group, by board. Nursery to UKG use the progress card',
+        to: '/exam-groups',
+      },
+      {
+        who: 'admin',
+        title: 'Check the grading scale',
+        note: 'Each board has its own scale and pass mark',
+        to: '/grade-setup',
+      },
+      {
+        who: 'admin',
+        title: 'Add any extra exam',
         note: 'Optionally inside an exam group with a weight',
         to: '/exams',
       },
@@ -123,7 +196,12 @@ export const FLOWS = [
         note: 'Grades come from the grading scale',
         to: '/merit-list',
       },
-      { who: 'admin', title: 'Print report cards', note: 'With attendance', to: '/exams' },
+      {
+        who: 'admin',
+        title: 'Print report cards',
+        note: 'Title and fields follow the class’s board; affiliation shows only when verified',
+        to: '/exams',
+      },
       {
         who: 'parent',
         title: 'Query a mark',
@@ -201,12 +279,329 @@ export const FLOWS = [
     ],
   },
   {
+    id: 'transport',
+    title: 'Transport',
+    blurb: 'From buying a bus to a child riding it, being billed, and being tracked.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Add vehicles',
+        note: 'Registration, capacity, insurance dates',
+        to: '/vehicles',
+      },
+      {
+        who: 'admin',
+        title: 'Add drivers and attendants',
+        note: 'Licence dates are tracked',
+        to: '/transport-staff',
+      },
+      {
+        who: 'admin',
+        title: 'Define routes and stops',
+        note: 'Each stop has a fee band',
+        to: '/transport-routes',
+      },
+      {
+        who: 'admin',
+        title: 'Assign students to a route and stop',
+        note: 'Decides who is billed',
+        to: '/transport-assignments',
+      },
+      {
+        who: 'accountant',
+        title: 'Generate transport fees',
+        note: 'Billed through the normal fee flow',
+        to: '/transport-fees',
+      },
+      {
+        who: 'teacher',
+        title: 'Take bus attendance',
+        note: 'Per route, date and trip',
+        to: '/transport-attendance',
+      },
+      {
+        who: 'admin',
+        title: 'Watch buses live',
+        note: 'Parents see their child’s bus in the portal',
+        to: '/bus-tracking',
+      },
+      {
+        who: 'admin',
+        title: 'Log maintenance',
+        note: 'Service and repairs per vehicle',
+        to: '/transport-maintenance',
+      },
+    ],
+  },
+  {
+    id: 'library',
+    title: 'Library',
+    blurb: 'From stocking books to issue, return and fines.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Create book categories',
+        note: 'Fiction, reference, textbooks…',
+        to: '/library-categories',
+      },
+      { who: 'admin', title: 'Add books', note: 'Copies, shelf and category', to: '/library' },
+      {
+        who: 'admin',
+        title: 'Register members',
+        note: 'Students and staff get a library card',
+        to: '/library-members',
+      },
+      {
+        who: 'admin',
+        title: 'Issue and return books',
+        note: 'Due dates and late fines are worked out for you',
+        to: '/library',
+      },
+      {
+        who: 'admin',
+        title: 'Handle reservations',
+        note: 'For a book that is out',
+        to: '/library-reservations',
+      },
+      {
+        who: 'admin',
+        title: 'Review the reports',
+        note: 'Overdue, popular and lost books',
+        to: '/library-reports',
+      },
+    ],
+  },
+  {
+    id: 'hostel',
+    title: 'Hostel',
+    blurb: 'From setting up rooms to boarders, meals, visitors and fees.',
+    steps: [
+      { who: 'admin', title: 'Add hostels and rooms', note: 'Capacity and beds', to: '/hostels' },
+      {
+        who: 'admin',
+        title: 'Allocate a room and bed',
+        note: 'One boarder per bed',
+        to: '/hostel-allocation',
+      },
+      {
+        who: 'accountant',
+        title: 'Bill hostel fees',
+        note: 'Billed through the normal fee flow',
+        to: '/hostel-fees',
+      },
+      {
+        who: 'teacher',
+        title: 'Take hostel attendance',
+        note: 'Roll call, morning and night',
+        to: '/hostel-attendance',
+      },
+      { who: 'admin', title: 'Plan the mess menu', note: 'Meals for the week', to: '/hostel-mess' },
+      {
+        who: 'admin',
+        title: 'Log visitors',
+        note: 'Who came, to see whom, in and out',
+        to: '/hostel-visitors',
+      },
+    ],
+  },
+  {
+    id: 'inventory',
+    title: 'Inventory and purchasing',
+    blurb: 'From a teacher’s request to stock on the shelf and assets that are tracked.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Set up categories and items',
+        note: 'With a reorder level',
+        to: '/inventory-items',
+      },
+      { who: 'admin', title: 'Add suppliers', note: 'Contacts and terms', to: '/suppliers' },
+      {
+        who: 'teacher',
+        title: 'Request what is needed',
+        note: 'The office approves or declines',
+        to: '/inventory-requests',
+      },
+      {
+        who: 'admin',
+        title: 'Raise a purchase order',
+        note: 'Lines for each item and supplier',
+        to: '/purchase-orders',
+      },
+      { who: 'admin', title: 'Receive stock', note: 'Stock in updates the balance', to: '/stock-in' },
+      { who: 'admin', title: 'Issue stock', note: 'Stock out, to a person or department', to: '/stock-out' },
+      {
+        who: 'admin',
+        title: 'Register assets and maintenance',
+        note: 'Computers, furniture, equipment',
+        to: '/assets',
+      },
+    ],
+  },
+  {
+    id: 'documents',
+    title: 'Certificates and ID cards',
+    blurb: 'From designing a template to a signed certificate in the register.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Prepare the templates',
+        note: 'Bonafide, transfer, character, fee',
+        to: '/document-templates',
+      },
+      { who: 'parent', title: 'Request a certificate', note: 'From the portal', to: '/parent-requests' },
+      {
+        who: 'office',
+        title: 'Verify the documents handed in',
+        note: 'Verified, or sent back with a reason',
+        to: '/document-verification',
+      },
+      {
+        who: 'office',
+        title: 'Issue the certificate',
+        note: 'Recorded in the issued register',
+        to: '/documents',
+      },
+      { who: 'admin', title: 'Design the ID card', note: 'Layout and photo', to: '/id-card-design' },
+      { who: 'office', title: 'Print ID cards', note: 'By class', to: '/id-cards' },
+    ],
+  },
+  {
+    id: 'communication',
+    title: 'Notices and messages',
+    blurb: 'Telling parents, students and staff what they need to know.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Connect email, SMS and push',
+        note: 'Under Settings, Integrations',
+        to: '/integrations',
+      },
+      {
+        who: 'admin',
+        title: 'Prepare message templates',
+        note: 'Fee reminder, absence, holiday',
+        to: '/message-templates',
+      },
+      { who: 'admin', title: 'Post a notice', note: 'Shown on the dashboard and the portal', to: '/notices' },
+      {
+        who: 'admin',
+        title: 'Send email, SMS or a push',
+        note: 'To parents by class, or to staff',
+        to: '/send-message',
+      },
+      {
+        who: 'admin',
+        title: 'Check what was delivered',
+        note: 'Failures are listed with the reason',
+        to: '/message-history',
+      },
+      {
+        who: 'admin',
+        title: 'Answer feedback and grievances',
+        note: 'Escalates if left unanswered',
+        to: '/feedback',
+      },
+    ],
+  },
+  {
+    id: 'access',
+    title: 'Logins, roles and security',
+    blurb: 'Who can sign in and what each person can reach. Enforced on the server, not just in the menu.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Create staff logins',
+        note: 'Teachers, accountant, librarian, transport, HR, office',
+        to: '/users',
+      },
+      {
+        who: 'admin',
+        title: 'Pick or build a role',
+        note: 'Principal, Librarian, Transport Manager, HR Manager, Office Staff are ready-made',
+        to: '/roles',
+      },
+      {
+        who: 'admin',
+        title: 'Fine-tune a role’s rights',
+        note: 'Read or write, per module',
+        to: '/role-rights',
+      },
+      {
+        who: 'admin',
+        title: 'Create parent and student logins',
+        note: 'Parents see only their own children',
+        to: '/parents',
+      },
+      {
+        who: 'admin',
+        title: 'Review sign-ins and changes',
+        note: 'Login history and the audit log, including board-rule changes',
+        to: '/audit',
+      },
+      {
+        who: 'admin',
+        title: 'Take a backup',
+        note: 'Before upgrades and at term end',
+        to: '/backup-restore',
+      },
+    ],
+  },
+  {
+    id: 'reports',
+    title: 'Designing and sharing reports',
+    blurb: 'From a question the school has to a report the right people can run themselves.',
+    steps: [
+      {
+        who: 'admin',
+        title: 'Create folders for the reports',
+        note: 'Students, Finance, Board returns…',
+        to: '/custom-reports',
+      },
+      {
+        who: 'admin',
+        title: 'Design the report',
+        note: 'Dataset, columns, filters, date range, sort and a title',
+        to: '/custom-reports',
+      },
+      {
+        who: 'admin',
+        title: 'Save it in a folder and choose who may run it',
+        note: 'Only the roles you tick can see it',
+        to: '/custom-reports',
+      },
+      {
+        who: 'teacher',
+        title: 'Run a shared report',
+        note: 'On screen, as CSV for Excel, or print it',
+        to: '/saved-reports',
+      },
+      {
+        who: 'accountant',
+        title: 'Run the finance reports',
+        note: 'Only those shared with the accountant',
+        to: '/saved-reports',
+      },
+    ],
+  },
+  {
     id: 'year-end',
     title: 'Year end and new year',
     blurb: 'Closing one academic year and opening the next.',
     steps: [
       { who: 'admin', title: 'Finish exams and results', note: 'Last report cards', to: '/merit-list' },
-      { who: 'admin', title: 'Promote classes', note: 'Move up, hold back or graduate', to: '/promotion' },
+      {
+        who: 'admin',
+        title: 'Check who meets the promotion rule',
+        note: 'The board’s thresholds on results and attendance. Cannot-tell is shown, never guessed',
+        to: '/promotion',
+      },
+      {
+        who: 'admin',
+        title: 'Promote classes',
+        note: 'Move up, hold back or graduate. Moving between boards must be confirmed',
+        to: '/promotion',
+      },
       { who: 'admin', title: 'Open the new academic year', note: 'Make it current', to: '/academic-years' },
       {
         who: 'accountant',
@@ -245,6 +640,7 @@ export const CLASS_LINKS = [
 export const ROLES = ['Admin / office', 'Teacher', 'Accountant', 'Parent', 'Student'];
 export const RESPONSIBILITIES = [
   ['Set up school, classes, subjects, timetable', ['do', 'see', 'see', '', '']],
+  ['Board rules, affiliation record, grading scale', ['do', '', '', '', '']],
   ['Admissions and enrolment', ['do', '', '', '', '']],
   ['Register students and staff', ['do', 'see', 'see', '', '']],
   ['Mark attendance', ['do', 'do', '', 'see', 'see']],

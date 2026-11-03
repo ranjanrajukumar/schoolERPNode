@@ -48,7 +48,7 @@ export const ACTIONS = ['view', 'create', 'edit', 'delete', 'approve', 'export']
 const COLUMN = Object.fromEntries(ACTIONS.map((a) => [a, `can${a[0].toUpperCase()}${a.slice(1)}`]));
 
 /** What a request does, from its method and address: view, create, edit, delete, approve or export. */
-export function actionOf(method, urlPath) {
+function actionOf(method, urlPath) {
   const path = urlPath.split('?')[0].toLowerCase();
   const last = path.split('/').filter(Boolean).pop() ?? '';
   if (['approve', 'reject', 'accept', 'decide'].includes(last) && method !== 'GET') return 'approve';
@@ -60,7 +60,7 @@ export function actionOf(method, urlPath) {
 }
 
 let cache = null; // Map "role|module" -> row, kept until an admin saves a change
-export const clearRightsCache = () => {
+const clearRightsCache = () => {
   cache = null;
 };
 async function rights() {
@@ -68,15 +68,29 @@ async function rights() {
   return cache;
 }
 
+/** Whether this role may export (print, PDF, Excel, CSV) from this module. False only when an admin switched Export off for it. */
+export async function mayExport(role, moduleKey) {
+  if (role === 'admin') return true;
+  const row = (await rights()).get(`${role}|${moduleKey}`);
+  return !row || row.canExport !== false;
+}
+
+/**
+ * Building a saved report as a file (PDF, Excel, CSV, print) is an export from the screen the report is on, so the report routes check
+ * the Export right of that screen's module themselves. The generic check below must not also treat these as "create" in Reports.
+ */
+const REPORT_BUILD = /^\/api\/report-designer\/(runs|print|templates\/\d+\/(csv|run))\/?$/;
+
 /** False only when an admin has switched this action off for this role in this module. Admin is never limited. */
 export async function rightsAllow(role, method, urlPath) {
   if (role === 'admin') return true;
+  if (method === 'POST' && REPORT_BUILD.test(urlPath.split('?')[0])) return true;
   const module = moduleOfPath(urlPath) ?? portalAreaOf(urlPath);
   const row = module ? (await rights()).get(`${role}|${module}`) : null;
   return !row || row[COLUMN[actionOf(method, urlPath)]] !== false;
 }
 
-export const shapeRight = (row) =>
+const shapeRight = (row) =>
   Object.fromEntries(ACTIONS.map((a) => [a, row ? row[COLUMN[a]] !== false : true]));
 
 /** The rights of every module for one role, as the client needs them to show or hide buttons. */

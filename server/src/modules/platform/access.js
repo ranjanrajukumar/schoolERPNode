@@ -4,7 +4,8 @@
  * Module keys equal the sidebar group slugs (client/src/config/menu.js).
  */
 export const MODULES = [
-  { key: 'admissions', label: 'Admissions', prefixes: ['admissions'] },
+  { key: 'board-management', label: 'Board Management', prefixes: ['boards', 'board-registration'] },
+  { key: 'admissions', label: 'Admissions', prefixes: ['admissions', 'visitors'] },
   {
     key: 'students',
     label: 'Students',
@@ -61,8 +62,12 @@ export const MODULES = [
   { key: 'hostel', label: 'Hostel', prefixes: ['hostel'] },
   { key: 'health-and-safety', label: 'Health & Safety', prefixes: ['safety'] },
   { key: 'events-and-activities', label: 'Events & Activities', prefixes: ['activities'] },
-  { key: 'documents-and-certificates', label: 'Documents & Certificates', prefixes: ['documents'] },
-  { key: 'reports', label: 'Reports', prefixes: ['reports'] },
+  {
+    key: 'documents-and-certificates',
+    label: 'Documents & Certificates',
+    prefixes: ['documents', 'document-checks'],
+  },
+  { key: 'reports', label: 'Reports', prefixes: ['reports', 'report-designer'] },
   {
     key: 'settings',
     label: 'Settings',
@@ -79,6 +84,12 @@ const PHOTO_MODULE = {
   student: 'students',
   staff: 'staff-and-hr',
   enquiry: 'admissions',
+  adm_student_sign: 'admissions',
+  adm_father_photo: 'admissions',
+  adm_father_sign: 'admissions',
+  adm_mother_photo: 'admissions',
+  adm_mother_sign: 'admissions',
+  adm_student_thumb: 'admissions',
   school: 'settings',
 };
 const MODULE_OF = new Map(MODULES.flatMap((m) => m.prefixes.map((p) => [p, m.key])));

@@ -2,6 +2,7 @@ import { fn, col } from 'sequelize';
 import {
   Activity,
   ClassSubject,
+  Exam,
   FeeStructure,
   HostelAllocation,
   SchoolClass,
@@ -14,6 +15,7 @@ import {
 } from '../../models/index.js';
 import { Op } from 'sequelize';
 import { classSubjectMap } from './subjectMap.service.js';
+import { boardOfClass, findBoard } from '../boards/boardRules.service.js';
 import { badRequest } from '../../utils/httpError.js';
 
 const CLASS_FIELDS = ['name', 'section', 'room', 'branchId', 'classTeacherId'];
@@ -68,8 +70,23 @@ async function checkTeacher(data) {
   if (teacher.status !== 'active') throw badRequest('The class teacher must be an active staff member');
 }
 
+/** A class carries its board's id and name. Accepts either, and keeps the two in step. */
+async function resolveBoard(body, data) {
+  const ref = body.boardId ?? body.board;
+  if (ref === undefined) return;
+  const board = await findBoard(ref);
+  if (!board || !board.isEnabled) throw badRequest('Choose a board that is switched on');
+  data.boardId = board.id;
+  data.board = board.name;
+}
+
 export async function createClass(body) {
   const data = pick(body);
+  await resolveBoard(body, data);
+  if (!data.boardId) {
+    const board = await boardOfClass({});
+    Object.assign(data, { boardId: board.id, board: board.name });
+  }
   await checkTeacher(data);
   return (await SchoolClass.create(data)).id;
 }
@@ -79,6 +96,12 @@ export async function updateClass(id, body) {
   const cls = await SchoolClass.findByPk(id);
   if (!cls) return false;
   const data = pick(body);
+  await resolveBoard(body, data);
+  // a class that already has exams keeps its board: switching would mix two boards' records in one class
+  if (data.boardId && data.boardId !== cls.boardId && (await Exam.count({ where: { classId: id } })))
+    throw badRequest(
+      'This class already has exams, so its board cannot be changed. Create a new class for the other board',
+    );
   await checkTeacher(data);
   await cls.update(data);
   return true;

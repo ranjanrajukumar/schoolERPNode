@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 
-/** A single row (id 1) holding school-wide grading policy. */
+/** One row per board holding its pass mark: id 1 is CBSE, id 2 is UP Board. */
 export default (sequelize) =>
   sequelize.define(
     'GradingSetting',

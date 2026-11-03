@@ -1,8 +1,6 @@
 import {
   Exam,
   ExamGroup,
-  GradeBand,
-  GradingSetting,
   Mark,
   RevaluationRequest,
   SchoolClass,
@@ -13,34 +11,70 @@ import {
 import { badRequest, conflict, notFound } from '../../utils/httpError.js';
 import { loadGrading } from './grading.js';
 import { getResults } from './exams.service.js';
+import { boardOfClass, requireRule, saveRule } from '../boards/boardRules.service.js';
+import { stageOf } from '../academics/subjectTemplates.js';
 
 const round = (n) => Math.round(n * 100) / 100;
 const className = (c) => (c ? `${c.name}-${c.section}` : null);
 
 /* ---------- Grade setup ---------- */
 
-/** Replaces the whole grade scale and pass mark. The scale must start at 0 so every percentage earns a grade. */
-export async function saveGrading({ passPercent, bands }) {
-  const pass = Number(passPercent);
-  if (Number.isNaN(pass) || pass < 0 || pass > 100) throw badRequest('Pass mark must be between 0 and 100');
-  if (!Array.isArray(bands) || !bands.length) throw badRequest('Add at least one grade');
-
-  const clean = bands.map((b) => ({ grade: String(b.grade ?? '').trim(), minPercent: Number(b.min) }));
-  if (clean.some((b) => !b.grade || b.grade.length > 10))
-    throw badRequest('Every grade needs a name of up to 10 characters');
-  if (clean.some((b) => Number.isNaN(b.minPercent) || b.minPercent < 0 || b.minPercent > 100))
-    throw badRequest('Each lower limit must be between 0 and 100');
-  if (new Set(clean.map((b) => b.minPercent)).size !== clean.length)
-    throw badRequest('Two grades cannot start at the same percentage');
-  if (new Set(clean.map((b) => b.grade.toLowerCase())).size !== clean.length)
-    throw badRequest('Grade names must be different');
-  if (!clean.some((b) => b.minPercent === 0)) throw badRequest('The lowest grade must start at 0%');
-
-  await sequelize.transaction(async (transaction) => {
-    await GradeBand.destroy({ where: {}, transaction });
-    await GradeBand.bulkCreate(clean, { transaction });
-    await GradingSetting.upsert({ id: 1, passPercent: pass }, { transaction });
+/** Saves the board's grade scale and pass mark as a new version of its grading rule. */
+export async function saveGrading({ passPercent, bands, board = 'CBSE', sourceRef, changeNote }) {
+  await saveRule({
+    boardRef: board,
+    ruleType: 'grading',
+    payload: { passPercent, bands },
+    sourceRef,
+    changeNote: changeNote ?? 'Edited in Grade setup',
   });
+}
+
+/* ---------- Board exam pattern ---------- */
+
+/**
+ * Gives each class its board's yearly exams and an "Annual result" group that combines them by weight.
+ * A class that already has the group is left alone, as is any exam name it already has.
+ */
+export async function applyExamPattern(classIds = []) {
+  const classes = await SchoolClass.findAll({ where: classIds.length ? { id: classIds } : {} });
+  if (!classes.length) throw badRequest('No classes to apply a pattern to');
+  let exams = 0;
+  let groups = 0;
+  const skipped = [];
+  const rules = new Map(); // one lookup per board
+  await sequelize.transaction(async (transaction) => {
+    for (const cls of classes) {
+      const label = `${cls.name}-${cls.section}`;
+      const board = await boardOfClass(cls);
+      if (!rules.has(board.id)) rules.set(board.id, await requireRule(board, 'exam_pattern'));
+      const pattern = rules.get(board.id).payload;
+      if (pattern.skipStages.includes(stageOf(cls.name))) {
+        skipped.push(`${label} (no written exams)`);
+        continue;
+      }
+      if (await ExamGroup.findOne({ where: { classId: cls.id, name: pattern.groupName }, transaction })) {
+        skipped.push(`${label} (already has ${pattern.groupName})`);
+        continue;
+      }
+      const group = await ExamGroup.create({ classId: cls.id, name: pattern.groupName }, { transaction });
+      groups += 1;
+      const have = new Set(
+        (await Exam.findAll({ where: { classId: cls.id }, attributes: ['name'], transaction })).map(
+          (e) => e.name,
+        ),
+      );
+      for (const p of pattern.exams) {
+        if (have.has(p.name)) continue;
+        await Exam.create(
+          { name: p.name, classId: cls.id, maxMarks: p.maxMarks, weight: p.weight, examGroupId: group.id },
+          { transaction },
+        );
+        exams += 1;
+      }
+    }
+  });
+  return { classes: classes.length, groups, exams, skipped };
 }
 
 /* ---------- Exam groups ---------- */
@@ -95,7 +129,7 @@ export async function getGroupResults(groupId) {
       rows: [],
     };
 
-  const policy = await loadGrading();
+  const policy = await loadGrading(await boardOfClass(group.SchoolClass));
   const perExam = [];
   for (const exam of exams) perExam.push({ exam, rows: (await getResults(exam.id, policy)).rows });
 

@@ -4,6 +4,7 @@ import { sequelize } from './models/index.js';
 import { migrateDatabase } from './config/migration.js';
 import { startAbsenceAlertTimer } from './modules/attendance/autoAbsence.service.js';
 import { startAutoBackupTimer } from './modules/settings/autoBackup.service.js';
+import { startRunMaintenance } from './modules/reports/designer/runs.service.js';
 import { startGlobalSync } from './modules/globalauth/globalAuth.service.js';
 
 assertEnvironment();
@@ -23,6 +24,7 @@ server.on('error', (err) => {
 startAbsenceAlertTimer();
 startAutoBackupTimer();
 startGlobalSync();
+startRunMaintenance().catch((err) => console.error('Report maintenance did not start:', err.message));
 
 const shutdown = () =>
   server.close(async () => {

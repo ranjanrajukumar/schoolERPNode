@@ -25,6 +25,7 @@ const TABS = [
   'Homework',
   'OnlineClasses',
   'Materials',
+  'Syllabus',
   'Results',
   'Fees',
   'Library',
@@ -48,6 +49,7 @@ const LABELS = {
   Homework: 'Homework & Assignments',
   OnlineClasses: 'Online Classes',
   Materials: 'Learning Materials',
+  Syllabus: 'Syllabus',
   Results: 'Exams & Results',
   Fees: 'Fees & Payments',
   Notices: 'Notices & Announcements',
@@ -797,6 +799,61 @@ function Homework({ base }) {
           )}
         </tbody>
       </TableCard>
+    </>
+  );
+}
+
+const TOPIC_STATE = { not_started: 'Not started', in_progress: 'In progress', completed: 'Completed' };
+
+/** The class syllabus, subject by subject, with how much has been taught. Read-only. */
+function Syllabus({ base }) {
+  const [subjects, setSubjects] = useState(null);
+  useEffect(() => {
+    api(`${base}/syllabus`)
+      .then(setSubjects)
+      .catch(() => setSubjects([]));
+  }, [base]);
+  if (!subjects) return <p className="hint">Loading…</p>;
+  if (!subjects.length) return <p className="hint">The syllabus has not been added yet.</p>;
+  return (
+    <>
+      {subjects.map((s) => (
+        <details key={s.subjectId} className="card" style={{ padding: 12, marginBottom: 8 }}>
+          <summary>
+            <b>{s.subjectName}</b> · {s.completed} of {s.total} topics taught ({s.percent}%)
+          </summary>
+          <TableCard>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Topic</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {s.topics.map((t) => (
+                <tr key={t.id}>
+                  <td>{t.sequence}</td>
+                  <td>
+                    {t.title}
+                    {t.objective && (
+                      <>
+                        <br />
+                        <small>{t.objective}</small>
+                      </>
+                    )}
+                  </td>
+                  <td>
+                    {TOPIC_STATE[t.status] ?? t.status}
+                    {t.status === 'completed' && t.completedOn && <small> · {t.completedOn}</small>}
+                    {t.status !== 'completed' && t.plannedDate && <small> · planned {t.plannedDate}</small>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </TableCard>
+        </details>
+      ))}
     </>
   );
 }
@@ -2258,6 +2315,7 @@ const VIEWS = {
   Results,
   Homework,
   Materials,
+  Syllabus,
   Lms: LmsCourses,
   Library,
   Transport,

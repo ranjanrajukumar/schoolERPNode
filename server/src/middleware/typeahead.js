@@ -19,13 +19,15 @@ const escapeLike = (term) => term.replace(/[\\%_]/g, (c) => `\\${c}`);
  *  - `id` returns just that record, so a form can show the label of a value it already holds.
  *  - `filters` lists the query parameters that may narrow the search (e.g. status), each fixed in code.
  *  - With nothing typed it returns the newest records, so the dropdown is never empty.
- * Response: [{ id, label, sub }], never more than 25 rows, so a school with thousands of students sends a few bytes.
+ * `details` (optional) turns a record into [[heading, value], ...] for a picker that shows several fields side by side.
+ * Response: [{ id, label, sub, details? }], never more than 25 rows, so a school with thousands of students sends a few bytes.
  */
 export function typeahead({
   model,
   fields,
   label,
   sub = () => null,
+  details = null,
   filters = [],
   include = [],
   order = [['id', 'DESC']],
@@ -63,6 +65,14 @@ export function typeahead({
       order,
       limit,
     });
-    res.json(rows.map((r) => ({ id: r.id, label: label(r), sub: sub(r) })));
+    res.json(
+      rows.map((r) => ({
+        id: r.id,
+        label: label(r),
+        sub: sub(r),
+        // the record's own fields, as [heading, value] pairs, so a picker can show several at once
+        ...(details && { details: details(r).filter(([, v]) => v !== null && v !== undefined && v !== '') }),
+      })),
+    );
   });
 }

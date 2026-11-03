@@ -49,7 +49,6 @@ import Lms from '../modules/academics/Lms.jsx';
 import LmsDashboard from '../modules/academics/LmsDashboard.jsx';
 import LmsProgress from '../modules/academics/LmsProgress.jsx';
 import LmsCourseScreen from '../modules/academics/LmsCourseScreen.jsx';
-import TeacherTimetable from '../modules/academics/TeacherTimetable.jsx';
 import StudentLeaves from '../modules/attendance/StudentLeaves.jsx';
 import AttendanceCorrections from '../modules/attendance/AttendanceCorrections.jsx';
 import PeriodAttendance from '../modules/attendance/PeriodAttendance.jsx';
@@ -75,6 +74,10 @@ import Promotion from '../modules/academics/Promotion.jsx';
 import AcademicYears from '../modules/academics/AcademicYears.jsx';
 import Exams from '../modules/exams/Exams.jsx';
 import MarkEntry from '../modules/exams/MarkEntry.jsx';
+import BoardRegistration from '../modules/academics/BoardRegistration.jsx';
+import VisitorRecords from '../modules/office/VisitorRecords.jsx';
+import DocumentVerification from '../modules/office/DocumentVerification.jsx';
+import BoardRules from '../modules/settings/BoardRules.jsx';
 import GradeSetup from '../modules/exams/GradeSetup.jsx';
 import ExamGroups from '../modules/exams/ExamGroups.jsx';
 import MeritList from '../modules/exams/MeritList.jsx';
@@ -151,6 +154,8 @@ import UserGuide from '../modules/help/UserGuide.jsx';
 import SupportRequests from '../modules/help/SupportRequests.jsx';
 import SystemUpdates from '../modules/help/SystemUpdates.jsx';
 import About from '../modules/help/About.jsx';
+import ReportDesigner from '../modules/reports/designer/ReportDesigner.jsx';
+import SavedReports from '../modules/reports/SavedReports.jsx';
 import CustomReports from '../modules/reports/CustomReports.jsx';
 import PushNotifications from '../modules/communication/PushNotifications.jsx';
 import StudentForm from '../modules/academics/StudentForm.jsx';
@@ -209,6 +214,10 @@ export default function AppRoutes() {
           <Route path="exams" element={<Exams />} />
           <Route path="settings" element={<Settings />} />
           <Route path="grade-setup" element={<GradeSetup />} />
+          <Route path="board-rules" element={<BoardRules />} />
+          <Route path="visitors" element={<VisitorRecords />} />
+          <Route path="document-verification" element={<DocumentVerification />} />
+          <Route path="board-registration" element={<BoardRegistration />} />
           <Route path="exam-groups" element={<ExamGroups />} />
           <Route path="merit-list" element={<MeritList />} />
           <Route path="revaluation" element={<Revaluation />} />
@@ -288,6 +297,8 @@ export default function AppRoutes() {
           <Route path="system-updates" element={<SystemUpdates />} />
           <Route path="about" element={<About />} />
           <Route path="custom-reports" element={<CustomReports />} />
+          <Route path="saved-reports" element={<SavedReports />} />
+          <Route path="report-designer" element={<ReportDesigner />} />
           <Route path="push-notifications" element={<PushNotifications />} />
           <Route path="master-data" element={<MasterData />} />
           <Route path="school-profile" element={<SchoolProfile />} />
@@ -328,7 +339,7 @@ export default function AppRoutes() {
           <Route path="lms-announcements" element={<LmsCourseScreen kind="announcements" />} />
           <Route path="lms-assignments" element={<LmsCourseScreen kind="assignments" />} />
           <Route path="lms-quizzes" element={<LmsCourseScreen kind="quizzes" />} />
-          <Route path="teacher-timetable" element={<TeacherTimetable />} />
+          <Route path="teacher-timetable" element={<Navigate to="/timetable?view=teacher" replace />} />
           <Route path="departments" element={<Departments />} />
           <Route path="designations" element={<Designations />} />
           <Route path="staff-attendance" element={<StaffAttendance />} />

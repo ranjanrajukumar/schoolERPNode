@@ -19,6 +19,12 @@ const OWNERS = {
   mother_photo: { model: Student, label: 'student', who: ['admin'] },
   mother_sign: { model: Student, label: 'student', who: ['admin'] },
   student_thumb: { model: Student, label: 'student', who: ['admin'] },
+  adm_student_sign: { model: Admission, label: 'application', who: ['admin'] },
+  adm_father_photo: { model: Admission, label: 'application', who: ['admin'] },
+  adm_father_sign: { model: Admission, label: 'application', who: ['admin'] },
+  adm_mother_photo: { model: Admission, label: 'application', who: ['admin'] },
+  adm_mother_sign: { model: Admission, label: 'application', who: ['admin'] },
+  adm_student_thumb: { model: Admission, label: 'application', who: ['admin'] },
   school: { model: null, label: 'school', who: ['admin'] },
 };
 

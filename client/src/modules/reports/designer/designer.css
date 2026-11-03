@@ -1,0 +1,461 @@
+/* The visual report designer */
+.rd-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rd-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.rd-bar input.rd-name {
+  min-width: 220px;
+  font-weight: 600;
+}
+.rd-bar .rd-sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+  margin: 0 4px;
+}
+.rd-bar .rd-status {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+.rd-bar .rd-status.dirty {
+  color: var(--warning-text);
+}
+.rd-bar .rd-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.rd-bar .rd-zoom input {
+  width: 90px;
+}
+
+.rd-main {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 270px;
+  gap: 10px;
+  align-items: start;
+}
+.rd-side {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  max-height: calc(100vh - 210px);
+  overflow: auto;
+  position: sticky;
+  top: 8px;
+}
+.rd-side h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.rd-side h3 small {
+  font-weight: 400;
+  color: var(--muted);
+}
+.rd-side h4 {
+  margin: 14px 0 6px;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rd-side select,
+.rd-side input:not([type='checkbox']):not([type='color']),
+.rd-side textarea {
+  width: 100%;
+}
+.rd-side .hint {
+  font-size: 12px;
+  margin: 4px 0 8px;
+}
+.rd-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.rd-field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  font-size: 12.5px;
+}
+.rd-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: end;
+}
+.rd-four {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.rd-four label,
+.rd-num {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11.5px;
+}
+.rd-inline {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.rd-check {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 12.5px;
+  margin: 6px 0;
+}
+.rd-filter {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.rd-filter input {
+  grid-column: 1 / 2;
+}
+.rd-filter .link {
+  justify-self: end;
+}
+.rd-bands {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 12.5px;
+}
+.rd-style {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 6px 0;
+}
+.rd-style input[type='color'],
+.rd-num input[type='color'] {
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  background: none;
+}
+.rd-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.rd-chips {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.rd-chips li {
+  padding: 4px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-2);
+  font-size: 12px;
+  cursor: grab;
+  user-select: none;
+}
+.rd-chips li:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.rd-chips li:active {
+  cursor: grabbing;
+}
+.rd-chips.tools li {
+  border-radius: var(--radius-sm);
+}
+.rd-chips .rd-empty {
+  cursor: default;
+  background: none;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+/* the page and its bands */
+.rd-center {
+  background: #dfe3ec;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 12px;
+  overflow: auto;
+  max-height: calc(100vh - 210px);
+}
+.rd-page-wrap {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+}
+.rd-page {
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(18, 23, 43, 0.18);
+  padding: 8px 0 18px;
+}
+.rd-band {
+  position: relative;
+  margin: 0 0 2px;
+}
+.rd-band-tag {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 0;
+  border-top: 1px solid var(--border);
+  padding: 2px 8px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.rd-band.selected .rd-band-tag {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+}
+.rd-band-body {
+  position: relative;
+  background: repeating-linear-gradient(0deg, transparent 0 9px, rgba(100, 109, 133, 0.07) 9px 10px), #fff;
+  outline: 1px dashed var(--border-strong);
+  outline-offset: -1px;
+}
+.rd-band.selected .rd-band-body {
+  outline-color: var(--primary);
+}
+.rd-band-grip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 5;
+}
+.rd-band-grip:hover {
+  background: rgba(79, 70, 229, 0.35);
+}
+.rd-el {
+  outline: 1px solid transparent;
+}
+.rd-el:hover {
+  outline-color: rgba(79, 70, 229, 0.5);
+}
+.rd-el.selected {
+  outline: 2px solid var(--primary);
+  z-index: 4;
+}
+.rd-face {
+  outline: none;
+  cursor: move;
+}
+.rd-text {
+  white-space: pre-wrap;
+  line-height: 1.15;
+  padding: 0 1px;
+}
+.rd-field {
+  background: rgba(79, 70, 229, 0.08);
+}
+.rd-summary {
+  background: rgba(21, 128, 61, 0.1);
+}
+.rd-line {
+  width: 100%;
+  margin-top: 3px;
+}
+.rd-box {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.rd-image {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  color: var(--muted);
+  background: repeating-linear-gradient(45deg, #f1f3f8 0 6px, #e8ebf3 6px 12px);
+}
+
+/* preview and open dialogs */
+.rd-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(18, 23, 43, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+.rd-preview-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  width: min(1000px, 100%);
+  height: min(92vh, 1100px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.rd-preview-card header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.rd-preview-card header h2 {
+  margin: 0 auto 0 0;
+  font-size: 15px;
+}
+.rd-preview-card iframe {
+  flex: 1;
+  border: 0;
+  width: 100%;
+  background: #e9ecf3;
+}
+.rd-preview-card .rd-note {
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+.rd-open-group {
+  margin-bottom: 14px;
+}
+.rd-open-group h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.rd-open-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.rd-open-row .grow {
+  flex: 1;
+}
+.rd-open-row small {
+  color: var(--muted);
+  display: block;
+}
+
+@media (max-width: 1100px) {
+  .rd-main {
+    grid-template-columns: 1fr;
+  }
+  .rd-side {
+    position: static;
+    max-height: none;
+  }
+}
+@media print {
+  .rd-bar,
+  .rd-side {
+    display: none !important;
+  }
+}
+
+/* The app's global button and input styles are big and blue. Inside the designer they are scaled back so the controls fit the panels. */
+.rd-shell button {
+  margin-right: 0;
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.rd-shell .rd-bar input,
+.rd-shell .rd-bar select {
+  min-height: 34px;
+  padding: 5px 9px;
+  font-size: 13px;
+}
+.rd-shell .rd-side input:not([type='checkbox']):not([type='color']),
+.rd-shell .rd-side select,
+.rd-shell .rd-side textarea {
+  min-height: 32px;
+  padding: 5px 8px;
+  font-size: 13px;
+}
+.rd-shell .rd-side input[type='color'],
+.rd-shell .rd-bar input[type='color'] {
+  min-height: 28px;
+}
+.rd-shell .rd-side button:not(.link) {
+  min-height: 32px;
+}
+.rd-shell button.link {
+  background: none;
+  color: var(--primary);
+  padding: 0 4px;
+  min-height: 0;
+  font-weight: 600;
+}
+.rd-shell button.link:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+.rd-shell .rd-chips li {
+  font-size: 12px;
+}
+.rd-pos {
+  grid-template-columns: 1fr 1fr;
+}
+.rd-bar .rd-zoom button {
+  min-height: 28px;
+  padding: 2px 8px;
+}
+
+.rd-formula {
+  background: rgba(217, 119, 6, 0.1);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+.rd-help {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+.rd-help div {
+  margin-bottom: 6px;
+}
+.rd-help dt {
+  font-weight: 600;
+}
+.rd-help dd {
+  margin: 0;
+  color: var(--muted);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 11.5px;
+  word-break: break-word;
+}

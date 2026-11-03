@@ -17,6 +17,16 @@ import defineSetting from './setting.model.js';
 import defineActivity from './activity.model.js';
 import defineActivityParticipant from './activityParticipant.model.js';
 import defineExam from './exam.model.js';
+import defineStaffUnavailability from './staffUnavailability.model.js';
+import defineStudentBoardRegistration from './studentBoardRegistration.model.js';
+import defineOfficeVisitor from './officeVisitor.model.js';
+import defineDocumentCheck from './documentCheck.model.js';
+import defineReportFolder from './reportFolder.model.js';
+import defineReportTemplate from './reportTemplate.model.js';
+import defineReportRun from './reportRun.model.js';
+import defineBoard from './board.model.js';
+import defineBoardAffiliation from './boardAffiliation.model.js';
+import defineBoardRule from './boardRule.model.js';
 import defineGradeBand from './gradeBand.model.js';
 import defineGradingSetting from './gradingSetting.model.js';
 import defineExamGroup from './examGroup.model.js';
@@ -248,6 +258,16 @@ export const JobOpening = defineJobOpening(sequelize);
 export const JobApplicant = defineJobApplicant(sequelize);
 export const PerformanceReview = definePerformanceReview(sequelize);
 export const Room = defineRoom(sequelize);
+export const StaffUnavailability = defineStaffUnavailability(sequelize);
+export const StudentBoardRegistration = defineStudentBoardRegistration(sequelize);
+export const OfficeVisitor = defineOfficeVisitor(sequelize);
+export const DocumentCheck = defineDocumentCheck(sequelize);
+export const ReportFolder = defineReportFolder(sequelize);
+export const ReportTemplate = defineReportTemplate(sequelize);
+export const ReportRun = defineReportRun(sequelize);
+export const Board = defineBoard(sequelize);
+export const BoardAffiliation = defineBoardAffiliation(sequelize);
+export const BoardRule = defineBoardRule(sequelize);
 export const RoomBooking = defineRoomBooking(sequelize);
 export const Substitution = defineSubstitution(sequelize);
 export const LoginEvent = defineLoginEvent(sequelize);
@@ -593,5 +613,27 @@ StaffSalary.belongsTo(Staff, { foreignKey: 'staffId' });
 // Payslips are payroll records; staff who have any cannot be deleted (mark them inactive instead).
 Staff.hasMany(Payslip, { foreignKey: 'staffId', onDelete: 'RESTRICT' });
 Payslip.belongsTo(Staff, { foreignKey: 'staffId' });
+
+Staff.hasMany(StaffUnavailability, { foreignKey: 'staffId', onDelete: 'CASCADE' });
+StaffUnavailability.belongsTo(Staff, { foreignKey: 'staffId' });
+
+Student.hasMany(StudentBoardRegistration, { foreignKey: 'studentId', onDelete: 'CASCADE' });
+StudentBoardRegistration.belongsTo(Student, { foreignKey: 'studentId' });
+
+Student.hasMany(DocumentCheck, { foreignKey: 'studentId', onDelete: 'CASCADE' });
+DocumentCheck.belongsTo(Student, { foreignKey: 'studentId' });
+
+ReportFolder.hasMany(ReportTemplate, { foreignKey: 'folderId', onDelete: 'RESTRICT' });
+ReportTemplate.belongsTo(ReportFolder, { foreignKey: 'folderId' });
+
+// Boards: a rule or affiliation cannot outlive its board, and a board in use by a class cannot be deleted.
+Board.hasMany(BoardRule, { foreignKey: 'boardId', onDelete: 'RESTRICT' });
+BoardRule.belongsTo(Board, { foreignKey: 'boardId' });
+BoardRule.belongsTo(AcademicYear, { foreignKey: 'effectiveYearId', constraints: false });
+Board.hasMany(BoardAffiliation, { foreignKey: 'boardId', onDelete: 'RESTRICT' });
+BoardAffiliation.belongsTo(Board, { foreignKey: 'boardId' });
+Board.hasMany(StudentBoardRegistration, { foreignKey: 'boardId', onDelete: 'RESTRICT' });
+Board.hasMany(SchoolClass, { foreignKey: 'boardId', onDelete: 'RESTRICT' });
+SchoolClass.belongsTo(Board, { foreignKey: 'boardId' });
 
 export { sequelize };

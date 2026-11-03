@@ -107,6 +107,36 @@ export default function ExamGroups() {
         </div>
         <div className="head-actions">
           {canWrite && (
+            <button
+              type="button"
+              className="ghost"
+              disabled={busy}
+              onClick={async () => {
+                if (
+                  !window.confirm(
+                    "Create each class's board exams and an Annual result group? Classes that already have one are skipped.",
+                  )
+                )
+                  return;
+                setError('');
+                setBusy(true);
+                try {
+                  const r = await api('/exams/apply-pattern', { method: 'POST', body: {} });
+                  setNotice(
+                    `Created ${r.groups} group(s) and ${r.exams} exam(s). Skipped ${r.skipped.length} class(es).`,
+                  );
+                  load();
+                } catch (err) {
+                  setError(err.message);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              Apply board exam pattern
+            </button>
+          )}
+          {canWrite && (
             <button type="button" className="big-action" onClick={openNew}>
               ＋ New group
             </button>

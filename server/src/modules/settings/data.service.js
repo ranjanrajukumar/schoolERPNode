@@ -145,14 +145,40 @@ export async function exportCsv(key) {
 /* ---------- Custom reports ---------- */
 
 const REPORT_LIMIT = 5000;
-const OPS = ['contains', 'equals', 'not_equals', 'greater', 'less', 'empty', 'not_empty'];
+const OPS = [
+  'contains',
+  'equals',
+  'not_equals',
+  'greater',
+  'less',
+  'empty',
+  'not_empty',
+  'on_or_after',
+  'on_or_before',
+  'one_of',
+];
 
 export const datasetColumns = () =>
   Object.entries(EXPORTS).map(([key, e]) => ({ key, label: e.label, columns: e.columns.map((c) => c.key) }));
 
 const numeric = (v) => v !== '' && v !== null && v !== undefined && !Number.isNaN(Number(v));
 function matches(value, { op, value: wanted }) {
-  const text = value === null || value === undefined ? '' : String(value);
+  // one_of takes a list of values; a board's report uses it to stay inside that board's classes
+  if (op === 'one_of') {
+    const own =
+      value instanceof Date
+        ? value.toISOString().slice(0, 10)
+        : value === null || value === undefined
+          ? ''
+          : String(value);
+    return Array.isArray(wanted) && wanted.includes(own);
+  }
+  const text =
+    value instanceof Date
+      ? value.toISOString().slice(0, 10)
+      : value === null || value === undefined
+        ? ''
+        : String(value);
   const w = String(wanted ?? '');
   switch (op) {
     case 'contains':
@@ -165,6 +191,10 @@ function matches(value, { op, value: wanted }) {
       return numeric(text) && numeric(w) ? Number(text) > Number(w) : text > w;
     case 'less':
       return numeric(text) && numeric(w) ? Number(text) < Number(w) : text !== '' && text < w;
+    case 'on_or_after':
+      return text !== '' && text.slice(0, 10) >= w;
+    case 'on_or_before':
+      return text !== '' && text.slice(0, 10) <= w;
     case 'empty':
       return text === '';
     case 'not_empty':
@@ -174,20 +204,30 @@ function matches(value, { op, value: wanted }) {
   }
 }
 
-/** A saved-nowhere, run-on-demand report: choose a dataset, the columns to show, filters and a sort. */
-export async function runReport({ dataset, columns, filters = [], sortBy, sortDir }) {
+/** Refuses a report request that names an unknown dataset, column, filter or sort. Returns the dataset and the columns to show. */
+export function checkReportRequest({ dataset, columns, filters = [], sortBy }) {
   const source = EXPORTS[dataset];
   if (!source) throw badRequest('Choose a dataset');
   const allowed = new Set(source.columns.map((c) => c.key));
   const shown = columns?.length ? columns : source.columns.map((c) => c.key);
   if (shown.some((c) => !allowed.has(c))) throw badRequest('Unknown column');
-  if (!Array.isArray(filters) || filters.length > 10) throw badRequest('Use at most 10 filters');
+  if (!Array.isArray(filters) || filters.length > 12) throw badRequest('Use at most 10 filters');
   for (const f of filters) {
     if (!allowed.has(f.column)) throw badRequest('Unknown filter column');
     if (!OPS.includes(f.op)) throw badRequest('Unknown filter type');
+    if (
+      f.op === 'one_of' &&
+      !(Array.isArray(f.value) && f.value.length <= 500 && f.value.every((v) => typeof v === 'string'))
+    )
+      throw badRequest('“one of” needs a list of up to 500 values');
   }
   if (sortBy && !allowed.has(sortBy)) throw badRequest('Unknown sort column');
+  return { source, shown };
+}
 
+/** A run-on-demand report: choose a dataset, the columns to show, filters and a sort. */
+export async function runReport({ dataset, columns, filters = [], sortBy, sortDir }) {
+  const { source, shown } = checkReportRequest({ dataset, columns, filters, sortBy });
   let rows = (await source.rows()).filter((row) => filters.every((f) => matches(row[f.column], f)));
   if (sortBy) {
     const dir = sortDir === 'desc' ? -1 : 1;

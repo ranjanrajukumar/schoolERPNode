@@ -36,6 +36,16 @@ export default function ReportCard() {
 
   if (!card) return error ? <p className="error">{error}</p> : <p>Loading…</p>;
   const { student, exam, subjects, summary, attendance } = card;
+  // what this board's report card shows; every field is on until the board's report-card rule turns it off
+  const L = {
+    title: 'Report card',
+    showPercentage: true,
+    showGrade: true,
+    showRank: true,
+    showAttendance: true,
+    footerNote: '',
+    ...card.layout,
+  };
   const split = subjects.some((s) => s.practicalMax !== undefined);
   const [tone, label] = RESULT[summary?.result] ?? ['', '—'];
 
@@ -66,9 +76,11 @@ export default function ReportCard() {
             {(school.address || school.phone) && (
               <small>{[school.address, school.phone].filter(Boolean).join(' · ')}</small>
             )}
+            {card.board?.affiliation && <small className="block">{card.board.affiliation}</small>}
           </div>
           <span className="rc-title">
-            Report card<small>{exam.name}</small>
+            {L.title}
+            <small>{exam.name}</small>
           </span>
         </header>
 
@@ -193,24 +205,28 @@ export default function ReportCard() {
 
         {summary ? (
           <div className="rc-summary">
-            <Tile label="Percentage" value={`${summary.percentage}%`} />
-            <Tile label="Grade" value={summary.grade} />
-            <Tile label="Rank" value={`${summary.rank}`} hint={`of ${card.classSize}`} />
+            {L.showPercentage && <Tile label="Percentage" value={`${summary.percentage}%`} />}
+            {L.showGrade && <Tile label="Grade" value={summary.grade} />}
+            {L.showRank && <Tile label="Rank" value={`${summary.rank}`} hint={`of ${card.classSize}`} />}
             <div className="rc-tile">
               <small>Result</small>
               <b>
                 <span className={`badge ${tone}`}>● {label}</span>
               </b>
             </div>
-            <Tile
-              label="Attendance"
-              value={attendance.percentage === null ? '—' : `${attendance.percentage}%`}
-              hint={attendance.percentage === null ? 'no records' : `${attendance.days} days`}
-            />
+            {L.showAttendance && (
+              <Tile
+                label="Attendance"
+                value={attendance.percentage === null ? '—' : `${attendance.percentage}%`}
+                hint={attendance.percentage === null ? 'no records' : `${attendance.days} days`}
+              />
+            )}
           </div>
         ) : (
           <p className="hint">No marks have been entered for this student yet.</p>
         )}
+
+        {L.footerNote && <p className="hint">{L.footerNote}</p>}
 
         <footer className="rc-sign">
           <span>Class teacher</span>

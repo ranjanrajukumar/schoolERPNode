@@ -2,6 +2,19 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { api } from '../services/api.js';
 
 const DEBOUNCE_MS = 250;
+const MAX_SHOWN = 25;
+
+const words = (q) => q.trim().toLowerCase().split(/s+/).filter(Boolean);
+const textOf = (o) =>
+  [o.label, o.sub, ...(o.details ?? []).map(([, v]) => v)].filter(Boolean).join(' ').toLowerCase();
+
+/** The typed words picked out in a piece of text, so it is clear why a row matched. */
+function Marked({ text, terms }) {
+  const t = String(text ?? '');
+  if (!terms.length) return t;
+  const re = new RegExp(`(${terms.map((w) => w.replace(/[.*+?^${}()|[]\]/g, '\$&')).join('|')})`, 'ig');
+  return t.split(re).map((part, i) => (i % 2 ? <mark key={i}>{part}</mark> : part));
+}
 
 /**
  * Type a few letters, pick from the matches. Used wherever a form needs one student, staff member, parent or book,
@@ -11,9 +24,17 @@ const DEBOUNCE_MS = 250;
  *   <TypeaheadSelect kind="students" value={form.studentId} onChange={(id, item) => ...} filters={{ status: 'active' }} required />
  *
  * `value` is an id (or ''), `onChange(id, item)` gets '' and null when cleared. Arrow keys move, Enter picks, Escape closes.
+ *
+ * Each option shows all of its fields side by side when the record has `details` ([[heading, value], ...]), and the typed words are
+ * highlighted wherever they match. Typing several words narrows the list, in any order ("ravi 8a" finds Ravi Shah in 8-A).
+ *
+ * For any list that is already on the screen, pass `options` instead of `kind`; the search then happens in the browser, over every field:
+ *
+ *   <TypeaheadSelect options={rooms.map((r) => ({ id: r.id, label: r.name, details: [['Block', r.block], ['Seats', r.seats]] }))} ... />
  */
 export default function TypeaheadSelect({
   kind,
+  options: local = null,
   value,
   onChange,
   filters = {},
@@ -26,11 +47,19 @@ export default function TypeaheadSelect({
   const box = useRef(null);
   const [text, setText] = useState('');
   const [selected, setSelected] = useState(null);
-  const [options, setOptions] = useState([]);
+  const [fetched, setFetched] = useState([]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [state, setState] = useState('idle'); // idle | loading | error
   const filterKey = JSON.stringify(filters);
+  const terms = words(text);
+  const options = local
+    ? local
+        .filter(
+          (o) => !exclude.map(String).includes(String(o.id)) && terms.every((w) => textOf(o).includes(w)),
+        )
+        .slice(0, MAX_SHOWN)
+    : fetched;
 
   // A value that arrives from outside (editing a record, a link) is shown by name, fetched by id.
   useEffect(() => {
@@ -39,6 +68,10 @@ export default function TypeaheadSelect({
       return;
     }
     if (selected && String(selected.id) === String(value)) return;
+    if (local) {
+      setSelected(local.find((o) => String(o.id) === String(value)) ?? null);
+      return;
+    }
     let cancelled = false;
     api(`/lookup/${kind}?id=${encodeURIComponent(value)}`)
       .then((rows) => {
@@ -48,7 +81,7 @@ export default function TypeaheadSelect({
     return () => {
       cancelled = true;
     };
-  }, [value, kind]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value, kind, local]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const search = useCallback(
     (q) => {
@@ -60,7 +93,7 @@ export default function TypeaheadSelect({
       });
       return api(`/lookup/${kind}?${params}`)
         .then((rows) => {
-          setOptions(rows);
+          setFetched(rows);
           setActive(0);
           setState('idle');
         })
@@ -71,10 +104,10 @@ export default function TypeaheadSelect({
 
   // Search as the person types, a moment after they pause.
   useEffect(() => {
-    if (!open) return undefined;
+    if (!open || local) return undefined;
     const t = setTimeout(() => search(text), DEBOUNCE_MS);
     return () => clearTimeout(t);
-  }, [text, open, search]);
+  }, [text, open, search, local]);
 
   useEffect(() => {
     const away = (e) => {
@@ -161,9 +194,13 @@ export default function TypeaheadSelect({
           />
           {open && (
             <ul className="typeahead-list" id={listId} role="listbox">
-              {state === 'loading' && !options.length && <li className="typeahead-note">Searching…</li>}
-              {state === 'error' && <li className="typeahead-note">Could not search. Try again.</li>}
-              {state === 'idle' && !options.length && <li className="typeahead-note">No match</li>}
+              {!local && state === 'loading' && !options.length && (
+                <li className="typeahead-note">Searching…</li>
+              )}
+              {!local && state === 'error' && (
+                <li className="typeahead-note">Could not search. Try again.</li>
+              )}
+              {(local || state === 'idle') && !options.length && <li className="typeahead-note">No match</li>}
               {options.map((o, i) => (
                 <li
                   key={o.id}
@@ -176,8 +213,25 @@ export default function TypeaheadSelect({
                   }}
                   onMouseEnter={() => setActive(i)}
                 >
-                  {o.label}
-                  {o.sub && <small>{o.sub}</small>}
+                  {o.details?.length ? (
+                    <span className="typeahead-cols">
+                      {o.details.map(([heading, v]) => (
+                        <span key={heading}>
+                          <em>{heading}</em>
+                          <Marked text={v} terms={terms} />
+                        </span>
+                      ))}
+                    </span>
+                  ) : (
+                    <>
+                      <Marked text={o.label} terms={terms} />
+                      {o.sub && (
+                        <small>
+                          <Marked text={o.sub} terms={terms} />
+                        </small>
+                      )}
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

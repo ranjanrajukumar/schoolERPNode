@@ -6,6 +6,7 @@ import Pagination from '../../components/Pagination.jsx';
 import TypeaheadSelect from '../../components/TypeaheadSelect.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useOpenNew } from '../../hooks/useOpenNew.js';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 10;
 const EMPTY_BOOK = { title: '', author: '', categoryId: '', isbn: '', copies: 1 };
@@ -220,6 +221,7 @@ export default function Library() {
           <p className="hint">Manage books, issue them to students and follow what is overdue.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="library" />
           <Gate action="export">
             <button type="button" className="ghost" onClick={exportCsv}>
               ↓ Export

@@ -8,6 +8,8 @@ export default (sequelize) =>
       name: { type: DataTypes.STRING(50), allowNull: false },
       branchId: { type: DataTypes.INTEGER, allowNull: true },
       classTeacherId: { type: DataTypes.INTEGER, allowNull: true },
+      boardId: { type: DataTypes.INTEGER, allowNull: true }, // the board's record; `board` below is its name, kept for display
+      board: { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'CBSE' }, // CBSE | UP Board
       room: { type: DataTypes.STRING(20), allowNull: true },
       section: { type: DataTypes.STRING(10), allowNull: false, defaultValue: 'A' },
     },

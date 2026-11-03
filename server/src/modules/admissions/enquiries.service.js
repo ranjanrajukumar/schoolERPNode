@@ -413,7 +413,13 @@ export async function purgeEnquiry(id) {
   const a = await Admission.findByPk(id, { paranoid: false });
   if (!a || !a.deletedAt)
     throw conflict('Delete the enquiry first; only deleted enquiries can be removed permanently');
-  await Photo.destroy({ where: { entity: 'enquiry', entityId: a.id } });
+  const owned = [
+    'enquiry',
+    ...['student_sign', 'father_photo', 'father_sign', 'mother_photo', 'mother_sign', 'student_thumb'].map(
+      (k) => `adm_${k}`,
+    ),
+  ];
+  await Photo.destroy({ where: { entity: owned, entityId: a.id } });
   await ApplicationDocument.destroy({ where: { admissionId: a.id } });
   await a.destroy({ force: true });
 }

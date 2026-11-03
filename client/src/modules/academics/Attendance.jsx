@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import Modal from '../../components/Modal.jsx';
 import Pagination from '../../components/Pagination.jsx';
 import { localDate } from '../../utils/dates.js';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 25;
 const today = () => localDate();
@@ -208,6 +209,7 @@ export default function Attendance() {
           <p className="hint">Take attendance and monitor student presence by class.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="attendance" />
           <Gate action="export">
             <button type="button" className="ghost" onClick={exportCsv}>
               ↓ Export report

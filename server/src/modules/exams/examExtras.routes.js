@@ -12,6 +12,7 @@ import {
   listRevaluations,
   meritList,
   requestRevaluation,
+  applyExamPattern,
   saveGrading,
 } from './examExtras.service.js';
 
@@ -22,9 +23,15 @@ const admin = requireRole('admin');
 /* Grade setup */
 router.get(
   '/grading',
-  asyncHandler(async (_req, res) => {
-    const g = await loadGrading();
-    res.json({ passPercent: g.passPercent, bands: g.bands, isDefault: g.isDefault });
+  asyncHandler(async (req, res) => {
+    const g = await loadGrading(req.query.board || 'CBSE');
+    res.json({
+      passPercent: g.passPercent,
+      bands: g.bands,
+      isDefault: g.isDefault,
+      version: g.version,
+      sourceRef: g.sourceRef,
+    });
   }),
 );
 router.put(
@@ -33,6 +40,16 @@ router.put(
   asyncHandler(async (req, res) => {
     await saveGrading(req.body);
     res.json({ ok: true });
+  }),
+);
+
+/* Board exam pattern */
+router.post(
+  '/apply-pattern',
+  admin,
+  asyncHandler(async (req, res) => {
+    const ids = Array.isArray(req.body.classIds) ? req.body.classIds.map(Number) : [];
+    res.json(await applyExamPattern(ids));
   }),
 );
 

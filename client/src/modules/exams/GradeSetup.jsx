@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { BOARD_GRADING } from '../../config/boardPresets.js';
 
 function Tile({ icon, tone, label, value, hint }) {
   return (
@@ -18,9 +19,10 @@ function Tile({ icon, tone, label, value, hint }) {
   );
 }
 
-/** Grade setup: the pass mark and where each grade starts. Results and report cards follow it. */
+/** Grade setup: the pass mark and where each grade starts. Each board has its own scale. Results and report cards of a class follow the scale of its board. */
 export default function GradeSetup() {
   const canWrite = useAuth().user?.role === 'admin';
+  const [board, setBoard] = useState('CBSE');
   const [passPercent, setPassPercent] = useState('');
   const [bands, setBands] = useState([]);
   const [isDefault, setIsDefault] = useState(false);
@@ -30,7 +32,7 @@ export default function GradeSetup() {
   const [notice, setNotice] = useState('');
 
   const load = () =>
-    api('/exams/grading')
+    api(`/exams/grading?board=${encodeURIComponent(board)}`)
       .then((g) => {
         setPassPercent(g.passPercent);
         setBands(g.bands.map((b) => ({ grade: b.grade, min: b.min })));
@@ -39,8 +41,10 @@ export default function GradeSetup() {
       })
       .catch((e) => setError(e.message));
   useEffect(() => {
+    setNotice('');
     load();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [board]);
 
   const setBand = (i, patch) => {
     setDirty(true);
@@ -53,7 +57,7 @@ export default function GradeSetup() {
     setNotice('');
     setBusy(true);
     try {
-      await api('/exams/grading', { method: 'PUT', body: { passPercent, bands } });
+      await api('/exams/grading', { method: 'PUT', body: { passPercent, bands, board } });
       setNotice('Grade setup saved. Results and report cards now use it.');
       load();
     } catch (err) {
@@ -68,7 +72,7 @@ export default function GradeSetup() {
     <form onSubmit={save}>
       <div className="profile-head">
         <div>
-          <h1>Grade setup</h1>
+          <h1>Grade setup · {board}</h1>
           <p className="hint">
             Each grade starts at its lower limit and runs up to the next grade. The lowest grade must start at
             0%. A student fails a subject when they score below the pass mark.
@@ -81,6 +85,23 @@ export default function GradeSetup() {
             </button>
           </div>
         )}
+      </div>
+      <div className="tabs" role="tablist">
+        {['CBSE', 'UP Board'].map((b) => (
+          <button
+            key={b}
+            type="button"
+            role="tab"
+            aria-selected={board === b}
+            className={`tab${board === b ? ' active' : ''}`}
+            onClick={() => {
+              if (dirty && !window.confirm('Discard the unsaved changes?')) return;
+              setBoard(b);
+            }}
+          >
+            {b}
+          </button>
+        ))}
       </div>
       {notice && <p className="success">{notice}</p>}
       {error && (
@@ -109,13 +130,28 @@ export default function GradeSetup() {
           icon="◷"
           tone="amber"
           label="Scale"
-          value={isDefault ? 'Built-in' : 'Your own'}
-          hint={isDefault ? 'Save to use your own' : null}
+          value={isDefault ? 'Unverified' : 'Verified'}
+          hint={isDefault ? 'Check it under Board rules' : null}
         />
       </div>
 
       <section className="card enquiry-card">
         <div className="toolbar">
+          {canWrite &&
+            [BOARD_GRADING[board === 'UP Board' ? 'UP' : 'CBSE']].map((b) => (
+              <button
+                key={b.label}
+                type="button"
+                className="ghost"
+                onClick={() => {
+                  setPassPercent(b.passPercent);
+                  setBands(b.bands.map((x) => ({ ...x })));
+                  setDirty(true);
+                }}
+              >
+                Use {b.label}
+              </button>
+            ))}
           <label className="range-field">
             <span>Pass mark (% needed in each subject)</span>
             <input

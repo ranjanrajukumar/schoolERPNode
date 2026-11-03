@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { assertTeacherMayMark } from './teacherScope.js';
 import {
   Attendance,
   AttendanceCorrection,
@@ -62,6 +63,11 @@ export async function getRoster(date, classId) {
  */
 export async function saveRecords(date, records, { reason, user }) {
   if (!Array.isArray(records) || !records.length) throw badRequest('records must be a non-empty list');
+  await assertTeacherMayMark(
+    user,
+    date,
+    records.map((r) => r.studentId),
+  );
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date).getTime()))
     throw badRequest('date must be YYYY-MM-DD');
   if (date > today()) throw badRequest('Attendance cannot be marked for a future date');

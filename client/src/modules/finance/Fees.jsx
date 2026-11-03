@@ -1,3 +1,4 @@
+import PageReports from '../reports/PageReports.jsx';
 import { useCallback, useEffect, useState } from 'react';
 import Gate from '../../components/Gate.jsx';
 import { api } from '../../services/api.js';
@@ -230,6 +231,7 @@ export default function Fees() {
           <p className="hint">Bill students, record what is paid and follow up what is still owed.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="fees" />
           <Gate action="export">
             <button type="button" className="ghost" onClick={exportCsv}>
               ↓ Export

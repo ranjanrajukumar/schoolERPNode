@@ -1300,7 +1300,7 @@ export const SIGNATURES = [
   ['student_thumb', 'Student left thumb'],
 ];
 
-export function SignaturesSection({ id, picked, onPick }) {
+export function SignaturesSection({ id, picked, onPick, prefix = '' }) {
   return (
     <FormSection
       title="Photos and signatures"
@@ -1311,7 +1311,7 @@ export function SignaturesSection({ id, picked, onPick }) {
       {SIGNATURES.map(([entity, label]) => (
         <div key={entity}>
           <PhotoField
-            entity={entity}
+            entity={prefix + entity}
             id={id}
             label={label}
             picked={picked[entity]}

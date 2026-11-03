@@ -12,7 +12,8 @@ import {
 } from '../../models/index.js';
 import { electiveFacts, splitOf } from '../academics/subjectMap.service.js';
 import { badRequest, forbidden, notFound } from '../../utils/httpError.js';
-import { loadGrading } from './grading.js';
+import { gradingForClass } from './grading.js';
+import { affiliationStatement, boardOfClass, resolveRule } from '../boards/boardRules.service.js';
 
 export const EXAM_FIELDS = ['name', 'classId', 'startDate', 'endDate', 'maxMarks'];
 
@@ -208,7 +209,7 @@ export async function saveMarks(examId, records = [], user) {
 /** Totals, percentage, grade and rank for every student who has marks in the exam. */
 export async function getResults(examId, grading = null) {
   const exam = await loadExam(examId);
-  const policy = grading ?? (await loadGrading());
+  const policy = grading ?? (await gradingForClass(exam.classId));
   const subjects = await examSubjects(exam);
   const facts = await electiveFacts(exam.classId);
   const students = await Student.findAll({
@@ -252,7 +253,7 @@ export async function getResults(examId, grading = null) {
 
 /** One student's report card: marks per subject, overall result, rank and attendance. */
 export async function getReportCard(examId, studentId) {
-  const policy = await loadGrading();
+  const policy = await gradingForClass((await loadExam(examId)).classId);
   const { exam, rows } = await getResults(examId, policy);
   const student = await Student.findByPk(studentId, { include: [SchoolClass] });
   if (!student) throw notFound('Student not found');
@@ -271,7 +272,16 @@ export async function getReportCard(examId, studentId) {
   const attendance = await Attendance.findAll({ where: { studentId }, attributes: ['status'] });
   const attended = attendance.filter((a) => a.status !== 'absent').length;
 
+  const board = await boardOfClass(student.SchoolClass);
+  const layout = (await resolveRule(board, 'report_card'))?.payload ?? null;
+  const affiliation =
+    layout?.showAffiliation === false
+      ? null
+      : await affiliationStatement(board, student.SchoolClass?.branchId ?? null);
+
   return {
+    board: { name: board.name, affiliation },
+    layout,
     exam: { id: exam.id, name: exam.name, maxMarks: exam.maxMarks },
     student: {
       id: student.id,

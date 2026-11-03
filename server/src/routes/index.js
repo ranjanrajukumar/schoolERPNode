@@ -12,6 +12,11 @@ import attendanceRoutes from '../modules/academics/attendance.routes.js';
 import academicYearsRoutes from '../modules/academics/academicYears.routes.js';
 import subjectsRoutes from '../modules/academics/subjects.routes.js';
 import classSubjectsRoutes from '../modules/academics/classSubjects.routes.js';
+import boardRegistrationRoutes from '../modules/boards/boardRegistration.routes.js';
+import visitorsRoutes from '../modules/office/visitors.routes.js';
+import documentChecksRoutes from '../modules/office/documentChecks.routes.js';
+import reportDesignerRoutes from '../modules/reports/reportDesigner.routes.js';
+import boardsRoutes from '../modules/boards/boards.routes.js';
 import timetableRoutes from '../modules/academics/timetable.routes.js';
 import promotionRoutes from '../modules/academics/promotion.routes.js';
 import admissionsRoutes from '../modules/admissions/admissions.routes.js';
@@ -113,6 +118,11 @@ router.use('/attendance', writeRoles('admin', 'teacher'), attendanceRoutes);
 router.use('/academic-years', writeRoles('admin'), academicYearsRoutes);
 router.use('/subjects', writeRoles('admin'), subjectsRoutes);
 router.use('/class-subjects', writeRoles('admin'), classSubjectsRoutes);
+router.use('/visitors', requireRole('admin'), visitorsRoutes);
+router.use('/document-checks', requireRole('admin'), documentChecksRoutes);
+router.use('/report-designer', requireRole('admin', 'teacher', 'accountant'), reportDesignerRoutes); // roles are checked per report inside
+router.use('/boards', requireRole('admin'), boardsRoutes); // board rules and affiliation: reads too belong to the admin
+router.use('/board-registration', requireRole('admin'), boardRegistrationRoutes);
 router.use('/timetable', writeRoles('admin'), timetableRoutes);
 router.use('/promotion', requireRole('admin'), promotionRoutes);
 router.use('/staff', writeRoles('admin'), staffRoutes);
@@ -135,6 +145,16 @@ router.use('/study-materials', writeRoles('admin', 'teacher'), materialsRoutes);
 router.use('/lms-tags', writeRoles('admin'), lmsTagsRoutes);
 router.use('/lms', writeRoles('admin', 'teacher'), lmsRoutes);
 router.use('/documents', requireRole('admin'), documentsRoutes);
+// A teacher reaches transport only to take bus attendance (with the routes and stops it lists); the rest is for the office and accountant.
+const TEACHER_TRANSPORT = ['/attendance', '/routes', '/stops'];
+router.use('/transport', (req, res, next) => {
+  if (
+    req.user.role === 'teacher' &&
+    !TEACHER_TRANSPORT.some((p) => req.path === p || req.path.startsWith(p + '/'))
+  )
+    return res.status(403).json({ error: 'Forbidden' });
+  next();
+});
 router.use('/transport', transportRoutes); // roles are set per route inside
 router.use('/photos', photoRoutes); // who may change a photo is set per owner inside
 router.use('/student-files', requireRole('admin', 'teacher'), filesRoutes);
@@ -163,7 +183,7 @@ router.use('/hr', hrRoutes); // roles are set per route inside
 router.use('/payroll', requireRole('admin', 'accountant'), payrollRoutes);
 router.use('/admissions', requireRole('admin'), admissionsRoutes);
 router.use('/notices', writeRoles('admin'), noticesRoutes);
-router.use('/library', writeRoles('admin', 'teacher'), libraryRoutes);
+router.use('/library', requireRole('admin'), libraryRoutes); // the librarian is an admin-based role narrowed to this module
 router.use('/activities', activitiesRoutes); // roles are set per route inside
 router.use('/settings', settingsRoutes); // roles are set per route inside
 router.use('/exams', examExtrasRoutes); // fixed paths (grading, groups, merit, revaluations) must come first

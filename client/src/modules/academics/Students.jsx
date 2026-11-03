@@ -10,6 +10,7 @@ import PersonThumb from '../../components/PersonThumb.jsx';
 import StudentForm from './StudentForm.jsx';
 import StudentDetails from './StudentDetails.jsx';
 import IdCardsPopup from '../../components/IdCardsPopup.jsx';
+import PageReports from '../reports/PageReports.jsx';
 
 const PAGE_SIZE = 10;
 const date = (d) =>
@@ -179,6 +180,7 @@ export default function Students() {
           <p className="hint">Manage student profiles, enrollment, and class placement.</p>
         </div>
         <div className="head-actions">
+          <PageReports page="students" />
           {canWrite && (
             <button type="button" className="ghost" onClick={() => setCards({})}>
               ▤ ID cards
