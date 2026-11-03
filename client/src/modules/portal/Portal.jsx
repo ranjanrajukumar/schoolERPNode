@@ -1948,6 +1948,10 @@ function Profile({ base }) {
         <h4>Brothers and sisters</h4>
         <SiblingsTable rows={p.siblings} />
       </section>
+      <section className="details-section">
+        <h4>This device</h4>
+        <PushToggle />
+      </section>
       <p className="hint">If something here is wrong, please tell your class teacher or the school office.</p>
     </div>
   );
@@ -2365,7 +2369,6 @@ export default function Portal() {
   return (
     <>
       <h1>{tab === 'Overview' ? (isStudent ? 'My school' : 'Parent portal') : label(tab, isStudent)}</h1>
-      <PushToggle />
       {!children.length && (
         <p className="hint">
           {isStudent

@@ -33,6 +33,7 @@ import Departments from '../modules/hr/Departments.jsx';
 import Designations from '../modules/hr/Designations.jsx';
 import StaffAttendance from '../modules/hr/StaffAttendance.jsx';
 import LeaveApplications from '../modules/hr/LeaveApplications.jsx';
+import MyProfile from '../modules/hr/MyProfile.jsx';
 import HrReports from '../modules/hr/HrReports.jsx';
 import StudentProfile from '../modules/students/StudentProfile.jsx';
 import HealthRecords from '../modules/students/HealthRecords.jsx';
@@ -344,6 +345,7 @@ export default function AppRoutes() {
           <Route path="designations" element={<Designations />} />
           <Route path="staff-attendance" element={<StaffAttendance />} />
           <Route path="leave-applications" element={<LeaveApplications />} />
+          <Route path="my-profile" element={<MyProfile />} />
           <Route path="hr-reports" element={<HrReports />} />
           <Route path="documents" element={<Documents />} />
           <Route path="documents/:id/print" element={<CertificatePage />} />

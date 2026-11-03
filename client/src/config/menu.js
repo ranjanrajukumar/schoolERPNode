@@ -234,6 +234,7 @@ export const MENU = [
     ['Staff Documents', '/staff-documents', ADMIN],
     ['Staff Attendance', '/staff-attendance', ADMIN],
     ['Monthly Staff Attendance', '/monthly-staff-attendance', ADMIN],
+    ['My Profile', '/my-profile', TEACHING],
     ['Staff Leave', '/leave-applications', TEACHING],
     ['Staff Leave Balance', '/staff-leave-balance', ADMIN],
     ['Payroll', '/payroll', FINANCE],

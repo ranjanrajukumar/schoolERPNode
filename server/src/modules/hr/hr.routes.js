@@ -4,7 +4,8 @@ import { requireRole, writeRoles } from '../../middleware/authMiddleware.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { crudRouter } from '../../utils/crud.js';
 import { Op } from 'sequelize';
-import { badRequest } from '../../utils/httpError.js';
+import { badRequest, notFound } from '../../utils/httpError.js';
+import { ownProfile } from './profileMine.js';
 import { saveStaffMonthly, staffMonthly } from '../attendance/monthly.service.js';
 import {
   applyLeave,
@@ -72,6 +73,16 @@ router.get(
       order: [['date', 'DESC']],
     });
     res.json(rows.map((r) => ({ id: r.id, date: r.date, status: r.status })));
+  }),
+);
+// GET /api/hr/profile/mine: the signed-in staff member's own record, every detail, in sections
+router.get(
+  '/profile/mine',
+  staffOnly,
+  asyncHandler(async (req, res) => {
+    const p = await ownProfile(ownStaffId(req));
+    if (!p) throw notFound('Staff record not found');
+    res.json(p);
   }),
 );
 router.get(

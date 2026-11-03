@@ -380,11 +380,21 @@
     "audience": "staff",
     "parentKey": "attendance",
     "roles": null,
+    "key": "attendance.myprofile",
+    "label": "My profile",
+    "icon": "list-outline",
+    "kind": "list",
+    "position": 10
+  },
+  {
+    "audience": "staff",
+    "parentKey": "attendance",
+    "roles": null,
     "key": "attendance.mark",
     "label": "Mark attendance",
     "icon": "checkbox-outline",
     "kind": "custom",
-    "position": 10
+    "position": 20
   },
   {
     "audience": "staff",
@@ -394,7 +404,7 @@
     "label": "My class today",
     "icon": "people-outline",
     "kind": "custom",
-    "position": 20
+    "position": 30
   },
   {
     "audience": "staff",
@@ -404,7 +414,7 @@
     "label": "My attendance",
     "icon": "calendar-outline",
     "kind": "list",
-    "position": 30
+    "position": 40
   },
   {
     "audience": "staff",
@@ -414,7 +424,7 @@
     "label": "My leave",
     "icon": "mail-outline",
     "kind": "list",
-    "position": 40
+    "position": 50
   },
   {
     "audience": "staff",
@@ -424,7 +434,7 @@
     "label": "My leave balance",
     "icon": "bar-chart-outline",
     "kind": "list",
-    "position": 50
+    "position": 60
   },
   {
     "audience": "staff",
@@ -434,7 +444,7 @@
     "label": "Student leave",
     "icon": "mail-open-outline",
     "kind": "list",
-    "position": 60
+    "position": 70
   },
   {
     "audience": "staff",

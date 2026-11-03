@@ -1788,6 +1788,19 @@
   },
   {
     "audience": "web",
+    "key": "staff-and-hr.my-profile",
+    "parentKey": "staff-and-hr",
+    "kind": "page",
+    "label": "My Profile",
+    "icon": "👥",
+    "roles": [
+      "admin",
+      "teacher"
+    ],
+    "position": 70
+  },
+  {
+    "audience": "web",
     "key": "staff-and-hr.staff-leave",
     "parentKey": "staff-and-hr",
     "kind": "page",
@@ -1797,7 +1810,7 @@
       "admin",
       "teacher"
     ],
-    "position": 70
+    "position": 80
   },
   {
     "audience": "web",
@@ -1809,7 +1822,7 @@
     "roles": [
       "admin"
     ],
-    "position": 80
+    "position": 90
   },
   {
     "audience": "web",
@@ -1822,7 +1835,7 @@
       "admin",
       "accountant"
     ],
-    "position": 90
+    "position": 100
   },
   {
     "audience": "web",
@@ -1834,7 +1847,7 @@
     "roles": [
       "admin"
     ],
-    "position": 100
+    "position": 110
   },
   {
     "audience": "web",
@@ -1846,7 +1859,7 @@
     "roles": [
       "admin"
     ],
-    "position": 110
+    "position": 120
   },
   {
     "audience": "web",
@@ -1858,7 +1871,7 @@
     "roles": [
       "admin"
     ],
-    "position": 120
+    "position": 130
   },
   {
     "audience": "web",

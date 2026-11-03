@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api.js';
 import { forgetPublicSettings } from '../../services/settings.js';
+import PushToggle from '../../components/PushToggle.jsx';
 
 function Tile({ icon, tone, label, value, hint }) {
   return (
@@ -156,6 +157,7 @@ export default function Settings() {
           </button>
         </div>
       </form>
+      {!only && <PushToggle />}
     </>
   );
 }

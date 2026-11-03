@@ -128,6 +128,11 @@ export const STAFF_MODULES = [
   {
     key: 'attendance', title: 'Attendance and leave', icon: '✅', roles: ['admin', 'teacher'],
     screens: [
+      {
+        key: 'myprofile', title: 'My profile', kind: 'list', path: '/hr/profile/mine', empty: 'Your staff record could not be found.',
+        pick: (d) => d.sections.flatMap((sec) => sec.rows.map(([label, value]) => ({ id: `${sec.title}-${label}`, label, value, section: sec.title }))),
+        row: (r) => ({ title: r.label, sub: r.value, right: r.section }),
+      },
       { key: 'mark', title: 'Mark attendance', kind: 'custom', route: 'MarkAttendance' },
       { key: 'myclass', title: 'My class today', kind: 'custom', route: 'MyClass' },
       {
