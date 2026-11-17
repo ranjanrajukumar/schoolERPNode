@@ -23,7 +23,7 @@ function IconTile({ icon, iconData, label, onPress }) {
 }
 
 const Panel = ({ children, style }) => (
-  <View style={[{ backgroundColor: '#fff', borderRadius: radius + 4, padding: space.md, marginBottom: space.md, shadowColor: '#0b1b3a', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }, style]}>{children}</View>
+  <View style={[{ backgroundColor: color.card, borderRadius: radius + 4, padding: space.md, marginBottom: space.md, shadowColor: color.shadow, shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 2 }, style]}>{children}</View>
 );
 
 function confirmSignOut(signOut) {
@@ -63,19 +63,19 @@ export default function HomeGrid({ tiles: flat, sections, summary, onBell }) {
     <View style={{ flex: 1, backgroundColor: color.bg }}>
       <View style={{ backgroundColor: color.header, paddingTop: insets.top + 10, paddingBottom: 14, paddingHorizontal: space.lg }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', marginRight: space.md }}>
+          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: color.card, alignItems: 'center', justifyContent: 'center', marginRight: space.md }}>
             <Text style={{ fontSize: 22, fontWeight: '800', color: color.header }}>{first.slice(0, 1) || '?'}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: '#fff', fontSize: 20, fontWeight: '800', letterSpacing: 1 }}>HELLO</Text>
-            <Text numberOfLines={1} style={{ color: '#fff', fontSize: 20, fontWeight: '800', letterSpacing: 1 }}>{first}</Text>
+            <Text style={{ color: color.onPrimary, fontSize: 20, fontWeight: '800', letterSpacing: 1 }}>HELLO</Text>
+            <Text numberOfLines={1} style={{ color: color.onPrimary, fontSize: 20, fontWeight: '800', letterSpacing: 1 }}>{first}</Text>
           </View>
-          <Pressable onPress={() => setQuery(query === null ? '' : null)} hitSlop={8} style={{ padding: 8 }} accessibilityLabel="Search"><Ionicons name="search-outline" size={26} color="#fff" /></Pressable>
-          {onBell ? <Pressable onPress={onBell} hitSlop={8} style={{ padding: 8 }} accessibilityLabel="Notices"><Ionicons name="notifications-outline" size={26} color="#fff" /></Pressable> : null}
-          <Pressable onPress={() => confirmSignOut(signOut)} hitSlop={8} style={{ padding: 8 }} accessibilityLabel="Sign out"><Ionicons name="log-out-outline" size={26} color="#fff" /></Pressable>
+          <Pressable onPress={() => setQuery(query === null ? '' : null)} hitSlop={8} style={{ padding: 8 }} accessibilityLabel="Search"><Ionicons name="search-outline" size={26} color={color.onPrimary} /></Pressable>
+          {onBell ? <Pressable onPress={onBell} hitSlop={8} style={{ padding: 8 }} accessibilityLabel="Notices"><Ionicons name="notifications-outline" size={26} color={color.onPrimary} /></Pressable> : null}
+          <Pressable onPress={() => confirmSignOut(signOut)} hitSlop={8} style={{ padding: 8 }} accessibilityLabel="Sign out"><Ionicons name="log-out-outline" size={26} color={color.onPrimary} /></Pressable>
         </View>
         {query !== null ? (
-          <TextInput value={query} onChangeText={setQuery} autoFocus placeholder="Search the menu" placeholderTextColor="#9fb3d9" style={{ marginTop: space.md, backgroundColor: 'rgba(255,255,255,0.15)', color: '#fff', borderRadius: 10, paddingHorizontal: space.md, paddingVertical: 10, fontSize: 16 }} />
+          <TextInput value={query} onChangeText={setQuery} autoFocus placeholder="Search the menu" placeholderTextColor={color.faint} style={{ marginTop: space.md, backgroundColor: 'rgba(255,255,255,0.15)', color: color.onPrimary, borderRadius: 10, paddingHorizontal: space.md, paddingVertical: 10, fontSize: 16 }} />
         ) : null}
       </View>
 

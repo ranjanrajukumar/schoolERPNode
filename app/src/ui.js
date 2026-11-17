@@ -64,7 +64,7 @@ export function Button({ title, onPress, busy, kind = 'primary', disabled, style
       accessibilityRole="button"
       style={({ pressed }) => [styles.button, kind === 'ghost' && styles.buttonGhost, kind === 'danger' && styles.buttonDanger, off && { opacity: 0.5 }, pressed && { opacity: 0.8 }, style]}
     >
-      {busy ? <ActivityIndicator color={kind === 'ghost' ? color.primary : '#fff'} /> : <Text style={[styles.buttonText, kind === 'ghost' && { color: color.primary }]}>{title}</Text>}
+      {busy ? <ActivityIndicator color={kind === 'ghost' ? color.primary : color.onPrimary} /> : <Text style={[styles.buttonText, kind === 'ghost' && { color: color.primary }]}>{title}</Text>}
     </Pressable>
   );
 }
@@ -73,7 +73,7 @@ export function Field({ label, style, ...props }) {
   return (
     <View style={[{ marginBottom: space.md }, style]}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
-      <TextInput placeholderTextColor="#9aa3b5" style={styles.input} {...props} />
+      <TextInput placeholderTextColor={color.faint} style={styles.input} {...props} />
     </View>
   );
 }
@@ -109,7 +109,7 @@ export function Chips({ options, value, onChange }) {
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: space.md, flexGrow: 0 }}>
       {options.map((o) => (
         <Pressable key={o.value} onPress={() => onChange(o.value)} style={[styles.chip, o.value === value && styles.chipOn]}>
-          <Text style={[styles.chipText, o.value === value && { color: '#fff' }]}>{o.label}</Text>
+          <Text style={[styles.chipText, o.value === value && { color: color.onPrimary }]}>{o.label}</Text>
         </Pressable>
       ))}
     </ScrollView>
@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
   button: { backgroundColor: color.primary, borderRadius: 10, paddingVertical: 13, paddingHorizontal: space.lg, alignItems: 'center', justifyContent: 'center', minHeight: 46 },
   buttonGhost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.primary },
   buttonDanger: { backgroundColor: color.red },
-  buttonText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  buttonText: { color: color.onPrimary, fontWeight: '700', fontSize: 15 },
   label: { fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4 },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: color.line, borderRadius: 10, paddingHorizontal: space.md, paddingVertical: 11, fontSize: 16, color: color.ink },
+  input: { backgroundColor: color.card, borderWidth: 1, borderColor: color.line, borderRadius: 10, paddingHorizontal: space.md, paddingVertical: 11, fontSize: 16, color: color.ink },
   tileRow: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginBottom: space.md },
   tile: { flexGrow: 1, flexBasis: '45%', borderRadius: radius, padding: space.md },
   tileLabel: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.6 },
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   badgeText: { fontSize: 12, fontWeight: '700' },
   banner: { borderRadius: 10, padding: space.md, marginBottom: space.md },
   empty: { textAlign: 'center', color: color.muted, marginVertical: space.xl },
-  chip: { borderWidth: 1, borderColor: color.line, backgroundColor: '#fff', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, marginRight: space.sm },
+  chip: { borderWidth: 1, borderColor: color.line, backgroundColor: color.card, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, marginRight: space.sm },
   chipOn: { backgroundColor: color.primary, borderColor: color.primary },
   chipText: { fontWeight: '700', color: color.ink },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.line },

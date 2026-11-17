@@ -57,8 +57,8 @@ export default function ListScreen({ route, navigation }) {
           value={query}
           onChangeText={setQuery}
           placeholder="Search"
-          placeholderTextColor="#9aa3b5"
-          style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: color.line, borderRadius: 10, paddingHorizontal: space.md, paddingVertical: 10, fontSize: 16, marginBottom: space.md, color: color.ink }}
+          placeholderTextColor={color.faint}
+          style={{ backgroundColor: color.card, borderWidth: 1, borderColor: color.line, borderRadius: 10, paddingHorizontal: space.md, paddingVertical: 10, fontSize: 16, marginBottom: space.md, color: color.ink }}
         />
       ) : null}
       {filters ? <Chips options={filters.map((f, i) => ({ value: i, label: f.label }))} value={filter} onChange={setFilter} /> : null}

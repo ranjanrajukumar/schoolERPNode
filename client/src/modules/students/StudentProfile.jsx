@@ -94,7 +94,7 @@ export default function StudentProfile() {
         )}
         <div className="card">
           <span>Behavior points</span>
-          <b style={{ color: p.behavior.points < 0 ? '#dc2626' : undefined }}>{p.behavior.points}</b>
+          <b style={{ color: p.behavior.points < 0 ? 'var(--danger)' : undefined }}>{p.behavior.points}</b>
         </div>
       </div>
 

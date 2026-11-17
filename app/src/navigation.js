@@ -36,7 +36,7 @@ const tabIcon = (name) => ({ color: c, size }) => <Ionicons name={name} size={si
 const tabOptions = {
   headerShown: false,
   tabBarActiveTintColor: color.header,
-  tabBarInactiveTintColor: '#8a93a6',
+  tabBarInactiveTintColor: color.faint,
   tabBarLabelStyle: { fontWeight: '600', fontSize: 12, marginBottom: 2 },
   tabBarStyle: { height: 76, paddingTop: 6, paddingBottom: 10 },
 };

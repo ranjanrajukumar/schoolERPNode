@@ -140,7 +140,7 @@ export default function Settings() {
                       <button
                         type="button"
                         className="link"
-                        style={{ color: '#2563eb' }}
+                        style={{ color: 'var(--primary)' }}
                         onClick={() => reset(i)}
                       >
                         Use default ({i.default === '' ? 'blank' : String(i.default)})

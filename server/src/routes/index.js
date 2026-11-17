@@ -83,6 +83,17 @@ import lmsTagsRoutes from '../modules/academics/lmsTags.routes.js';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     tags: [Health]
+ *     summary: Is the API up
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Always ok when the server is running
+ */
 router.get('/health', (_req, res) => res.json({ ok: true }));
 router.use('/auth', authRoutes);
 router.use('/public', publicAdmissionRoutes); // the website enquiry form; the only unauthenticated writes

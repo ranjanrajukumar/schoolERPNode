@@ -54,7 +54,7 @@ function Ring({ percent, size = 76 }) {
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={size} height={size} style={{ transform: [{ rotate: '-90deg' }] }}>
-        <Circle cx={size / 2} cy={size / 2} r={r} stroke="#dbe3f4" strokeWidth={stroke} fill="none" />
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke={color.primarySoft} strokeWidth={stroke} fill="none" />
         <Circle cx={size / 2} cy={size / 2} r={r} stroke={tone} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={`${(c * filled) / 100} ${c}`} />
       </Svg>
       <Text style={{ position: 'absolute', fontSize: 15, fontWeight: '800', color: color.ink }}>{percent === null ? '—' : `${percent}%`}</Text>
@@ -106,7 +106,7 @@ export function FamilySummary() {
         )}
       </ScrollView>
       <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8 }}>
-        {[0, 1].map((i) => <View key={i} style={{ width: i === page ? 22 : 8, height: 5, borderRadius: 3, marginHorizontal: 3, backgroundColor: i === page ? color.header : '#c5cde0' }} />)}
+        {[0, 1].map((i) => <View key={i} style={{ width: i === page ? 22 : 8, height: 5, borderRadius: 3, marginHorizontal: 3, backgroundColor: i === page ? color.header : color.line }} />)}
       </View>
     </View>
   );

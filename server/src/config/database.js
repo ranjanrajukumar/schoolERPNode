@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
 import { Sequelize } from 'sequelize';
 import { dbSsl } from './dbSsl.js';
-
-dotenv.config();
+import './env.js'; // loads .env into process.env; importing it (not calling dotenv here too) means whoever reaches this file always gets it, however they got here
 
 export const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
   host: process.env.DB_HOST,

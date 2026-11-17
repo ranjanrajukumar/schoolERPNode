@@ -972,7 +972,7 @@ export default function ApplicationForm({ id: openId, onClose, onDone }) {
             {row('Applying grade', gradeLabel)}
             <div className="summaryline">
               <span>Application status</span>
-              <strong style={{ color: status === 'draft' || status === 'enquiry' ? '#b47a24' : undefined }}>
+              <strong style={{ color: status === 'draft' || status === 'enquiry' ? 'var(--warning-text)' : undefined }}>
                 {{
                   draft: 'Draft',
                   enquiry: 'Enquiry',

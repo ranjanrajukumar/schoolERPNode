@@ -27,7 +27,7 @@ function ChooseAccount({ accounts, onChoose, onBack, busy, error }) {
       <Banner text={error} />
       {accounts.map((a) => (
         <Pressable key={`${a.clientCode}-${a.role}-${a.name}`} onPress={() => onChoose(a)} disabled={busy} accessibilityRole="button" accessibilityLabel={`${a.clientName}, ${ROLE_LABEL[a.role] ?? a.role}, ${a.name}`}
-          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: radius, borderWidth: 1, borderColor: color.line, padding: space.md, marginBottom: space.sm, opacity: busy ? 0.6 : 1 }}>
+          style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: color.card, borderRadius: radius, borderWidth: 1, borderColor: color.line, padding: space.md, marginBottom: space.sm, opacity: busy ? 0.6 : 1 }}>
           <SchoolBadge school={{ name: a.clientName, logoUrl: a.logoUrl }} />
           <View style={{ flex: 1, marginLeft: space.md }}>
             <Text style={{ fontSize: 16, fontWeight: '700', color: color.ink }}>{a.clientName}</Text>
@@ -92,7 +92,7 @@ export default function LoginScreen() {
     <View style={{ alignItems: 'center', marginBottom: space.xl }}>
       {client && !globalMode ? <SchoolBadge school={client} size={68} /> : (
         <View style={{ width: 64, height: 64, borderRadius: 18, backgroundColor: color.primary, alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name="school" size={34} color="#fff" />
+          <Ionicons name="school" size={34} color={color.onPrimary} />
         </View>
       )}
       <Text style={{ fontSize: 24, fontWeight: '800', color: color.ink, marginTop: space.md, textAlign: 'center' }}>School ERP</Text>

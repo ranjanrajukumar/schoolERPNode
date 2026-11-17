@@ -356,8 +356,8 @@ async function ensureFilesInDatabase() {
 
 /** The mobile app's menu lives in the database; add any default tile or page the table does not have yet. */
 async function ensureAppMenuItems() {
-  const { ensureAppMenu, applyMenuRoleFix } = await import('../modules/appmenu/appmenu.service.js');
-  const added = (await ensureAppMenu()) + (await applyMenuRoleFix());
+  const { ensureAppMenu, applyMenuRoleFix, applyMenuIconFix } = await import('../modules/appmenu/appmenu.service.js');
+  const added = (await ensureAppMenu()) + (await applyMenuRoleFix()) + (await applyMenuIconFix());
   if (added) console.log(`App menu: added ${added} item(s)`);
 }
 

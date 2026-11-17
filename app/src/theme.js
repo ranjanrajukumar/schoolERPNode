@@ -1,10 +1,13 @@
-// The same flat blue, soft pills and rounded white cards as the web app.
+// Mirrors the web design tokens in client/src/styles.css (:root). Change a value
+// there and here together so both apps keep the same look.
 export const color = {
-  primary: '#0b3a8a', primarySoft: '#e8eefc', header: '#0b3a8a', ink: '#1b2437', muted: '#5b6578', line: '#dfe4ee', bg: '#f5f7fb', card: '#ffffff',
-  green: '#1b7f4f', greenSoft: '#e6f5ec', amber: '#8a5a00', amberSoft: '#fff3d6', red: '#b3261e', redSoft: '#fdeceb',
+  primary: '#2563eb', primarySoft: '#eaf1ff', header: '#2563eb', onPrimary: '#ffffff',
+  ink: '#0f172a', muted: '#667289', line: '#e6eaf2', lineStrong: '#d5dce9', bg: '#f4f6fa', card: '#ffffff', surface2: '#f6f8fc', faint: '#9aa3b5', shadow: '#0f172a',
+  green: '#15803d', greenSoft: '#e3f6e9', amber: '#8a5a00', amberSoft: '#fef3d1', red: '#dc2626', redSoft: '#fdecec',
 };
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 };
-export const radius = 12;
+export const radius = 16;
+export const radiusSm = 12;
 export const TONES = {
   green: { bg: color.greenSoft, fg: color.green },
   amber: { bg: color.amberSoft, fg: color.amber },

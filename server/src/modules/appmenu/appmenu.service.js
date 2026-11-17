@@ -97,6 +97,29 @@ export async function applyMenuRoleFix() {
   return changed;
 }
 
+/**
+ * One-time fix: the course tiles of the student home used to share the plain list icon. Rows still carrying that default icon get
+ * the specific one; a tile an admin gave another icon (including one who set it back to the plain list icon on purpose) is left alone,
+ * same as applyMenuRoleFix above - a flag records it so this does not run, and cannot undo that choice, on every later boot.
+ */
+const ICON_FIX_FLAG = 'menu.iconFix.2026-11';
+const COURSE_ICONS = {
+  'academic.lms': 'play-circle-outline',
+  'academic.lmsannouncements': 'megaphone-outline',
+  'academic.lmsassignments': 'clipboard-outline',
+  'academic.lmsquizzes': 'help-circle-outline',
+};
+export async function applyMenuIconFix() {
+  if (await Setting.findByPk(ICON_FIX_FLAG)) return 0;
+  let changed = 0;
+  for (const [key, icon] of Object.entries(COURSE_ICONS)) {
+    const [n] = await AppMenuItem.update({ icon }, { where: { audience: 'family', key, icon: 'list-outline' } });
+    changed += n;
+  }
+  await Setting.create({ key: ICON_FIX_FLAG, value: JSON.stringify('done'), updatedByName: 'system' });
+  return changed;
+}
+
 /** The menu one person sees: active items, in order, whose roles (own, else the parent's) include theirs. */
 export async function menuFor(role, audience = audienceOf(role)) {
   const rows = await AppMenuItem.findAll({

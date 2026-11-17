@@ -130,7 +130,7 @@ export default function MarksScreen({ route }) {
                           keyboardType="decimal-pad"
                           maxLength={6}
                           placeholder="—"
-                          style={{ width: 64, textAlign: 'center', borderWidth: 1, borderColor: color.line, borderRadius: 8, paddingVertical: 8, fontSize: 16, color: color.ink, backgroundColor: '#fff' }}
+                          style={{ width: 64, textAlign: 'center', borderWidth: 1, borderColor: color.line, borderRadius: 8, paddingVertical: 8, fontSize: 16, color: color.ink, backgroundColor: color.card }}
                         />
                         <Text style={{ marginLeft: 6, color: color.muted }}>/ {max}</Text>
                       </View>
@@ -148,4 +148,4 @@ export default function MarksScreen({ route }) {
   );
 }
 
-const markInput = { width: 76, textAlign: 'center', borderWidth: 1, borderColor: color.line, borderRadius: 8, paddingVertical: 8, fontSize: 14, color: color.ink, backgroundColor: '#fff' };
+const markInput = { width: 76, textAlign: 'center', borderWidth: 1, borderColor: color.line, borderRadius: 8, paddingVertical: 8, fontSize: 14, color: color.ink, backgroundColor: color.card };

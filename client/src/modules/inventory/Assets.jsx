@@ -43,7 +43,7 @@ export default function Assets() {
             </div>
             <div className="card">
               <span>Service due</span>
-              <b style={{ color: d.maintenanceDue.length ? '#dc2626' : undefined }}>
+              <b style={{ color: d.maintenanceDue.length ? 'var(--danger)' : undefined }}>
                 {d.maintenanceDue.length}
               </b>
               <small>

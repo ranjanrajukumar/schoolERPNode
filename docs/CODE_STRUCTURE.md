@@ -55,7 +55,7 @@ server/
 | Module | Files (routes / service / helpers) | Purpose |
 |---|---|---|
 | `platform` | auth, users, roles, userGroups, audit, dashboard, support, access.js, loginActivity.js | Login, users, roles & permissions, audit log, dashboard |
-| `academics` | classes, subjects, classSubjects, students, attendance, timetable, scheduling, homework, materials, syllabus, promotion, calendar, onlineClasses, myClass, subjectMap, **lms** (+lmsFiles), studentFields, students.validation | Core academics + the LMS |
+| `academics` | classes, subjects, classSubjects, students, attendance, timetable, scheduling, homework, materials, syllabus, promotion, calendar, onlineClasses, myClass, subjectMap, **lms** (+lms.shared, lms.quizzes.service, lmsFiles), studentFields, students.validation | Core academics + the LMS |
 | `admissions` | admissions, enquiries, applications, applicationForm, admissionSteps/Choices/Services, public.routes, recordExtras | Enquiry → application → admission, public apply-online |
 | `attendance` | attendanceExtras, autoAbsence, monthly, studentLeave | Period/monthly attendance, leave, absence alerts |
 | `exams` | exams, examExtras, grading.js | Exams, marks, grade bands, revaluation |
@@ -69,7 +69,7 @@ server/
 | `messaging` | messaging, providers (SMS/SMTP) | Templates and sending |
 | `push` | push | Push notifications for the mobile app |
 | `documents` | documents, templates, idCardDesign | Certificates, ID cards |
-| `portal` | portal, parents, studentAccounts, studentLogin, hostelPortal, parentFields | Parent / student endpoints |
+| `portal` | portal (+ portal.lms.routes, portal.shared), parents, studentAccounts, studentLogin, hostelPortal, parentFields | Parent / student endpoints |
 | `settings` | settings, setup, data, importers, masters, branches, integrations, publicSchool, autoBackup | School profile, master data, import/export, backup |
 | `appmenu` | appmenu, defaults.json | Menu shown in the mobile app |
 | `globalauth` | globalAuth, globalSync.routes | Talks to the `global/` registry |
@@ -188,3 +188,12 @@ I did not run a dead-function (inside-file) analysis or check routes that no scr
 | New API | `modules/<area>/x.routes.js` + `x.service.js`, mount in `routes/index.js` |
 | New admin page | `client/src/modules/<area>/X.jsx`, route in `routes/index.jsx`, entry in `config/menu.js` |
 | New mobile screen | add an entry in `app/src/registry/*.js` (or a screen under `screens/`) |
+
+---
+
+## Design tokens (web and mobile)
+
+Colors, radius and spacing are defined once per app and kept identical (web has one consolidated token block at the top of the stylesheet):
+`client/src/styles.css` (`:root`, with dark mode) and `app/src/theme.js`.
+Use the tokens (`var(--primary)`, `color.primary`), not hard-coded hex values.
+When changing a token, change it in both files.

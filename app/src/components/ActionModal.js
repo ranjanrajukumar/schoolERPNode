@@ -22,13 +22,13 @@ function ChoicePicker({ options, value, onChange }) {
     <View style={{ marginBottom: space.md }}>
       {chosen ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-          <View style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 18, backgroundColor: color.header }}><Text style={{ color: '#fff', fontWeight: '700' }}>{chosen.label}</Text></View>
+          <View style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 18, backgroundColor: color.header }}><Text style={{ color: color.onPrimary, fontWeight: '700' }}>{chosen.label}</Text></View>
           <Pressable onPress={() => onChange('')}><Text style={{ color: color.muted }}>Clear</Text></Pressable>
         </View>
       ) : null}
       <Field value={query} onChangeText={setQuery} placeholder={chosen ? 'Type to choose another…' : 'Type to search…'} autoCapitalize="none" style={{ marginBottom: 4 }} />
       {needle ? (
-        <View style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: color.line, borderRadius: 10, overflow: 'hidden' }}>
+        <View style={{ backgroundColor: color.card, borderWidth: 1, borderColor: color.line, borderRadius: 10, overflow: 'hidden' }}>
           {matches.slice(0, SUGGESTIONS).map((o, i) => (
             <Pressable key={o.value} onPress={() => { onChange(o.value); setQuery(''); }} style={{ paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: i ? 1 : 0, borderTopColor: color.line }}>
               <Text style={{ color: color.ink }}>{o.label}</Text>
@@ -99,7 +99,7 @@ export default function ActionModal({ visible, action, row, child = null, onClos
                 const updateLine = (index, patch) => setValues((current) => ({ ...current, [f.key]: lines.map((line, i) => i === index ? { ...line, ...patch } : line) }));
                 return <View key={f.key} style={{ marginBottom: space.md }}>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', marginBottom: 6 }}>{f.label}{f.required ? ' *' : ''}</Text>
-                  {lines.map((line, index) => <View key={`${f.key}-${index}`} style={{ backgroundColor: '#fff', borderWidth: 1, borderColor: color.line, borderRadius: 10, padding: space.sm, marginBottom: space.sm }}>
+                  {lines.map((line, index) => <View key={`${f.key}-${index}`} style={{ backgroundColor: color.card, borderWidth: 1, borderColor: color.line, borderRadius: 10, padding: space.sm, marginBottom: space.sm }}>
                     <Text style={{ color: color.ink, fontWeight: '700', marginBottom: 4 }}>Line {index + 1}</Text>
                     {choices ? <Chips options={choices.length > 1 ? choices : [...choices, { value: '__', label: '—' }]} value={String(line.itemId ?? '')} onChange={(v) => updateLine(index, { itemId: v === '__' ? '' : v })} /> : <Muted>Loading choices…</Muted>}
                     <Field label="Quantity" value={String(line.quantity ?? '')} keyboardType="number-pad" onChangeText={(v) => updateLine(index, { quantity: v.replace(/[^0-9]/g, '') })} />
@@ -112,7 +112,7 @@ export default function ActionModal({ visible, action, row, child = null, onClos
               return choices && f.multi ? (
                 <View key={f.key} style={{ marginBottom: space.sm }}>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: color.muted, textTransform: 'uppercase', marginBottom: 4 }}>{f.label}{f.required ? ' *' : ''}</Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{choices.map((choice) => { const selected = (values[f.key] ?? []).includes(String(choice.value)); return <Pressable key={choice.value} onPress={() => setValues((current) => ({ ...current, [f.key]: selected ? current[f.key].filter((x) => x !== String(choice.value)) : [...(current[f.key] ?? []), String(choice.value)] }))} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 18, backgroundColor: selected ? color.header : '#fff', borderWidth: 1, borderColor: color.line }}><Text style={{ color: selected ? '#fff' : color.ink }}>{choice.label}</Text></Pressable>; })}</View>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{choices.map((choice) => { const selected = (values[f.key] ?? []).includes(String(choice.value)); return <Pressable key={choice.value} onPress={() => setValues((current) => ({ ...current, [f.key]: selected ? current[f.key].filter((x) => x !== String(choice.value)) : [...(current[f.key] ?? []), String(choice.value)] }))} style={{ paddingVertical: 8, paddingHorizontal: 12, borderRadius: 18, backgroundColor: selected ? color.header : color.card, borderWidth: 1, borderColor: color.line }}><Text style={{ color: selected ? color.onPrimary : color.ink }}>{choice.label}</Text></Pressable>; })}</View>
                 </View>
               ) : choices ? (
                 <View key={f.key} style={{ marginBottom: space.sm }}>

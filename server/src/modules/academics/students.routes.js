@@ -15,6 +15,47 @@ import { setStudentElectives, studentSubjects } from './subjectMap.service.js';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /students:
+ *   get:
+ *     tags: [Students]
+ *     summary: List students, filterable and paged
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema: { type: string }
+ *         description: Matches name, admission number or roll number
+ *       - in: query
+ *         name: classId
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string }
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, default: 1 }
+ *       - in: query
+ *         name: pageSize
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: A page of students
+ *   post:
+ *     tags: [Students]
+ *     summary: Register a new student
+ *     description: An empty admissionNo is generated. Set allowDuplicate to confirm a same-name-and-birthday student, and billFees to bill the class fee structure.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       201:
+ *         description: Student created
+ *       400:
+ *         description: Validation failed; the error and errors fields list what is wrong
+ */
 // GET /api/students?q=&classId=&status=&page=&pageSize=
 router.get(
   '/',
@@ -23,10 +64,28 @@ router.get(
   }),
 );
 
+/**
+ * @openapi
+ * /students/summary:
+ *   get:
+ *     tags: [Students]
+ *     summary: Counts for the students dashboard tile
+ *     responses:
+ *       200: { description: Summary counts }
+ */
 router.get(
   '/summary',
   asyncHandler(async (_req, res) => res.json(await studentSummary())),
 );
+/**
+ * @openapi
+ * /students/registration-summary:
+ *   get:
+ *     tags: [Students]
+ *     summary: Counts for the registration/admission dashboard tile
+ *     responses:
+ *       200: { description: Summary counts }
+ */
 router.get(
   '/registration-summary',
   asyncHandler(async (_req, res) => res.json(await registrationSummary())),
@@ -44,6 +103,39 @@ router.put(
   }),
 );
 
+/**
+ * @openapi
+ * /students/{id}:
+ *   get:
+ *     tags: [Students]
+ *     summary: One student's full record
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200: { description: The student }
+ *       404: { description: Student not found }
+ *   put:
+ *     tags: [Students]
+ *     summary: Update a student (partial fields allowed)
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema: { type: object }
+ *     responses:
+ *       200: { description: Saved }
+ *       400: { description: Validation failed }
+ *       404: { description: Student not found }
+ *   delete:
+ *     tags: [Students]
+ *     summary: Delete a student and their stored photos/signatures
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200: { description: Deleted }
+ *       404: { description: Student not found }
+ */
 router.get(
   '/:id',
   asyncHandler(async (req, res) => {

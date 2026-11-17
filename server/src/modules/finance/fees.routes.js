@@ -28,6 +28,42 @@ const pick = (body) =>
     FEE_FIELDS.filter((f) => body[f] !== undefined).map((f) => [f, body[f] === '' ? null : body[f]]),
   );
 
+/**
+ * @openapi
+ * /fees:
+ *   get:
+ *     tags: [Fees]
+ *     summary: List fee charges, filterable
+ *     parameters:
+ *       - in: query
+ *         name: studentId
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: classId
+ *         schema: { type: integer }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [paid, partial, overdue, unpaid] }
+ *     responses:
+ *       200: { description: Matching fee charges }
+ *   post:
+ *     tags: [Fees]
+ *     summary: Create a one-off fee charge for a student
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [studentId, title, amount]
+ *             properties:
+ *               studentId: { type: integer }
+ *               title: { type: string }
+ *               amount: { type: number }
+ *     responses:
+ *       201: { description: Fee created }
+ *       400: { description: Student, title and amount are required }
+ */
 // GET /api/fees?studentId=&classId=&status=paid|partial|overdue|unpaid
 router.get(
   '/',
@@ -108,6 +144,43 @@ router.delete(
   }),
 );
 
+/**
+ * @openapi
+ * /fees/{id}/payments:
+ *   get:
+ *     tags: [Fees]
+ *     summary: Payments recorded against one fee charge
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     responses:
+ *       200: { description: The fee's payments }
+ *   post:
+ *     tags: [Fees]
+ *     summary: Record a payment against a fee charge
+ *     parameters:
+ *       - $ref: '#/components/parameters/IdParam'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [amount, method]
+ *             properties:
+ *               amount: { type: number }
+ *               method: { type: string }
+ *               paidOn: { type: string, format: date }
+ *     responses:
+ *       201:
+ *         description: Payment recorded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id: { type: integer }
+ *                 receiptNo: { type: string }
+ */
 router.get(
   '/:id/payments',
   asyncHandler(async (req, res) => res.json(await listPayments(req.params.id))),

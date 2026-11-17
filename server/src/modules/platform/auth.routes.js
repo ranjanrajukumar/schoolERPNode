@@ -12,6 +12,36 @@ import { classesOf } from '../academics/myClass.service.js';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Sign in with email/mobile number and password
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, example: admin@school.local }
+ *               password: { type: string, format: password }
+ *     responses:
+ *       200:
+ *         description: Signed in; the token is used as a Bearer token on later requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token: { type: string }
+ *                 user: { type: object }
+ *       401:
+ *         description: Wrong email or password
+ */
 router.post(
   '/login',
   checkLoginAllowed,
@@ -39,6 +69,16 @@ router.post(
   }),
 );
 
+/**
+ * @openapi
+ * /auth/me:
+ *   get:
+ *     tags: [Auth]
+ *     summary: The signed-in user's own profile and access
+ *     responses:
+ *       200:
+ *         description: The current user, so the UI can hide what a custom role does not include
+ */
 // The signed-in user's current access, so the UI can hide what a custom role does not include.
 router.get(
   '/me',
